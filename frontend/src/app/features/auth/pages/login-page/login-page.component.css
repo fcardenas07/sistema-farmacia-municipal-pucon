@@ -1,3 +1,4 @@
+/* CONTENEDOR GENERAL (izquierda + derecha) */
 .login-page-container {
   display: flex;
   width: 100%;
@@ -5,12 +6,14 @@
   background: #0f1123;
 }
 
-
+/* COLUMNA DERECHA (formulario) */
 .login-right {
-  width: 20%;
+  width: 50%;               /* antes 20%, debe ser mitad para layout correcto */
   display: flex;
-  justify-content: flex-start;   /* antes: center */
-  align-items: flex-start;        /* antes: center */
-  padding-top: 70px;              /* SUBE EL FORMULARIO */
-  padding-right: 29%;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  padding-top: 8vh;         /* antes 70px */
+  padding-left: 8vw;        /* reemplaza padding-right rígido */
+  padding-right: 5vw;       /* espacio más controlado */
 }
