@@ -1,0 +1,35 @@
+<div class="login-form-wrapper">
+
+  <!-- LOGO SUPERIOR -->
+  <div class="logo-area">
+    <img src="assets/images/medicon.png" class="logo-img" />
+    <p class="brand">Farmacia Pucón</p>
+  </div>
+
+  <!-- TÍTULO -->
+  <h2 class="title">¡Bienvenido de nuevo!</h2>
+
+  <!-- FORMULARIO -->
+  <form (ngSubmit)="onSubmit()" class="form">
+
+    <input
+      type="password"
+      placeholder="Código de personal"
+      [(ngModel)]="personalCode"
+      name="personalCode"
+      required />
+
+     <input
+      type="password"
+      placeholder="Contraseña"
+      [(ngModel)]="password"
+      name="password"
+      required />
+
+    <button type="submit" class="login-btn">
+      Iniciar sesión
+    </button>
+
+  </form>
+
+</div>

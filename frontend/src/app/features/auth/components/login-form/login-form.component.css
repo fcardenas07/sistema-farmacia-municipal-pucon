@@ -1,0 +1,72 @@
+/* Contenedor general que centra el logo + título + formulario */
+.login-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;        /* Centra todo */
+  width: 100%;
+  color: white;
+}
+
+/* Logo (icono medicon.png) */
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 70px;
+}
+
+.logo-img {
+  width: 90px;                /* tamaño ideal */
+  height: 90px;
+  object-fit: contain;        /* evita deformaciones */
+  border-radius: 50%;         /* lo hace redondo (opcional) */
+  margin-bottom: 10px;
+}
+
+.brand {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Título */
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;        /* Centra inputs y botón */
+}
+
+/* Campos de texto */
+input {
+  width: 380px;               /* ancho más grande */
+  padding: 18px 20px;         /* más altos */
+  font-size: 17px;            /* tipografía más grande */
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+/* Botón */
+.login-btn {
+  width: 380px;
+  padding: 18px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  background: #6c4ef2;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.login-btn:hover {
+  background: #593ae0;
+}
