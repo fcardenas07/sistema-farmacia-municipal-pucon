@@ -1,1 +1,24 @@
-<p>detalle-venta-vendedor works!</p>
+<app-navbar-vendedor></app-navbar-vendedor>
+
+<div class="venta-container">
+
+  <!-- Título de ancho completo -->
+  <div class="title-box">
+    <h1 class="title">Detalle de la venta</h1>
+  </div>
+
+  <!-- Contenido principal dividido en dos columnas -->
+  <div class="venta-content">
+
+    <div class="col-left">
+      <app-detalle-productos></app-detalle-productos>
+    </div>
+
+    <div class="col-right">
+      <app-detalle-total-pago></app-detalle-total-pago>
+      <app-detalle-opciones-pago></app-detalle-opciones-pago>
+    </div>
+
+  </div>
+
+</div>
