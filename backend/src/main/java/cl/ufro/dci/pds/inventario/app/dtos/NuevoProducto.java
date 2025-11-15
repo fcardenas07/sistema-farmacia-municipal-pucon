@@ -1,5 +1,9 @@
 ﻿package cl.ufro.dci.pds.inventario.app.dtos;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+
+import java.util.List;
+
 public record NuevoProducto(
         String idProducto,
         String nombreComercial,
@@ -9,5 +13,20 @@ public record NuevoProducto(
         String unidadMedida,
         int stockMinimo,
         int stockMaximo,
-        String estado
-) {}
+        String estado,
+        List<NuevoCodigo> codigos
+) {
+    public Producto aEntidad() {
+        Producto p = new Producto();
+        p.setIdProducto(idProducto);
+        p.setNombreComercial(nombreComercial);
+        p.setNombreGenerico(nombreGenerico);
+        p.setPresentacion(presentacion);
+        p.setDosificacion(dosificacion);
+        p.setUnidadMedida(unidadMedida);
+        p.setStockMinimo(stockMinimo);
+        p.setStockMaximo(stockMaximo);
+        p.setEstado(estado);
+        return p;
+    }
+}

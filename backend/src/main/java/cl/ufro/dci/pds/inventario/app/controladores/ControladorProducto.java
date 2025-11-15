@@ -5,7 +5,7 @@ import cl.ufro.dci.pds.inventario.app.dtos.ProductoActualizado;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoDuplicadoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,7 @@ public class ControladorProducto {
             return ResponseEntity
                     .created(URI.create("/productos/" + creado.idProducto()))
                     .body(creado);
-        } catch (ProductoDuplicadoException ex) {
+        } catch (CodigoDuplicadoException ex) {
             return ResponseEntity.status(409).build();
         } catch (Exception ex) {
             return ResponseEntity.status(500).build();

@@ -1,53 +1,53 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
+import cl.ufro.dci.pds.inventario.app.dtos.NuevoCodigo;
 import cl.ufro.dci.pds.inventario.app.dtos.NuevoProducto;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ServicioProducto {
 
     private final RepositorioProducto repositorioProducto;
+    private final ServicioCodigo servicioCodigo; // inyectamos el servicio de códigos
 
-    public ServicioProducto(RepositorioProducto repositorioProducto) {
+    public ServicioProducto(RepositorioProducto repositorioProducto, ServicioCodigo servicioCodigo) {
         this.repositorioProducto = repositorioProducto;
+        this.servicioCodigo = servicioCodigo;
     }
 
     public Producto crear(NuevoProducto dto) {
-
-        var idProducto = dto.idProducto();
-
-        if (repositorioProducto.findById(idProducto).isPresent()) {
-            throw new ProductoDuplicadoException(idProducto);
+        if (repositorioProducto.existsById(dto.idProducto())) {
+            throw new ProductoDuplicadoException(dto.idProducto());
         }
-        Producto p = new Producto();
 
-        p.setIdProducto(idProducto);
-        p.setNombreComercial(dto.nombreComercial());
-        p.setNombreGenerico(dto.nombreGenerico());
-        p.setPresentacion(dto.presentacion());
-        p.setDosificacion(dto.dosificacion());
-        p.setUnidadMedida(dto.unidadMedida());
-        p.setStockMinimo(dto.stockMinimo());
-        p.setStockMaximo(dto.stockMaximo());
-        p.setEstado(dto.estado());
+        var producto = dto.aEntidad();
 
-        return repositorioProducto.save(p);
+        agregarCodigosAlProducto(producto, dto);
+        return repositorioProducto.save(producto);
+    }
+
+    private void agregarCodigosAlProducto(Producto producto, NuevoProducto dto) {
+        if (dto.codigos() == null) return;
+        dto.codigos().stream()
+                .map(NuevoCodigo::aEntidad)
+                .map(servicioCodigo::crear)
+                .forEach(producto::agregarCodigo);
     }
 
     public Producto actualizar(String id, ProductoModificado dto) {
-        Producto p = repositorioProducto.findById(id)
+        var producto = repositorioProducto.findById(id)
                 .orElseThrow(() -> new ProductoNoEncontradoException(id));
 
-        if(dto.nombreComercial() != null) p.setNombreComercial(dto.nombreComercial());
-        if(dto.nombreGenerico() != null) p.setNombreGenerico(dto.nombreGenerico());
-        if(dto.presentacion() != null) p.setPresentacion(dto.presentacion());
-        if(dto.dosificacion() != null) p.setDosificacion(dto.dosificacion());
-        if(dto.unidadMedida() != null) p.setUnidadMedida(dto.unidadMedida());
-        if(dto.stockMinimo() != null) p.setStockMinimo(dto.stockMinimo());
-        if(dto.stockMaximo() != null) p.setStockMaximo(dto.stockMaximo());
-        if(dto.estado() != null) p.setEstado(dto.estado());
+        dto.aplicarCambios(producto);
+        actualizarCodigosDelProducto(dto);
+        return repositorioProducto.save(producto);
+    }
 
-        return repositorioProducto.save(p);
+    private void actualizarCodigosDelProducto(ProductoModificado dto) {
+        if (dto.codigos() == null) return;
+        dto.codigos().forEach(c -> servicioCodigo.actualizarParaProducto(c.idCodigo(), c));
     }
 }
+

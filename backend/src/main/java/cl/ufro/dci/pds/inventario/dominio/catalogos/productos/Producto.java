@@ -1,11 +1,11 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -40,7 +40,20 @@ public class Producto {
     @Column(name = "estado")
     private String estado;
 
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Codigo> codigos = new ArrayList<>();
+
     public Producto() {
+    }
+
+    public void agregarCodigo(Codigo codigo) {
+        codigos.add(codigo);
+        codigo.setProducto(this);
+    }
+
+    public void quitarCodigo(Codigo codigo) {
+        codigos.remove(codigo);
+        codigo.setProducto(null);
     }
 
     public String getIdProducto() {
@@ -137,9 +150,10 @@ public class Producto {
                 ", presentacion='" + presentacion + '\'' +
                 ", dosificacion='" + dosificacion + '\'' +
                 ", unidadMedida='" + unidadMedida + '\'' +
-                ", stockMinimo='" + stockMinimo + '\'' +
-                ", stockMaximo='" + stockMaximo + '\'' +
+                ", stockMinimo=" + stockMinimo +
+                ", stockMaximo=" + stockMaximo +
                 ", estado='" + estado + '\'' +
+                ", codigos=" + codigos.stream().map(Codigo::getCodigoBarra) +
                 '}';
     }
 }
