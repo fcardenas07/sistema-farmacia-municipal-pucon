@@ -1,7 +1,7 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
-import cl.ufro.dci.pds.inventario.app.dtos.NuevoProducto;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
+import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
+import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,26 +18,23 @@ public class ServicioProducto {
     }
 
     @Transactional
-    public Producto crear(NuevoProducto dto) {
+    public Producto crear(ProductoACrear dto) {
         if (repositorioProducto.existsById(dto.idProducto())) {
             throw new ProductoDuplicadoException(dto.idProducto());
         }
 
         var producto = dto.aEntidad();
-
         agregarCodigosAlProducto(producto, dto);
         return repositorioProducto.save(producto);
     }
 
-    private void agregarCodigosAlProducto(Producto producto, NuevoProducto dto) {
+    private void agregarCodigosAlProducto(Producto producto, ProductoACrear dto) {
         if (dto.codigos() == null) return;
-        dto.codigos().stream()
-                .map(servicioCodigo::crear)
-                .forEach(producto::agregarCodigo);
+        dto.codigos().forEach((codigo) -> servicioCodigo.crear(producto, codigo));
     }
 
     @Transactional
-    public Producto actualizar(String id, ProductoModificado dto) {
+    public Producto actualizar(String id, ProductoAModificar dto) {
         var producto = repositorioProducto.findById(id)
                 .orElseThrow(() -> new ProductoNoEncontradoException(id));
 
@@ -46,9 +43,8 @@ public class ServicioProducto {
         return repositorioProducto.save(producto);
     }
 
-    private void actualizarCodigosDelProducto(String idProducto, ProductoModificado dto) {
+    private void actualizarCodigosDelProducto(String idProducto, ProductoAModificar dto) {
         if (dto.codigos() == null) return;
         dto.codigos().forEach(c -> servicioCodigo.actualizarParaProducto(idProducto, c));
     }
 }
-

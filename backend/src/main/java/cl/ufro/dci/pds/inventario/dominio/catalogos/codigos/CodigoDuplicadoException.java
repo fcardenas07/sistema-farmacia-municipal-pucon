@@ -2,6 +2,6 @@
 
 public class CodigoDuplicadoException extends RuntimeException {
     public CodigoDuplicadoException(String id) {
-        super("Ya existe un codigo con id = " + id);
+        super("Ya existe un código con id = " + id);
     }
 }

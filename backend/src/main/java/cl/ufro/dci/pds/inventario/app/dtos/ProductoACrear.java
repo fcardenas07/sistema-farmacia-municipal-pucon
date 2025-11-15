@@ -4,7 +4,7 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 
 import java.util.List;
 
-public record NuevoProducto(
+public record ProductoACrear(
         String idProducto,
         String nombreComercial,
         String nombreGenerico,
@@ -14,7 +14,7 @@ public record NuevoProducto(
         int stockMinimo,
         int stockMaximo,
         String estado,
-        List<NuevoCodigo> codigos
+        List<CodigoACrear> codigos
 ) {
     public Producto aEntidad() {
         Producto p = new Producto();

@@ -2,11 +2,12 @@
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 
-public record CodigoModificado(String idCodigo,
-                               String codigosDeBarra
+public record CodigoCreado(
+        String idCodigo,
+        String codigosDeBarra
 ) {
-    public static CodigoModificado desde(Codigo codigo) {
-        return new CodigoModificado(
+    public static CodigoCreado desde(Codigo codigo) {
+        return new CodigoCreado(
                 codigo.getIdCodigo(),
                 codigo.getCodigoBarra()
         );

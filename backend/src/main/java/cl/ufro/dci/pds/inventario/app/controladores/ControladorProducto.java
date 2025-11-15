@@ -1,7 +1,7 @@
 ﻿package cl.ufro.dci.pds.inventario.app.controladores;
 
-import cl.ufro.dci.pds.inventario.app.dtos.NuevoProducto;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoActualizado;
+import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
+import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
@@ -23,7 +23,7 @@ public class ControladorProducto {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoCreado> crear(@RequestBody NuevoProducto dto) {
+    public ResponseEntity<ProductoCreado> crear(@RequestBody ProductoACrear dto) {
         try {
             var creado = servicioAppProducto.crearProducto(dto);
             return ResponseEntity
@@ -37,12 +37,12 @@ public class ControladorProducto {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductoActualizado> actualizar(
+    public ResponseEntity<ProductoModificado> actualizar(
             @PathVariable String id,
-            @RequestBody ProductoModificado productoModificado
+            @RequestBody ProductoAModificar dto
     ) {
         try {
-            var actualizado = servicioAppProducto.actualizarProducto(id, productoModificado);
+            var actualizado = servicioAppProducto.actualizarProducto(id, dto);
             return ResponseEntity.ok(actualizado);
         } catch (ProductoNoEncontradoException ex) {
             return ResponseEntity.notFound().build();

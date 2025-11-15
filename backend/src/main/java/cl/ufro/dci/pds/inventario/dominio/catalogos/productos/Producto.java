@@ -1,12 +1,7 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
-
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -41,33 +36,7 @@ public class Producto {
     @Column(name = "estado")
     private String estado;
 
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Codigo> codigos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lote> lotes = new ArrayList<>();
-
     public Producto() {
-    }
-
-    public void agregarCodigo(Codigo codigo) {
-        codigos.add(codigo);
-        codigo.setProducto(this);
-    }
-
-    public void quitarCodigo(Codigo codigo) {
-        codigos.remove(codigo);
-        codigo.setProducto(null);
-    }
-
-    public void agregarLote(Lote lote) {
-        lotes.add(lote);
-        lote.setProducto(this);
-    }
-
-    public void quitarLote(Lote lote) {
-        lotes.remove(lote);
-        lote.setProducto(null);
     }
 
     public String getIdProducto() {
@@ -166,9 +135,7 @@ public class Producto {
                 ", unidadMedida='" + unidadMedida + '\'' +
                 ", stockMinimo=" + stockMinimo +
                 ", stockMaximo=" + stockMaximo +
-                ", estado='" + estado + '\'' +
-                ", codigos=" + codigos.stream().map(Codigo::getCodigoBarra) + '\'' +
-                ", lotes=" + lotes.stream().map(Lote::getNumeroLote) +
+                ", estado='" + estado +
                 '}';
     }
 }
