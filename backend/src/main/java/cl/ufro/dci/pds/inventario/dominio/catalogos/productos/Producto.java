@@ -2,6 +2,7 @@
 
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class Producto {
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Codigo> codigos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Lote> lotes = new ArrayList<>();
+
     public Producto() {
     }
 
@@ -54,6 +58,16 @@ public class Producto {
     public void quitarCodigo(Codigo codigo) {
         codigos.remove(codigo);
         codigo.setProducto(null);
+    }
+
+    public void agregarLote(Lote lote) {
+        lotes.add(lote);
+        lote.setProducto(this);
+    }
+
+    public void quitarLote(Lote lote) {
+        lotes.remove(lote);
+        lote.setProducto(null);
     }
 
     public String getIdProducto() {
@@ -153,7 +167,8 @@ public class Producto {
                 ", stockMinimo=" + stockMinimo +
                 ", stockMaximo=" + stockMaximo +
                 ", estado='" + estado + '\'' +
-                ", codigos=" + codigos.stream().map(Codigo::getCodigoBarra) +
+                ", codigos=" + codigos.stream().map(Codigo::getCodigoBarra) + '\'' +
+                ", lotes=" + lotes.stream().map(Lote::getNumeroLote) +
                 '}';
     }
 }

@@ -1,22 +1,23 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
-import cl.ufro.dci.pds.inventario.app.dtos.NuevoCodigo;
 import cl.ufro.dci.pds.inventario.app.dtos.NuevoProducto;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ServicioProducto {
 
     private final RepositorioProducto repositorioProducto;
-    private final ServicioCodigo servicioCodigo; // inyectamos el servicio de códigos
+    private final ServicioCodigo servicioCodigo;
 
     public ServicioProducto(RepositorioProducto repositorioProducto, ServicioCodigo servicioCodigo) {
         this.repositorioProducto = repositorioProducto;
         this.servicioCodigo = servicioCodigo;
     }
 
+    @Transactional
     public Producto crear(NuevoProducto dto) {
         if (repositorioProducto.existsById(dto.idProducto())) {
             throw new ProductoDuplicadoException(dto.idProducto());
@@ -35,6 +36,7 @@ public class ServicioProducto {
                 .forEach(producto::agregarCodigo);
     }
 
+    @Transactional
     public Producto actualizar(String id, ProductoModificado dto) {
         var producto = repositorioProducto.findById(id)
                 .orElseThrow(() -> new ProductoNoEncontradoException(id));
