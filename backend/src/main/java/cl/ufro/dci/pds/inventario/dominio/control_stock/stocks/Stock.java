@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.control_stock.stocks;
+package cl.ufro.dci.pds.inventario.dominio.control_stock.stocks;
 
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import jakarta.persistence.*;

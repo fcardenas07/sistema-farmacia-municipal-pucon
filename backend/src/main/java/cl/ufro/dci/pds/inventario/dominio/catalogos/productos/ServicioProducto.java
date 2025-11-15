@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
@@ -24,8 +24,9 @@ public class ServicioProducto {
         }
 
         var producto = dto.aEntidad();
+        var productoGuardado = repositorioProducto.save(producto);
         agregarCodigosAlProducto(producto, dto);
-        return repositorioProducto.save(producto);
+        return productoGuardado;
     }
 
     private void agregarCodigosAlProducto(Producto producto, ProductoACrear dto) {

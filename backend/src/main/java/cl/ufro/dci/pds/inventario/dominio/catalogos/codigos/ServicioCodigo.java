@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
@@ -26,7 +26,7 @@ public class ServicioCodigo {
     }
 
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {
-        var codigo = repositorioCodigo.findByIdAndProductoId(dto.idCodigo(), idProducto)
+        var codigo = repositorioCodigo.findByIdCodigoAndProducto_IdProducto(dto.idCodigo(), idProducto)
                 .orElseThrow(() -> new CodigoNoEncontradoException(dto.idCodigo()));
 
         dto.aplicarCambios(codigo);
@@ -34,6 +34,6 @@ public class ServicioCodigo {
     }
 
     public List<Codigo> obtenerCodigosConIdProducto(String idProducto) {
-        return repositorioCodigo.findAllByProductoId(idProducto);
+        return repositorioCodigo.findAllByProducto_IdProducto(idProducto);
     }
 }

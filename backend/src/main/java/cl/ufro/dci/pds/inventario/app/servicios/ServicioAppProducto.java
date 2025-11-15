@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.app.servicios;
+package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;

@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 public class ProductoDuplicadoException extends RuntimeException {
     public ProductoDuplicadoException(String id) {

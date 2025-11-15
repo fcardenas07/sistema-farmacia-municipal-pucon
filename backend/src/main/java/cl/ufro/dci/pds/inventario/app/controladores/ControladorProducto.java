@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.app.controladores;
+package cl.ufro.dci.pds.inventario.app.controladores;
 
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
@@ -32,11 +32,12 @@ public class ControladorProducto {
         } catch (CodigoDuplicadoException ex) {
             return ResponseEntity.status(409).build();
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ProductoModificado> actualizar(
             @PathVariable String id,
             @RequestBody ProductoAModificar dto
@@ -47,6 +48,7 @@ public class ControladorProducto {
         } catch (ProductoNoEncontradoException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             return ResponseEntity.status(500).build();
         }
     }

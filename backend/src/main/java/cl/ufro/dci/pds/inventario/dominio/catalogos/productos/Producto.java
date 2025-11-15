@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 import jakarta.persistence.*;
 

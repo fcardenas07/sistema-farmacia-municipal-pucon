@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
+package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
