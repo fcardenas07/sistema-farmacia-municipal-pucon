@@ -1,6 +1,7 @@
 ﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoModificado;
+import cl.ufro.dci.pds.inventario.app.dtos.NuevoCodigo;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,10 +13,12 @@ public class ServicioCodigo {
         this.repositorioCodigo = repositorioCodigo;
     }
 
-    public Codigo crear(Codigo codigo) {
-        if (repositorioCodigo.existsById(codigo.getIdCodigo())) {
-            throw new CodigoDuplicadoException(codigo.getIdCodigo());
+    public Codigo crear(NuevoCodigo nuevoCodigo) {
+        if (repositorioCodigo.existsById(nuevoCodigo.idCodigo())) {
+            throw new CodigoDuplicadoException(nuevoCodigo.idCodigo());
         }
+
+        var codigo = nuevoCodigo.aEntidad();
         return repositorioCodigo.save(codigo);
     }
 

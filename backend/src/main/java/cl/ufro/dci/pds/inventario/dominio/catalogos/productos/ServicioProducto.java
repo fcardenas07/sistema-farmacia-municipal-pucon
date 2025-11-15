@@ -31,7 +31,6 @@ public class ServicioProducto {
     private void agregarCodigosAlProducto(Producto producto, NuevoProducto dto) {
         if (dto.codigos() == null) return;
         dto.codigos().stream()
-                .map(NuevoCodigo::aEntidad)
                 .map(servicioCodigo::crear)
                 .forEach(producto::agregarCodigo);
     }
@@ -41,13 +40,13 @@ public class ServicioProducto {
                 .orElseThrow(() -> new ProductoNoEncontradoException(id));
 
         dto.aplicarCambios(producto);
-        actualizarCodigosDelProducto(dto);
+        actualizarCodigosDelProducto(id, dto);
         return repositorioProducto.save(producto);
     }
 
-    private void actualizarCodigosDelProducto(ProductoModificado dto) {
+    private void actualizarCodigosDelProducto(String idProducto, ProductoModificado dto) {
         if (dto.codigos() == null) return;
-        dto.codigos().forEach(c -> servicioCodigo.actualizarParaProducto(c.idCodigo(), c));
+        dto.codigos().forEach(c -> servicioCodigo.actualizarParaProducto(idProducto, c));
     }
 }
 
