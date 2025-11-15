@@ -7,6 +7,7 @@ import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class ControladorProducto {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoCreado> crear(@RequestBody ProductoACrear dto) {
+    public ResponseEntity<ProductoCreado> crear(@Valid @RequestBody ProductoACrear dto) {
         try {
             var creado = servicioAppProducto.crearProducto(dto);
             return ResponseEntity
@@ -39,6 +40,7 @@ public class ControladorProducto {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductoModificado> actualizar(
+            @Valid
             @PathVariable String id,
             @RequestBody ProductoAModificar dto
     ) {
