@@ -28,6 +28,14 @@ public class Codigo {
 
     public Codigo() {}
 
+    public Codigo(String idCodigo, String codigoBarra, String tipoCodigo, boolean activo, Producto producto) {
+        this.idCodigo = idCodigo;
+        this.codigoBarra = codigoBarra;
+        this.tipoCodigo = tipoCodigo;
+        this.activo = activo;
+        this.producto = producto;
+    }
+
     public String getIdCodigo() {
         return idCodigo;
     }

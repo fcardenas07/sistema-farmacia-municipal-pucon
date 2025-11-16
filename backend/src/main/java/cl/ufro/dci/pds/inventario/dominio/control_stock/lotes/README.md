@@ -1,4 +1,4 @@
-﻿# lotes
+# lotes
 
 ## Descripción
 Directorio para el módulo **lotes**.

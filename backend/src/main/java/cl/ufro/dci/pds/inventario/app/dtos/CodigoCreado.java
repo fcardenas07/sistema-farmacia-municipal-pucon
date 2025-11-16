@@ -4,7 +4,7 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 
 public record CodigoCreado(
         String idCodigo,
-        String codigosDeBarra
+        String codigoBarra
 ) {
     public static CodigoCreado desde(Codigo codigo) {
         return new CodigoCreado(

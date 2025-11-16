@@ -1,4 +1,4 @@
-﻿# stocks
+# stocks
 
 ## Descripción
 Directorio para el módulo **stocks**.

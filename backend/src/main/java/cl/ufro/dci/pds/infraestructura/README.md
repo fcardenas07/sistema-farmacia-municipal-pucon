@@ -1,4 +1,4 @@
-﻿# infraestructura
+# infraestructura
 
 ## Descripción
 Directorio para el módulo **infraestructura**.
