@@ -78,7 +78,6 @@ public class ControladorProductoTest {
 
     @Test
     void crearProductoConBodyInvalidoFormato() throws Exception {
-        // Body inválido: no es JSON
         String bodyInvalido = "esto no es JSON";
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +123,6 @@ public class ControladorProductoTest {
 
     @Test
     void crearProductoConCamposTipoIncorrecto() throws Exception {
-        // Body con campo de tipo incorrecto
         String bodyTipoIncorrecto = """
             {
                 "idProducto": "P001",
@@ -370,6 +368,36 @@ public class ControladorProductoTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("Actualizar producto con lista de códigos nula no modifica códigos y devuelve 200")
+    void actualizarProductoConCodigosNulosNoModifica() throws Exception {
+        String idProducto = "P001";
+
+        var dto = new ProductoAModificar(
+                "Nombre Nuevo",
+                null,
+                null,
+                null,
+                null,
+                10,
+                50,
+                true,
+                null
+        );
+
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
+                .thenReturn(new ProductoModificado(
+                        dto.nombreComercial(),
+                        dto.activo(),
+                        List.of(new CodigoModificado("C001", "1234567890123"))
+                ));
+
+        mockMvc.perform(patch("/productos/{id}", idProducto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+    }
 
     @Test
     @DisplayName("Crear producto con id vacío devuelve 400")
@@ -1309,7 +1337,8 @@ public class ControladorProductoTest {
     }
 
     @Test
-    void crearProducto_errorInternoServicio_retorna500() throws Exception {
+    @DisplayName("Crear producto cuando ocurre un error inesperado devuelve 500")
+    void crearProductoConErrorInesperado() throws Exception {
         var dto = productoValido;
 
         when(servicioAppProducto.crearProducto(any()))
@@ -1320,36 +1349,5 @@ public class ControladorProductoTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.mensaje").value("Error interno del servidor"));
-    }
-
-    @Test
-    @DisplayName("Actualizar producto con lista de códigos nula no modifica códigos y devuelve 200")
-    void actualizarProductoConCodigosNulosNoModifica() throws Exception {
-        String idProducto = "P001";
-
-        var dto = new ProductoAModificar(
-                "Nombre Nuevo",
-                null,
-                null,
-                null,
-                null,
-                10,
-                50,
-                true,
-                null
-        );
-
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenReturn(new ProductoModificado(
-                        dto.nombreComercial(),
-                        dto.activo(),
-                        List.of(new CodigoModificado("C001", "1234567890123"))
-                ));
-
-        mockMvc.perform(patch("/productos/{id}", idProducto)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
     }
 }

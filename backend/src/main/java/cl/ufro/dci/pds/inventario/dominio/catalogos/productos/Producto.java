@@ -39,6 +39,19 @@ public class Producto {
     public Producto() {
     }
 
+    public Producto(String idProducto, String nombreComercial, String nombreGenerico, String presentacion,
+                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo, boolean activo) {
+        this.idProducto = idProducto;
+        this.nombreComercial = nombreComercial;
+        this.nombreGenerico = nombreGenerico;
+        this.presentacion = presentacion;
+        this.dosificacion = dosificacion;
+        this.unidadMedida = unidadMedida;
+        this.stockMinimo = stockMinimo;
+        this.stockMaximo = stockMaximo;
+        this.activo = activo;
+    }
+
     public String getIdProducto() {
         return idProducto;
     }
@@ -126,16 +139,6 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto{" +
-                "idProducto='" + idProducto + '\'' +
-                ", nombreComercial='" + nombreComercial + '\'' +
-                ", nombreGenerico='" + nombreGenerico + '\'' +
-                ", presentacion='" + presentacion + '\'' +
-                ", dosificacion='" + dosificacion + '\'' +
-                ", unidadMedida='" + unidadMedida + '\'' +
-                ", stockMinimo=" + stockMinimo +
-                ", stockMaximo=" + stockMaximo +
-                ", activo='" + activo +
-                '}';
+        return "Producto{" + "idProducto='" + idProducto + '\'' + ", nombreComercial='" + nombreComercial + '\'' + ", nombreGenerico='" + nombreGenerico + '\'' + ", presentacion='" + presentacion + '\'' + ", dosificacion='" + dosificacion + '\'' + ", unidadMedida='" + unidadMedida + '\'' + ", stockMinimo=" + stockMinimo + ", stockMaximo=" + stockMaximo + ", activo='" + activo + '}';
     }
 }
