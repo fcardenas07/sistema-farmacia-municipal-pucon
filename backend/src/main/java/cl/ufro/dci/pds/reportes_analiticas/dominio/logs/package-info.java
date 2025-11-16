@@ -1,0 +1,1 @@
+package cl.ufro.dci.pds.reportes_analiticas.dominio.logs;
