@@ -2,11 +2,9 @@ package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service

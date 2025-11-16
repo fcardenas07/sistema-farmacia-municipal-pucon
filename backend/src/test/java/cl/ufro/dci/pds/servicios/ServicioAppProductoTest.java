@@ -58,8 +58,8 @@ class ServicioAppProductoTest {
                 List.of(new CodigoACrear("C001", "1234567890123", "EAN", true)));
 
         when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
-        when(servicioCodigo.obtenerCodigosConIdProducto("P001"))
-                .thenReturn(List.of(codigoEntidad));
+        when(servicioCodigo.crear(eq(productoEntidad), any(CodigoACrear.class))).thenReturn(codigoEntidad);
+        when(servicioCodigo.obtenerCodigosConIdProducto("P001")).thenReturn(List.of(codigoEntidad));
 
         ProductoCreado creado = servicioAppProducto.crearProducto(dto);
 
@@ -67,6 +67,8 @@ class ServicioAppProductoTest {
         assertEquals("Paracetamol", creado.nombreComercial());
         assertEquals(1, creado.codigos().size());
         assertEquals("C001", creado.codigos().getFirst().idCodigo());
+
+        verify(servicioCodigo).crear(eq(productoEntidad), any(CodigoACrear.class));
     }
 
     @Test
@@ -76,7 +78,8 @@ class ServicioAppProductoTest {
                 "Tabletas 400mg", "400mg", "Comprimidos", 5, 50, true,
                 List.of(new CodigoACrear("C002", "9876543210987", "EAN", true)));
 
-        when(servicioProducto.crear(any(ProductoACrear.class)))
+        when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
+        when(servicioCodigo.crear(eq(productoEntidad), any(CodigoACrear.class)))
                 .thenThrow(new CodigoDuplicadoException("C002"));
 
         assertThrows(CodigoDuplicadoException.class, () -> servicioAppProducto.crearProducto(dto));
@@ -103,6 +106,7 @@ class ServicioAppProductoTest {
         productoEntidad.setActivo(false);
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
+        when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class))).thenReturn(codigoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto(id)).thenReturn(List.of(codigoEntidad));
 
         ProductoModificado modificado = servicioAppProducto.actualizarProducto(id, dto);
@@ -111,6 +115,8 @@ class ServicioAppProductoTest {
         assertFalse(modificado.activo());
         assertEquals(1, modificado.codigos().size());
         assertEquals("C001", modificado.codigos().getFirst().idCodigo());
+
+        verify(servicioCodigo).actualizarParaProducto(eq(id), any(CodigoAModificar.class));
     }
 
     @Test
@@ -142,6 +148,7 @@ class ServicioAppProductoTest {
         );
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
+        when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class))).thenReturn(codigoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto(id)).thenReturn(codigos);
 
         ProductoModificado modificado = servicioAppProducto.actualizarProducto(id, dto);
@@ -149,8 +156,9 @@ class ServicioAppProductoTest {
         assertEquals(2, modificado.codigos().size());
         assertEquals("C001", modificado.codigos().get(0).idCodigo());
         assertEquals("C002", modificado.codigos().get(1).idCodigo());
-    }
 
+        verify(servicioCodigo, times(2)).actualizarParaProducto(eq(id), any(CodigoAModificar.class));
+    }
 
     @Test
     @DisplayName("Actualizar producto inexistente lanza ProductoNoEncontradoException")
@@ -174,7 +182,8 @@ class ServicioAppProductoTest {
                 10, 50, true,
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true)));
 
-        when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class)))
+        when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
+        when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class)))
                 .thenThrow(new CodigoNoEncontradoException("C999"));
 
         assertThrows(CodigoNoEncontradoException.class, () -> servicioAppProducto.actualizarProducto(id, dto));
@@ -188,7 +197,8 @@ class ServicioAppProductoTest {
                 10, 50, true,
                 List.of(new CodigoAModificar("C002", "7800987654321", "EAN", true)));
 
-        when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class)))
+        when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
+        when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class)))
                 .thenThrow(new CodigoNoPerteneceProductoException("C002", id));
 
         assertThrows(CodigoNoPerteneceProductoException.class, () -> servicioAppProducto.actualizarProducto(id, dto));
@@ -213,5 +223,7 @@ class ServicioAppProductoTest {
 
         assertEquals(1, modificado.codigos().size());
         assertEquals("C001", modificado.codigos().getFirst().idCodigo());
+
+        verify(servicioCodigo, never()).actualizarParaProducto(eq(id), any(CodigoAModificar.class));
     }
 }
