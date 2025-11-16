@@ -1,13 +1,12 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
+import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ServicioAppProducto {
@@ -41,5 +40,19 @@ public class ServicioAppProducto {
 
         var codigos = servicioCodigo.obtenerCodigosConIdProducto(id);
         return ProductoModificado.desde(actualizado, codigos);
+    }
+
+    @Transactional
+    public List<ProductoFiltrado> buscarProductosFiltrados(
+            String idProducto,
+            String nombreComercial,
+            String nombreGenerico,
+            Boolean activo
+    ) {
+        var productos = servicioProducto.buscarPorCampos(idProducto, nombreComercial, nombreGenerico, activo);
+
+        return productos.stream()
+                .map(ProductoFiltrado::desde)
+                .toList();
     }
 }

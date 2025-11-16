@@ -1,9 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.controladores;
 
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
+import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,6 +46,20 @@ public class ControladorProducto {
     ) {
         var actualizado = servicioAppProducto.actualizarProducto(id, dto);
         return ResponseEntity.ok(actualizado);
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProductoFiltrado>> buscarProductos(
+            @RequestParam(required = false) String idProducto,
+            @RequestParam(required = false) String nombreComercial,
+            @RequestParam(required = false) String nombreGenerico,
+            @RequestParam(required = false) Boolean activo
+    ) {
+        var productos = servicioAppProducto.buscarProductosFiltrados(
+                idProducto, nombreComercial, nombreGenerico, activo
+        );
+
+        return ResponseEntity.ok(productos);
     }
 
     @ExceptionHandler({CodigoDuplicadoException.class, ProductoDuplicadoException.class})
