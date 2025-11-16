@@ -18,7 +18,8 @@ public record CodigoACrear(
         String tipoCodigo,
 
         boolean activo
-) {
+
+) implements CodigoConId{
     public Codigo aEntidad(Producto producto) {
         Codigo c = new Codigo();
         c.setProducto(producto);

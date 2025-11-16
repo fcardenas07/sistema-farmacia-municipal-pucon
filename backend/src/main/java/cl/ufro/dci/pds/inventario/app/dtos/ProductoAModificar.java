@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
+import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import jakarta.validation.Valid;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 @StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
+@CodigosUnicos(message =  "No se pueden repetir los IDs de los códigos")
 public record ProductoAModificar(
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
@@ -24,9 +26,11 @@ public record ProductoAModificar(
         String unidadMedida,
 
         @Min(value = 0, message = "El stock mínimo no puede ser negativo")
+        @Max(value = 100_000_000, message = "El stock mínimo no puede superar 100.000.000")
         Integer stockMinimo,
 
         @Min(value = 0, message = "El stock máximo no puede ser negativo")
+        @Max(value = 100_000_000, message = "El stock máximo no puede superar 100.000.000")
         Integer stockMaximo,
 
         @NotNull(message = "El estado activo no puede ser nulo")
@@ -34,7 +38,7 @@ public record ProductoAModificar(
 
         @Valid
         List<CodigoAModificar> codigos
-) implements ProductoConStock {
+) implements ProductoConStock, ProductoConCodigos {
     public void aplicarCambios(Producto p) {
         if (nombreComercial != null) p.setNombreComercial(nombreComercial);
         if (nombreGenerico != null) p.setNombreGenerico(nombreGenerico);

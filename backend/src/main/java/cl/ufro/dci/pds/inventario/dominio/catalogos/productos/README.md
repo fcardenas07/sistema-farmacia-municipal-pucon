@@ -1,4 +1,4 @@
-﻿# productos
+# productos
 
 ## Descripción
 Directorio para el módulo **productos**.

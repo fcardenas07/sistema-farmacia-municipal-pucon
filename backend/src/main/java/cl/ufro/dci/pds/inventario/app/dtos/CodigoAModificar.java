@@ -15,7 +15,7 @@ public record CodigoAModificar(
         String tipoCodigo,
 
         Boolean activo
-) {
+) implements CodigoConId{
     public void aplicarCambios(Codigo codigo) {
         if (codigoBarra != null) codigo.setCodigoBarra(codigoBarra);
         if (tipoCodigo != null) codigo.setTipoCodigo(tipoCodigo);

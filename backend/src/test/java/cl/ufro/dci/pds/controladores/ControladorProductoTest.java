@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -75,6 +77,70 @@ public class ControladorProductoTest {
     }
 
     @Test
+    void crearProductoConBodyInvalidoFormato() throws Exception {
+        // Body inválido: no es JSON
+        String bodyInvalido = "esto no es JSON";
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(bodyInvalido))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void crearProductoConBodyVacioJSON() throws Exception {
+        String bodyVacioJSON = "{}";
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(bodyVacioJSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
+                .andExpect(jsonPath("$.codigos").value("El producto debe tener al menos un código"));
+    }
+
+    @Test
+    void crearProductoConCamposVacios() throws Exception {
+        String bodyCamposVacios = """
+        {
+            "idProducto": "",
+            "nombreComercial": "",
+            "nombreGenerico": ""
+        }
+        """;
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(bodyCamposVacios))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
+    }
+
+    @Test
+    void crearProductoConCamposTipoIncorrecto() throws Exception {
+        // Body con campo de tipo incorrecto
+        String bodyTipoIncorrecto = """
+            {
+                "idProducto": "P001",
+                "nombreComercial": "Paracetamol",
+                "nombreGenerico": "Paracetamol genérico",
+                "stockMinimo": "no es número"
+            }
+            """;
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(bodyTipoIncorrecto))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Crear producto válido devuelve 201")
     void crearProductoValido() throws Exception {
         var dto = productoValido;
@@ -86,7 +152,7 @@ public class ControladorProductoTest {
                 List.of(new CodigoCreado("C001", "1234567890123"))
         );
 
-        Mockito.when(servicioAppProducto.crearProducto(Mockito.any(ProductoACrear.class)))
+        when(servicioAppProducto.crearProducto(any(ProductoACrear.class)))
                 .thenReturn(creado);
 
         mockMvc.perform(post("/productos")
@@ -116,7 +182,7 @@ public class ControladorProductoTest {
                 List.of(new CodigoACrear("C002", "9876543210987", "EAN", true))
         );
 
-        Mockito.when(servicioAppProducto.crearProducto(Mockito.any(ProductoACrear.class)))
+        when(servicioAppProducto.crearProducto(any(ProductoACrear.class)))
                 .thenThrow(new CodigoDuplicadoException("C002"));
 
         mockMvc.perform(post("/productos")
@@ -155,7 +221,7 @@ public class ControladorProductoTest {
                 )
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), Mockito.any(ProductoAModificar.class)))
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
                 .thenReturn(actualizado);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -200,9 +266,9 @@ public class ControladorProductoTest {
                 )
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(
+        when(servicioAppProducto.actualizarProducto(
                         Mockito.eq(idProducto),
-                        Mockito.any(ProductoAModificar.class)))
+                        any(ProductoAModificar.class)))
                 .thenReturn(actualizado);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -236,7 +302,7 @@ public class ControladorProductoTest {
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(Mockito.eq(idProductoInexistente), Mockito.any(ProductoAModificar.class)))
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProductoInexistente), any(ProductoAModificar.class)))
                 .thenThrow(new ProductoNoEncontradoException(idProductoInexistente));
 
         mockMvc.perform(patch("/productos/{id}", idProductoInexistente)
@@ -265,7 +331,7 @@ public class ControladorProductoTest {
                 )
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), Mockito.any(ProductoAModificar.class)))
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
                 .thenThrow(new CodigoNoEncontradoException("C999"));
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -294,7 +360,7 @@ public class ControladorProductoTest {
                 )
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), Mockito.any(ProductoAModificar.class)))
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
                 .thenThrow(new CodigoNoPerteneceProductoException("C002", idProducto));
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -326,7 +392,7 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.idProducto").value("El idProducto no puede ser vacío"));
+                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"));
     }
 
     @Test
@@ -349,7 +415,7 @@ public class ControladorProductoTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede ser vacío"));
+                .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"));
     }
 
     @Test
@@ -372,7 +438,7 @@ public class ControladorProductoTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede ser vacío"));
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
     }
 
     @Test
@@ -982,7 +1048,7 @@ public class ControladorProductoTest {
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true))
         );
 
-        Mockito.when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), Mockito.any(ProductoAModificar.class)))
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
                 .thenThrow(new CodigoNoPerteneceProductoException("C999", idProducto));
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -1070,5 +1136,220 @@ public class ControladorProductoTest {
                         .content(objectMapper.writeValueAsString(productoDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.['codigos[0].tipoCodigo']").value("El tipo de código no puede tener más de 50 caracteres"));
+    }
+
+    @Test
+    @DisplayName("Actualizar códigos con IDs duplicados devuelve 400")
+    void actualizarCodigosDuplicadosDevuelve400() throws Exception {
+        String idProducto = "P001";
+
+        var codigo1 = new CodigoAModificar("C001", null, null, null);
+        var codigo2 = new CodigoAModificar("C002", null, null, null);
+        var codigoDuplicado = new CodigoAModificar("C001", null, null, null);
+
+        var productoDto = new ProductoAModificar(
+                null, null, null, null, null,
+                10, 50, true,
+                List.of(codigo1, codigo2, codigoDuplicado)
+        );
+
+        mockMvc.perform(patch("/productos/{id}", idProducto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(productoDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigosUnicos").value("No se pueden repetir los IDs de los códigos"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con códigos duplicados devuelve 400")
+    void crearProductoConCodigosDuplicadosDevuelve400() throws Exception {
+        var codigo1 = new CodigoACrear("C001", "123", "TipoA", true);
+        var codigo2 = new CodigoACrear("C002", "456", "TipoB", true);
+        var codigoDuplicado = new CodigoACrear("C001", "789", "TipoC", true);
+
+        var productoDto = new ProductoACrear(
+                "P001",
+                "Producto A",
+                "Genérico A",
+                "Presentación",
+                "Dosificación",
+                "Unidad",
+                10,
+                50,
+                true,
+                List.of(codigo1, codigo2, codigoDuplicado)
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(productoDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigosUnicos").value("No se pueden repetir los IDs de los códigos"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con stock mínimo máximo permitido devuelve 400 si supera el límite")
+    void crearProductoConStockMinimoExcedido() throws Exception {
+        ProductoACrear dto = new ProductoACrear(
+                productoValido.idProducto(),
+                productoValido.nombreComercial(),
+                productoValido.nombreGenerico(),
+                productoValido.presentacion(),
+                productoValido.dosificacion(),
+                productoValido.unidadMedida(),
+                100_000_001,
+                productoValido.stockMaximo(),
+                productoValido.activo(),
+                productoValido.codigos()
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.stockMinimo").value("El stock mínimo no puede superar 100.000.000"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con stock máximo excedido devuelve 400")
+    void crearProductoConStockMaximoExcedido() throws Exception {
+        ProductoACrear dto = new ProductoACrear(
+                productoValido.idProducto(),
+                productoValido.nombreComercial(),
+                productoValido.nombreGenerico(),
+                productoValido.presentacion(),
+                productoValido.dosificacion(),
+                productoValido.unidadMedida(),
+                productoValido.stockMinimo(),
+                100_000_001,
+                productoValido.activo(),
+                productoValido.codigos()
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.stockMaximo").value("El stock máximo no puede superar 100.000.000"));
+    }
+
+    @Test
+    @DisplayName("Actualizar producto con stock mínimo excedido devuelve 400")
+    void actualizarProductoConStockMinimoExcedido() throws Exception {
+        ProductoAModificar dto = new ProductoAModificar(
+                null,
+                null,
+                null,
+                null,
+                null,
+                100_000_001,
+                null,
+                true,
+                null
+        );
+
+        mockMvc.perform(patch("/productos/P001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.stockMinimo").value("El stock mínimo no puede superar 100.000.000"));
+    }
+
+    @Test
+    @DisplayName("Actualizar producto con stock máximo excedido devuelve 400")
+    void actualizarProductoConStockMaximoExcedido() throws Exception {
+        ProductoAModificar dto = new ProductoAModificar(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                100_000_001,
+                true,
+                null
+        );
+
+        mockMvc.perform(patch("/productos/P001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.stockMaximo").value("El stock máximo no puede superar 100.000.000"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con todos los campos en blanco devuelve 400")
+    void crearProductoConTodosLosCamposEnBlanco() throws Exception {
+        var codigo = new CodigoACrear("   ", "   ", "   ", true);
+
+        ProductoACrear dto = new ProductoACrear(
+                "   ",
+                "   ",
+                "   ",
+                "   ",
+                "   ",
+                "   ",
+                0,
+                0,
+                false,
+                List.of(codigo)
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
+                .andExpect(jsonPath("$.['codigos[0].codigoBarra']").value("El código de barra no puede estar vacío"))
+                .andExpect(jsonPath("$.['codigos[0].tipoCodigo']").value("El tipo de código no puede estar vacío"));
+    }
+
+    @Test
+    void crearProducto_errorInternoServicio_retorna500() throws Exception {
+        var dto = productoValido;
+
+        when(servicioAppProducto.crearProducto(any()))
+                .thenThrow(new RuntimeException("fallo inesperado"));
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.mensaje").value("Error interno del servidor"));
+    }
+
+    @Test
+    @DisplayName("Actualizar producto con lista de códigos nula no modifica códigos y devuelve 200")
+    void actualizarProductoConCodigosNulosNoModifica() throws Exception {
+        String idProducto = "P001";
+
+        var dto = new ProductoAModificar(
+                "Nombre Nuevo",
+                null,
+                null,
+                null,
+                null,
+                10,
+                50,
+                true,
+                null
+        );
+
+        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
+                .thenReturn(new ProductoModificado(
+                        dto.nombreComercial(),
+                        dto.activo(),
+                        List.of(new CodigoModificado("C001", "1234567890123"))
+                ));
+
+        mockMvc.perform(patch("/productos/{id}", idProducto)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -61,10 +62,15 @@ public class ControladorProducto {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> manejarErrorGeneral(Exception ex) {
+    public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {
         System.out.println(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
+
+        var body = Map.of("mensaje", "Error interno del servidor");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(body);
     }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> manejarBodyFaltante(HttpMessageNotReadableException ex) {

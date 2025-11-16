@@ -1,4 +1,4 @@
-﻿# rotulos
+# rotulos
 
 ## Descripción
 Directorio para el módulo **rotulos**.
