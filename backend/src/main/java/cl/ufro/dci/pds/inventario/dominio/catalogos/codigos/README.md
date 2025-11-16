@@ -1,4 +1,4 @@
-﻿# codigos
+# codigos
 
 ## Descripción
 Directorio para el módulo **codigos**.

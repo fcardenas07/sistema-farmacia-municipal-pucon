@@ -2,6 +2,7 @@ package cl.ufro.dci.pds.inventario.app.dtos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.List;
 
@@ -31,8 +32,9 @@ public record ProductoAModificar(
         @NotNull(message = "El estado activo no puede ser nulo")
         Boolean activo,
 
+        @Valid
         List<CodigoAModificar> codigos
-) {
+) implements ProductoConStock {
     public void aplicarCambios(Producto p) {
         if (nombreComercial != null) p.setNombreComercial(nombreComercial);
         if (nombreGenerico != null) p.setNombreGenerico(nombreGenerico);

@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.app.dtos.anotaciones;
+package cl.ufro.dci.pds.inventario.app.dtos.anotaciones;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

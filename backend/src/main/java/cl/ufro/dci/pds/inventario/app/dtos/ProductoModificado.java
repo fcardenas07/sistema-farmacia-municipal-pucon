@@ -7,13 +7,13 @@ import java.util.List;
 
 public record ProductoModificado(
         String nombreComercial,
-        String estado,
+        boolean activo,
         List<CodigoModificado> codigos
 ) {
     public static ProductoModificado desde(Producto producto, List<Codigo> codigos) {
         return new ProductoModificado(
                 producto.getNombreComercial(),
-                producto.getEstado(),
+                producto.getActivo(),
                 codigos.stream().map(CodigoModificado::desde).toList()
         );
     }

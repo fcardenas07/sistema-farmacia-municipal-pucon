@@ -2,6 +2,7 @@ package cl.ufro.dci.pds.inventario.app.dtos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public record ProductoACrear(
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
 
+        @NotBlank(message = "El nombre genérico no puede ser vacío")
         @Size(max = 200, message = "El nombre genérico no puede tener más de 200 caracteres")
         String nombreGenerico,
 
@@ -27,15 +29,18 @@ public record ProductoACrear(
         String unidadMedida,
 
         @Min(value = 0, message = "El stock mínimo no puede ser negativo")
-        int stockMinimo,
+        Integer stockMinimo,
 
         @Min(value = 0, message = "El stock máximo no puede ser negativo")
-        int stockMaximo,
+        Integer stockMaximo,
 
         boolean activo,
 
+        @Valid
+        @NotEmpty(message = "El producto debe tener al menos un código")
         List<CodigoACrear> codigos
-) {
+
+) implements ProductoConStock {
     public Producto aEntidad() {
         Producto p = new Producto();
         p.setIdProducto(idProducto);
