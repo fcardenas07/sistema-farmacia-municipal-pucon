@@ -30,8 +30,8 @@ public class Lote {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
-    @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Stock stock;
+    public Lote() {
+    }
 
     public String getIdLote() {
         return idLote;
@@ -81,26 +81,15 @@ public class Lote {
         this.producto = producto;
     }
 
-    public Stock getStock() {
-        return stock;
-    }
-
-    public void setStock(Stock stock) {
-        this.stock = stock;
-        if (stock != null) stock.setLote(this);
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Lote lote = (Lote) o;
-        return Objects.equals(idLote, lote.idLote) && Objects.equals(fechaElaboracion, lote.fechaElaboracion) && Objects.equals(fechaVencimiento, lote.fechaVencimiento) && Objects.equals(numeroLote, lote.numeroLote) && Objects.equals(estado, lote.estado) && Objects.equals(producto, lote.producto);
+        if (!(o instanceof Lote lote)) return false;
+        return Objects.equals(idLote, lote.idLote);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idLote, fechaElaboracion, fechaVencimiento, numeroLote, estado, producto);
+        return Objects.hashCode(idLote);
     }
 
     @Override
@@ -112,7 +101,6 @@ public class Lote {
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
                 ", producto=" + producto + '\'' +
-                ", stock=" + (stock != null ? stock.getCantidadActual() : "null") +
                 '}';
     }
 }

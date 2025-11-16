@@ -69,15 +69,13 @@ public class Stock {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Stock)) return false;
-        Stock stock = (Stock) o;
+        if (!(o instanceof Stock stock)) return false;
         return Objects.equals(idStock, stock.idStock);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idStock);
+        return Objects.hashCode(idStock);
     }
 
     @Override
