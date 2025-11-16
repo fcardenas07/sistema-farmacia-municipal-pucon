@@ -1,4 +1,4 @@
-﻿# proveedores
+# proveedores
 
 ## Descripción
 Directorio para el módulo **proveedores**.

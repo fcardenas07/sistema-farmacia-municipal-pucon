@@ -26,8 +26,12 @@ public class ServicioCodigo {
     }
 
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {
+        if (!repositorioCodigo.existsById(dto.idCodigo())) {
+            throw new CodigoNoEncontradoException(dto.idCodigo());
+        }
+
         var codigo = repositorioCodigo.findByIdCodigoAndProducto_IdProducto(dto.idCodigo(), idProducto)
-                .orElseThrow(() -> new CodigoNoEncontradoException(dto.idCodigo()));
+                .orElseThrow(() -> new CodigoNoPerteneceProductoException(dto.idCodigo(), idProducto));
 
         dto.aplicarCambios(codigo);
         return repositorioCodigo.save(codigo);

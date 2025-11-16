@@ -1,4 +1,4 @@
-﻿# servicios
+# servicios
 
 ## Descripción
 Directorio para el módulo **servicios**.

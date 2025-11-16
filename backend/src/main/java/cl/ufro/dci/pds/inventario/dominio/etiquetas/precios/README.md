@@ -1,4 +1,4 @@
-﻿# precios
+# precios
 
 ## Descripción
 Directorio para el módulo **precios**.

@@ -6,6 +6,7 @@ import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,14 +19,26 @@ public class ServicioAppProducto {
         this.servicioCodigo = servicioCodigo;
     }
 
+    @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
         var creado = servicioProducto.crear(dto);
-        var codigos = servicioCodigo.obtenerCodigosConIdProducto(dto.idProducto());
+
+        if (dto.codigos() != null) {
+            dto.codigos().forEach(c -> servicioCodigo.crear(creado, c));
+        }
+
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(creado.getIdProducto());
         return ProductoCreado.desde(creado, codigos);
     }
 
+    @Transactional
     public ProductoModificado actualizarProducto(String id, ProductoAModificar dto) {
         var actualizado = servicioProducto.actualizar(id, dto);
+
+        if (dto.codigos() != null) {
+            dto.codigos().forEach(c -> servicioCodigo.actualizarParaProducto(id, c));
+        }
+
         var codigos = servicioCodigo.obtenerCodigosConIdProducto(id);
         return ProductoModificado.desde(actualizado, codigos);
     }

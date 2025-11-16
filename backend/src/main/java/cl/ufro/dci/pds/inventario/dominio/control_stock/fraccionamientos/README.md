@@ -1,4 +1,4 @@
-﻿# fraccionamientos
+# fraccionamientos
 
 ## Descripción
 Directorio para el módulo **fraccionamientos**.

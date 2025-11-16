@@ -33,10 +33,23 @@ public class Producto {
     @Column(name = "stockMaximo")
     private int stockMaximo;
 
-    @Column(name = "estado")
-    private String estado;
+    @Column(name = "activo")
+    private boolean activo;
 
     public Producto() {
+    }
+
+    public Producto(String idProducto, String nombreComercial, String nombreGenerico, String presentacion,
+                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo, boolean activo) {
+        this.idProducto = idProducto;
+        this.nombreComercial = nombreComercial;
+        this.nombreGenerico = nombreGenerico;
+        this.presentacion = presentacion;
+        this.dosificacion = dosificacion;
+        this.unidadMedida = unidadMedida;
+        this.stockMinimo = stockMinimo;
+        this.stockMaximo = stockMaximo;
+        this.activo = activo;
     }
 
     public String getIdProducto() {
@@ -103,12 +116,12 @@ public class Producto {
         this.stockMaximo = stockMaximo;
     }
 
-    public String getEstado() {
-        return estado;
+    public boolean getActivo() {
+        return activo;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     @Override
@@ -124,16 +137,6 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto{" +
-                "idProducto='" + idProducto + '\'' +
-                ", nombreComercial='" + nombreComercial + '\'' +
-                ", nombreGenerico='" + nombreGenerico + '\'' +
-                ", presentacion='" + presentacion + '\'' +
-                ", dosificacion='" + dosificacion + '\'' +
-                ", unidadMedida='" + unidadMedida + '\'' +
-                ", stockMinimo=" + stockMinimo +
-                ", stockMaximo=" + stockMaximo +
-                ", estado='" + estado +
-                '}';
+        return "Producto{" + "idProducto='" + idProducto + '\'' + ", nombreComercial='" + nombreComercial + '\'' + ", nombreGenerico='" + nombreGenerico + '\'' + ", presentacion='" + presentacion + '\'' + ", dosificacion='" + dosificacion + '\'' + ", unidadMedida='" + unidadMedida + '\'' + ", stockMinimo=" + stockMinimo + ", stockMaximo=" + stockMaximo + ", activo='" + activo + '}';
     }
 }
