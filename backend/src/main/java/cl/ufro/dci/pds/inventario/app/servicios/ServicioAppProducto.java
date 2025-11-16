@@ -44,12 +44,11 @@ public class ServicioAppProducto {
 
     @Transactional
     public List<ProductoFiltrado> buscarProductosFiltrados(
-            String idProducto,
             String nombreComercial,
             String nombreGenerico,
             Boolean activo
     ) {
-        var productos = servicioProducto.buscarPorCampos(idProducto, nombreComercial, nombreGenerico, activo);
+        var productos = servicioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo);
 
         return productos.stream()
                 .map(ProductoFiltrado::desde)

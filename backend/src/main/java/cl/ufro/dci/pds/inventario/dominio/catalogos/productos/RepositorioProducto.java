@@ -11,14 +11,12 @@ import java.util.List;
 public interface RepositorioProducto extends JpaRepository<Producto, String> {
 
     @Query("""
-        SELECT p FROM Producto p
-        WHERE (:idProducto IS NULL OR p.idProducto = :idProducto)
-          AND (:nombreComercial IS NULL OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :nombreComercial, '%')))
-          AND (:nombreGenerico IS NULL OR LOWER(p.nombreGenerico) LIKE LOWER(CONCAT('%', :nombreGenerico, '%')))
-          AND (:activo IS NULL OR p.activo = :activo)
-    """)
+                SELECT p FROM Producto p
+                WHERE (:nombreComercial IS NULL OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :nombreComercial, '%')))
+                  AND (:nombreGenerico IS NULL OR LOWER(p.nombreGenerico) LIKE LOWER(CONCAT('%', :nombreGenerico, '%')))
+                  AND (:activo IS NULL OR p.activo = :activo)
+            """)
     List<Producto> buscarPorCampos(
-            @Param("idProducto") String idProducto,
             @Param("nombreComercial") String nombreComercial,
             @Param("nombreGenerico") String nombreGenerico,
             @Param("activo") Boolean activo

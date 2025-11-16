@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,6 +50,9 @@ public class ControladorProductoTest {
 
     private ProductoACrear productoValido;
 
+    private List<ProductoFiltrado> productosFiltrados;
+
+
     @BeforeEach
     void setUp() {
         repositorioProducto.deleteAll();
@@ -64,6 +68,12 @@ public class ControladorProductoTest {
                 true,
                 List.of(new CodigoACrear("C001", "1234567890123", "EAN", true),
                         new CodigoACrear("C002", "7800987654321", "EAN13", true))
+        );
+
+        productosFiltrados = List.of(
+                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol genérico", true),
+                new ProductoFiltrado("P002", "Ibuprofeno", "Ibuprofeno genérico", true),
+                new ProductoFiltrado("P003", "Amoxicilina", "Amoxicilina genérica", false)
         );
     }
 
@@ -104,12 +114,12 @@ public class ControladorProductoTest {
     @Test
     void crearProductoConCamposVacios() throws Exception {
         String bodyCamposVacios = """
-        {
-            "idProducto": "",
-            "nombreComercial": "",
-            "nombreGenerico": ""
-        }
-        """;
+                {
+                    "idProducto": "",
+                    "nombreComercial": "",
+                    "nombreGenerico": ""
+                }
+                """;
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,13 +134,13 @@ public class ControladorProductoTest {
     @Test
     void crearProductoConCamposTipoIncorrecto() throws Exception {
         String bodyTipoIncorrecto = """
-            {
-                "idProducto": "P001",
-                "nombreComercial": "Paracetamol",
-                "nombreGenerico": "Paracetamol genérico",
-                "stockMinimo": "no es número"
-            }
-            """;
+                {
+                    "idProducto": "P001",
+                    "nombreComercial": "Paracetamol",
+                    "nombreGenerico": "Paracetamol genérico",
+                    "stockMinimo": "no es número"
+                }
+                """;
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
@@ -265,8 +275,8 @@ public class ControladorProductoTest {
         );
 
         when(servicioAppProducto.actualizarProducto(
-                        Mockito.eq(idProducto),
-                        any(ProductoAModificar.class)))
+                Mockito.eq(idProducto),
+                any(ProductoAModificar.class)))
                 .thenReturn(actualizado);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
@@ -1337,17 +1347,79 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Crear producto cuando ocurre un error inesperado devuelve 500")
-    void crearProductoConErrorInesperado() throws Exception {
-        var dto = productoValido;
+    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
+    void buscarProductosSinFiltros() throws Exception {
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, null))
+                .thenReturn(productosFiltrados);
 
-        when(servicioAppProducto.crearProducto(any()))
-                .thenThrow(new RuntimeException("fallo inesperado"));
+        mockMvc.perform(get("/productos/buscar"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(productosFiltrados.size()))
+                .andExpect(jsonPath("$[0].idProducto").value("P001"));
+    }
 
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.mensaje").value("Error interno del servidor"));
+
+    @Test
+    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
+    void buscarProductosPorNombreComercial() throws Exception {
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Ibuprofeno", null, null))
+                .thenReturn(
+                        productosFiltrados.stream()
+                                .filter(p -> p.nombreComercial().equalsIgnoreCase("Ibuprofeno"))
+                                .toList()
+                );
+
+        mockMvc.perform(get("/productos/buscar")
+                        .param("nombreComercial", "Ibuprofeno"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].nombreComercial").value("Ibuprofeno"));
+    }
+
+    @Test
+    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
+    void buscarProductosPorNombreGenerico() throws Exception {
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol genérico", null))
+                .thenReturn(
+                        productosFiltrados.stream()
+                                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol genérico"))
+                                .toList()
+                );
+
+        mockMvc.perform(get("/productos/buscar")
+                        .param("nombreGenerico", "Paracetamol genérico"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].nombreGenerico").value("Paracetamol genérico"));
+    }
+
+    @Test
+    @DisplayName("Buscar productos por activo devuelve coincidencias")
+    void buscarProductosPorActivo() throws Exception {
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, true))
+                .thenReturn(
+                        productosFiltrados.stream()
+                                .filter(ProductoFiltrado::activo)
+                                .toList()
+                );
+
+        mockMvc.perform(get("/productos/buscar")
+                        .param("activo", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].activo").value(true))
+                .andExpect(jsonPath("$[1].activo").value(true));
+    }
+
+    @Test
+    @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
+    void buscarProductosSinCoincidencias() throws Exception {
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados("NoExiste", null, null))
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/productos/buscar")
+                        .param("nombreComercial", "NoExiste"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 }

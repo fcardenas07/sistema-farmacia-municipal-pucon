@@ -33,11 +33,10 @@ public class ServicioProducto {
     }
 
     public List<Producto> buscarPorCampos(
-            String idProducto,
             String nombreComercial,
             String nombreGenerico,
             Boolean activo
     ) {
-        return repositorioProducto.buscarPorCampos(idProducto, nombreComercial, nombreGenerico, activo);
+        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo);
     }
 }

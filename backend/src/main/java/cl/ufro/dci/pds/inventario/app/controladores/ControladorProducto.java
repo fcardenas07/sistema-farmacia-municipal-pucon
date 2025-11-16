@@ -50,13 +50,12 @@ public class ControladorProducto {
 
     @GetMapping("/buscar")
     public ResponseEntity<List<ProductoFiltrado>> buscarProductos(
-            @RequestParam(required = false) String idProducto,
             @RequestParam(required = false) String nombreComercial,
             @RequestParam(required = false) String nombreGenerico,
             @RequestParam(required = false) Boolean activo
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
-                idProducto, nombreComercial, nombreGenerico, activo
+                nombreComercial, nombreGenerico, activo
         );
 
         return ResponseEntity.ok(productos);
