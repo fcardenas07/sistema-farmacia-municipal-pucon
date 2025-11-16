@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,8 @@ class ServicioProductoTest {
     private ServicioProducto servicioProducto;
 
     private Producto productoEntidad;
+    private List<Producto> productosFiltrados;
+
 
     @BeforeEach
     void setUp() {
@@ -34,6 +37,12 @@ class ServicioProductoTest {
                 10,
                 100,
                 true
+        );
+
+        productosFiltrados = List.of(
+                new Producto("P001","Paracetamol","Paracetamol genérico","Tabletas 500mg","500mg","Comprimidos",10,100,true),
+                new Producto("P002","Ibuprofeno","Ibuprofeno genérico","Tabletas 400mg","400mg","Comprimidos",5,50,true),
+                new Producto("P003","Amoxicilina","Amoxicilina genérica","Caja 12 cápsulas","500mg","mg",20,200,false)
         );
     }
 
@@ -139,4 +148,65 @@ class ServicioProductoTest {
         verify(repositorioProducto).findById("P999");
         verify(repositorioProducto, never()).save(any());
     }
+
+    @Test
+    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
+    void buscarProductosSinFiltros() {
+        when(repositorioProducto.buscarPorCampos(null, null, null)).thenReturn(productosFiltrados);
+
+        var resultado = servicioProducto.buscarPorCampos(null, null, null);
+
+        assertEquals(3, resultado.size());
+        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P001")));
+        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P002")));
+        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P003")));
+    }
+
+    @Test
+    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
+    void buscarProductosPorNombreComercial() {
+        when(repositorioProducto.buscarPorCampos("Paracetamol", null, null))
+                .thenReturn(List.of(productosFiltrados.getFirst()));
+
+        var resultado = servicioProducto.buscarPorCampos("Paracetamol", null, null);
+
+        assertEquals(1, resultado.size());
+        assertEquals("Paracetamol", resultado.getFirst().getNombreComercial());
+    }
+
+    @Test
+    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
+    void buscarProductosPorNombreGenerico() {
+        when(repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null))
+                .thenReturn(List.of(productosFiltrados.get(1)));
+
+        var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null);
+
+        assertEquals(1, resultado.size());
+        assertEquals("Ibuprofeno genérico", resultado.getFirst().getNombreGenerico());
+    }
+
+    @Test
+    @DisplayName("Buscar productos por activo devuelve coincidencias")
+    void buscarProductosPorActivo() {
+        when(repositorioProducto.buscarPorCampos(null, null, true))
+                .thenReturn(productosFiltrados.stream().filter(Producto::getActivo).toList());
+
+        var resultado = servicioProducto.buscarPorCampos(null, null, true);
+
+        assertEquals(2, resultado.size());
+        assertTrue(resultado.stream().allMatch(Producto::getActivo));
+    }
+
+    @Test
+    @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
+    void buscarProductosSinCoincidencias() {
+        when(repositorioProducto.buscarPorCampos("X", null, null))
+                .thenReturn(List.of());
+
+        var resultado = servicioProducto.buscarPorCampos("X", null, null);
+
+        assertTrue(resultado.isEmpty());
+    }
+
 }
