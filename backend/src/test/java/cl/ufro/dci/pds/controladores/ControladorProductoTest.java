@@ -71,9 +71,9 @@ public class ControladorProductoTest {
         );
 
         productosFiltrados = List.of(
-                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol genérico", true),
-                new ProductoFiltrado("P002", "Ibuprofeno", "Ibuprofeno genérico", true),
-                new ProductoFiltrado("P003", "Amoxicilina", "Amoxicilina genérica", false)
+                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol genérico", true, 300),
+                new ProductoFiltrado("P002", "Ibuprofeno", "Ibuprofeno genérico", true, 100),
+                new ProductoFiltrado("P003", "Amoxicilina", "Amoxicilina genérica", false, 20)
         );
     }
 
@@ -1355,12 +1355,22 @@ public class ControladorProductoTest {
         mockMvc.perform(get("/productos/buscar"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(productosFiltrados.size()))
-                .andExpect(jsonPath("$[0].idProducto").value("P001"));
+
+                .andExpect(jsonPath("$[0].idProducto").value("P001"))
+                .andExpect(jsonPath("$[0].stockTotal").value(300))
+                .andExpect(jsonPath("$[0].disponible").value(true))
+
+                .andExpect(jsonPath("$[1].idProducto").value("P002"))
+                .andExpect(jsonPath("$[1].stockTotal").value(100))
+                .andExpect(jsonPath("$[1].disponible").value(true))
+
+                .andExpect(jsonPath("$[2].idProducto").value("P003"))
+                .andExpect(jsonPath("$[2].stockTotal").value(20))
+                .andExpect(jsonPath("$[2].disponible").value(false));
     }
 
-
     @Test
-    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() throws Exception {
         Mockito.when(servicioAppProducto.buscarProductosFiltrados("Ibuprofeno", null, null))
                 .thenReturn(
@@ -1373,11 +1383,13 @@ public class ControladorProductoTest {
                         .param("nombreComercial", "Ibuprofeno"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreComercial").value("Ibuprofeno"));
+                .andExpect(jsonPath("$[0].nombreComercial").value("Ibuprofeno"))
+                .andExpect(jsonPath("$[0].stockTotal").value(100))
+                .andExpect(jsonPath("$[0].disponible").value(true));
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() throws Exception {
         Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol genérico", null))
                 .thenReturn(
@@ -1390,7 +1402,9 @@ public class ControladorProductoTest {
                         .param("nombreGenerico", "Paracetamol genérico"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreGenerico").value("Paracetamol genérico"));
+                .andExpect(jsonPath("$[0].nombreGenerico").value("Paracetamol genérico"))
+                .andExpect(jsonPath("$[0].stockTotal").value(300))
+                .andExpect(jsonPath("$[0].disponible").value(true));
     }
 
     @Test
@@ -1407,8 +1421,16 @@ public class ControladorProductoTest {
                         .param("activo", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
+
+                // P001
                 .andExpect(jsonPath("$[0].activo").value(true))
-                .andExpect(jsonPath("$[1].activo").value(true));
+                .andExpect(jsonPath("$[0].stockTotal").value(300))
+                .andExpect(jsonPath("$[0].disponible").value(true))
+
+                // P002
+                .andExpect(jsonPath("$[1].activo").value(true))
+                .andExpect(jsonPath("$[1].stockTotal").value(100))
+                .andExpect(jsonPath("$[1].disponible").value(true));
     }
 
     @Test

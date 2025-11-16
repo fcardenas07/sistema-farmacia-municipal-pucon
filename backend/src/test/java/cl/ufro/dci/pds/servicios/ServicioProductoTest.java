@@ -150,52 +150,84 @@ class ServicioProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
+    @DisplayName("Buscar productos sin filtros devuelve todos los productos con campos correctos")
     void buscarProductosSinFiltros() {
         when(repositorioProducto.buscarPorCampos(null, null, null)).thenReturn(productosFiltrados);
 
         var resultado = servicioProducto.buscarPorCampos(null, null, null);
 
-        assertEquals(3, resultado.size());
-        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P001")));
-        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P002")));
-        assertTrue(resultado.stream().anyMatch(p -> p.getIdProducto().equals("P003")));
+        assertEquals(productosFiltrados.size(), resultado.size());
+
+        for (int i = 0; i < productosFiltrados.size(); i++) {
+            var esperado = productosFiltrados.get(i);
+            var actual = resultado.get(i);
+
+            assertEquals(esperado.getIdProducto(), actual.getIdProducto());
+            assertEquals(esperado.getNombreComercial(), actual.getNombreComercial());
+            assertEquals(esperado.getNombreGenerico(), actual.getNombreGenerico());
+            assertEquals(esperado.getActivo(), actual.getActivo());
+        }
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias con campos correctos")
     void buscarProductosPorNombreComercial() {
+        var productoEsperado = productosFiltrados.getFirst();
         when(repositorioProducto.buscarPorCampos("Paracetamol", null, null))
-                .thenReturn(List.of(productosFiltrados.getFirst()));
+                .thenReturn(List.of(productoEsperado));
 
         var resultado = servicioProducto.buscarPorCampos("Paracetamol", null, null);
 
         assertEquals(1, resultado.size());
-        assertEquals("Paracetamol", resultado.getFirst().getNombreComercial());
+        var actual = resultado.getFirst();
+
+        assertEquals(productoEsperado.getIdProducto(), actual.getIdProducto());
+        assertEquals(productoEsperado.getNombreComercial(), actual.getNombreComercial());
+        assertEquals(productoEsperado.getNombreGenerico(), actual.getNombreGenerico());
+        assertEquals(productoEsperado.getActivo(), actual.getActivo());
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias con campos correctos")
     void buscarProductosPorNombreGenerico() {
+        var productoEsperado = productosFiltrados.get(1);
         when(repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null))
-                .thenReturn(List.of(productosFiltrados.get(1)));
+                .thenReturn(List.of(productoEsperado));
 
         var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null);
 
         assertEquals(1, resultado.size());
-        assertEquals("Ibuprofeno genérico", resultado.getFirst().getNombreGenerico());
+        var actual = resultado.getFirst();
+
+        assertEquals(productoEsperado.getIdProducto(), actual.getIdProducto());
+        assertEquals(productoEsperado.getNombreComercial(), actual.getNombreComercial());
+        assertEquals(productoEsperado.getNombreGenerico(), actual.getNombreGenerico());
+        assertEquals(productoEsperado.getActivo(), actual.getActivo());
     }
 
     @Test
-    @DisplayName("Buscar productos por activo devuelve coincidencias")
+    @DisplayName("Buscar productos por activo devuelve coincidencias con campos correctos")
     void buscarProductosPorActivo() {
+        var productosEsperados = productosFiltrados.stream()
+                .filter(Producto::getActivo)
+                .toList();
+
         when(repositorioProducto.buscarPorCampos(null, null, true))
-                .thenReturn(productosFiltrados.stream().filter(Producto::getActivo).toList());
+                .thenReturn(productosEsperados);
 
         var resultado = servicioProducto.buscarPorCampos(null, null, true);
 
-        assertEquals(2, resultado.size());
-        assertTrue(resultado.stream().allMatch(Producto::getActivo));
+        assertEquals(productosEsperados.size(), resultado.size());
+
+        for (int i = 0; i < productosEsperados.size(); i++) {
+            var esperado = productosEsperados.get(i);
+            var actual = resultado.get(i);
+
+            assertEquals(esperado.getIdProducto(), actual.getIdProducto());
+            assertEquals(esperado.getNombreComercial(), actual.getNombreComercial());
+            assertEquals(esperado.getNombreGenerico(), actual.getNombreGenerico());
+            assertEquals(esperado.getActivo(), actual.getActivo());
+        }
     }
 
     @Test
@@ -208,5 +240,4 @@ class ServicioProductoTest {
 
         assertTrue(resultado.isEmpty());
     }
-
 }

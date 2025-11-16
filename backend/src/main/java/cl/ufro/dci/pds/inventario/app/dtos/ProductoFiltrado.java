@@ -6,14 +6,21 @@ public record ProductoFiltrado(
         String idProducto,
         String nombreComercial,
         String nombreGenerico,
-        boolean activo
+        boolean activo,
+        int stockTotal
 ) {
-    public static ProductoFiltrado desde(Producto producto) {
+
+    public boolean isDisponible() {
+        return stockTotal > 0 && activo;
+    }
+
+    public static ProductoFiltrado desde(Producto producto, int stockTotal) {
         return new ProductoFiltrado(
                 producto.getIdProducto(),
                 producto.getNombreComercial(),
                 producto.getNombreGenerico(),
-                producto.getActivo()
+                producto.getActivo(),
+                stockTotal
         );
     }
 }

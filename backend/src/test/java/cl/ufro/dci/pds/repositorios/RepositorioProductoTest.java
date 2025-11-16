@@ -30,7 +30,7 @@ class RepositorioProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
+    @DisplayName("buscar por campos con todos los filtros nulos devuelve todos los productos")
     void buscarProductosSinFiltros() {
         List<Producto> resultado = repositorioProducto.buscarPorCampos(null, null, null);
 
@@ -40,7 +40,7 @@ class RepositorioProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() {
         List<Producto> resultado = repositorioProducto.buscarPorCampos("Paracetamol", null, null);
 
@@ -49,7 +49,7 @@ class RepositorioProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
+    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() {
         List<Producto> resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null);
 

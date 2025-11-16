@@ -30,6 +30,9 @@ public class Lote {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 
+    @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL)
+    private Stock stock;
+
     public Lote() {
     }
 
@@ -73,6 +76,14 @@ public class Lote {
         this.estado = estado;
     }
 
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
     public Producto getProducto() {
         return producto;
     }
@@ -101,6 +112,7 @@ public class Lote {
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
                 ", producto=" + producto + '\'' +
+                ", stock=" + stock + '\'' +
                 '}';
     }
 }

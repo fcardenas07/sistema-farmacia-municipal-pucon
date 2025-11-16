@@ -4,6 +4,9 @@ import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.*;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,43 +22,49 @@ class ServicioAppProductoTest {
     private ServicioProducto servicioProducto;
     private ServicioCodigo servicioCodigo;
     private ServicioAppProducto servicioAppProducto;
+    private ServicioLote servicioLote;
 
     private Producto productoEntidad;
     private Codigo codigoEntidad;
 
     private List<Producto> productosEntidadesFiltrados;
+    private List<Lote> lotesSimulados;
 
     @BeforeEach
     void setUp() {
         servicioProducto = mock(ServicioProducto.class);
         servicioCodigo = mock(ServicioCodigo.class);
-        servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo);
+        servicioLote = mock(ServicioLote.class);
+        servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo, servicioLote);
 
-        productoEntidad = new Producto(
-                "P001",
-                "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
-                10,
-                100,
-                true
-        );
+        var productoParacetamol = new Producto("P001","Paracetamol","Paracetamol genérico","Tabletas 500mg","500mg","Comprimidos",10,100,true);
+        var productoIbuprofeno = new Producto("P002","Ibuprofeno","Ibuprofeno genérico","Tabletas 400mg","400mg","Comprimidos",5,50,true);
+        var productoAmoxicilina = new Producto("P003","Amoxicilina","Amoxicilina genérica","Caja 12 cápsulas","500mg","mg",20,200,false);
 
-        codigoEntidad = new Codigo(
-                "C001",
-                "1234567890123",
-                "EAN",
-                true,
-                productoEntidad
-        );
+        productoEntidad = productoParacetamol;
 
-        productosEntidadesFiltrados = List.of(
-                new Producto("P001","Paracetamol","Paracetamol genérico","Tabletas 500mg","500mg","Comprimidos",10,100,true),
-                new Producto("P002","Ibuprofeno","Ibuprofeno genérico","Tabletas 400mg","400mg","Comprimidos",5,50,true),
-                new Producto("P003","Amoxicilina","Amoxicilina genérica","Caja 12 cápsulas","500mg","mg",20,200,false)
+        codigoEntidad = new Codigo("C001","1234567890123","EAN",true, productoEntidad);
+
+        productosEntidadesFiltrados = List.of(productoParacetamol, productoIbuprofeno, productoAmoxicilina);
+
+        lotesSimulados = List.of(
+                crearLoteConStock("L001", productoParacetamol, 100),
+                crearLoteConStock("L002", productoIbuprofeno, 50),
+                crearLoteConStock("L003", productoAmoxicilina, 200)
         );
+    }
+
+    private Lote crearLoteConStock(String idLote, Producto producto, int cantidadStock) {
+        var lote = new Lote();
+        lote.setIdLote(idLote);
+        lote.setProducto(producto);
+
+        var stock = new Stock();
+        stock.setCantidadActual(cantidadStock);
+        stock.setLote(lote);
+
+        lote.setStock(stock);
+        return lote;
     }
 
     @Test
@@ -236,59 +245,94 @@ class ServicioAppProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
-    void buscarProductosSinFiltros() {
+    @DisplayName("Buscar todos los productos sin filtros devuelve todos los productos con stockTotal y disponible")
+    void buscarTodosLosProductosSinFiltros() {
         when(servicioProducto.buscarPorCampos(null, null, null))
                 .thenReturn(productosEntidadesFiltrados);
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
+                .thenReturn(lotesSimulados);
 
         var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, null);
 
         assertEquals(3, resultado.size());
-        assertTrue(resultado.stream().anyMatch(p -> p.idProducto().equals("P001")));
-        assertTrue(resultado.stream().anyMatch(p -> p.idProducto().equals("P002")));
-        assertTrue(resultado.stream().anyMatch(p -> p.idProducto().equals("P003")));
+
+        assertEquals("P001", resultado.getFirst().idProducto());
+        assertEquals(100, resultado.get(0).stockTotal());
+        assertTrue(resultado.get(0).isDisponible());
+
+        assertEquals("P002", resultado.get(1).idProducto());
+        assertEquals(50, resultado.get(1).stockTotal());
+        assertTrue(resultado.get(1).isDisponible());
+
+        assertEquals("P003", resultado.get(2).idProducto());
+        assertEquals(200, resultado.get(2).stockTotal());
+        assertFalse(resultado.get(2).isDisponible());
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreComercial devuelve coincidencias")
-    void buscarProductosPorNombreComercial() {
+    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
+    void buscarProductosPorNombreComercialDevuelveCoincidencias() {
         when(servicioProducto.buscarPorCampos("Paracetamol", null, null))
                 .thenReturn(List.of(productosEntidadesFiltrados.getFirst()));
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
+                .thenReturn(lotesSimulados);
 
         var resultado = servicioAppProducto.buscarProductosFiltrados("Paracetamol", null, null);
 
         assertEquals(1, resultado.size());
         assertEquals("Paracetamol", resultado.getFirst().nombreComercial());
+        assertEquals(100, resultado.getFirst().stockTotal());
+        assertTrue(resultado.getFirst().isDisponible());
     }
 
     @Test
-    @DisplayName("Buscar productos por nombreGenerico devuelve coincidencias")
-    void buscarProductosPorNombreGenerico() {
+    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
+    void buscarProductosPorNombreGenericoDevuelveCoincidencias() {
         when(servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null))
                 .thenReturn(List.of(productosEntidadesFiltrados.get(1)));
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
+                .thenReturn(lotesSimulados);
 
         var resultado = servicioAppProducto.buscarProductosFiltrados(null, "Ibuprofeno genérico", null);
 
         assertEquals(1, resultado.size());
         assertEquals("Ibuprofeno genérico", resultado.getFirst().nombreGenerico());
+        assertEquals(50, resultado.getFirst().stockTotal());
+        assertTrue(resultado.getFirst().isDisponible());
     }
 
     @Test
-    @DisplayName("Buscar productos por activo devuelve coincidencias")
-    void buscarProductosPorActivo() {
+    @DisplayName("Buscar productos activos devuelve solo productos activos")
+    void buscarProductosActivosDevuelveSoloActivos() {
         when(servicioProducto.buscarPorCampos(null, null, true))
-                .thenReturn(productosEntidadesFiltrados.stream().filter(Producto::getActivo).toList());
+                .thenReturn(productosEntidadesFiltrados.stream()
+                        .filter(Producto::getActivo)
+                        .toList());
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
+                .thenReturn(lotesSimulados);
 
         var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, true);
 
         assertEquals(2, resultado.size());
         assertTrue(resultado.stream().allMatch(ProductoFiltrado::activo));
+
+        assertEquals(100, resultado.get(0).stockTotal());
+        assertEquals(50, resultado.get(1).stockTotal());
+        assertTrue(resultado.get(0).isDisponible());
+        assertTrue(resultado.get(1).isDisponible());
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
-    void buscarProductosSinCoincidencias() {
+    void buscarProductosSinCoincidenciasDevuelveListaVacia() {
         when(servicioProducto.buscarPorCampos("X", null, null))
+                .thenReturn(List.of());
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(List.of());
 
         var resultado = servicioAppProducto.buscarProductosFiltrados("X", null, null);
