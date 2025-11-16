@@ -1,0 +1,74 @@
+/* Contenedor general */
+.opciones-container {
+  width: 90%;
+  margin-top: 2vh;
+  display: flex;
+  flex-direction: column;
+  gap: 3vh;
+}
+
+/* WRAPPER de los métodos */
+.metodos-wrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 botones por fila */
+  grid-gap: 1.5vh;
+  justify-items: center;
+}
+
+/* Estilo general de botones */
+.metodo-btn {
+  width: 120px;           /* cuadrado */
+  height: 120px;          /* cuadrado */
+  background: #ffffff;
+  border: none;
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1b1c29;
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+/* Botón activo (Efectivo) */
+.metodo-btn.activo {
+  background: #6c4ef2;
+  color: white;
+}
+
+/* Segunda fila debe alinearse también */
+.metodo-btn:nth-child(4) {
+  grid-column: 1 / span 1; /* Cheque empieza alineado abajo a la izquierda */
+}
+
+/* Botón Finalizar */
+.finalizar-wrapper {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.btn-finalizar {
+  width: 80%;
+  padding: 2vh 1vw;
+  background: #6c4ef2;
+  color: white;
+  font-size: 1.3rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s;
+  margin-top: 10%;
+}
+
+.btn-finalizar:hover {
+  background: #593ae0;
+}
