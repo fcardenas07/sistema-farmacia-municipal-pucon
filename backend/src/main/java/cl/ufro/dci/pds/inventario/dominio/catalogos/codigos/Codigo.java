@@ -70,15 +70,13 @@ public class Codigo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Codigo codigo = (Codigo) o;
-        return activo == codigo.activo && Objects.equals(idCodigo, codigo.idCodigo) && Objects.equals(codigoBarra, codigo.codigoBarra) && Objects.equals(tipoCodigo, codigo.tipoCodigo) && Objects.equals(producto, codigo.producto);
+        if (!(o instanceof Codigo codigo)) return false;
+        return Objects.equals(idCodigo, codigo.idCodigo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idCodigo, codigoBarra, tipoCodigo, activo, producto);
+        return Objects.hashCode(idCodigo);
     }
 
     @Override

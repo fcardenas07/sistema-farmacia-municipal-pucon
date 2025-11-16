@@ -113,15 +113,13 @@ public class Producto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Producto producto = (Producto) o;
-        return Objects.equals(idProducto, producto.idProducto) && Objects.equals(nombreComercial, producto.nombreComercial) && Objects.equals(nombreGenerico, producto.nombreGenerico) && Objects.equals(presentacion, producto.presentacion) && Objects.equals(dosificacion, producto.dosificacion) && Objects.equals(unidadMedida, producto.unidadMedida) && Objects.equals(stockMinimo, producto.stockMinimo) && Objects.equals(stockMaximo, producto.stockMaximo) && Objects.equals(estado, producto.estado);
+        if (!(o instanceof Producto producto)) return false;
+        return Objects.equals(idProducto, producto.idProducto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idProducto, nombreComercial, nombreGenerico, presentacion, dosificacion, unidadMedida, stockMinimo, stockMaximo, estado);
+        return Objects.hashCode(idProducto);
     }
 
     @Override
