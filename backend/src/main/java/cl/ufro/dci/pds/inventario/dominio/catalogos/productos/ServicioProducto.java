@@ -4,6 +4,8 @@ import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ServicioProducto {
 
@@ -28,5 +30,13 @@ public class ServicioProducto {
 
         dto.aplicarCambios(producto);
         return repositorioProducto.save(producto);
+    }
+
+    public List<Producto> buscarPorCampos(
+            String nombreComercial,
+            String nombreGenerico,
+            Boolean activo
+    ) {
+        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo);
     }
 }
