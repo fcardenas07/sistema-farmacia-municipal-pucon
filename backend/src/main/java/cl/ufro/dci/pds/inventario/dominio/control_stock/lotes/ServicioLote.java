@@ -18,5 +18,4 @@ public class ServicioLote {
         }
         return repositorioLote.findByProducto_IdProductoIn(idsProducto);
     }
-
 }

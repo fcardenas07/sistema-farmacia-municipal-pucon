@@ -6,8 +6,10 @@ public record ProductoFiltrado(
         String idProducto,
         String nombreComercial,
         String nombreGenerico,
+        String categoria,
         boolean activo,
-        int stockTotal
+        int stockTotal,
+        String urlFoto
 ) {
 
     public boolean isDisponible() {
@@ -19,8 +21,10 @@ public record ProductoFiltrado(
                 producto.getIdProducto(),
                 producto.getNombreComercial(),
                 producto.getNombreGenerico(),
-                producto.getActivo(),
-                stockTotal
+                producto.getCategoria(),
+                producto.isActivo(),
+                stockTotal,
+                producto.getUrlFoto()
         );
     }
 }

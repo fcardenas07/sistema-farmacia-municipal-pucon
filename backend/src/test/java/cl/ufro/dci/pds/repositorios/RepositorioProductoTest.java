@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.repositorios;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,18 @@ class RepositorioProductoTest {
         repositorioProducto.deleteAll();
 
         repositorioProducto.saveAll(List.of(
-                new Producto("P001", "Paracetamol", "Paracetamol genérico", "Tabletas 500mg", "500mg", "Comprimidos", 10, 100, true),
-                new Producto("P002", "Ibuprofeno", "Ibuprofeno genérico", "Tabletas 400mg", "400mg", "Comprimidos", 5, 50, true),
-                new Producto("P003", "Amoxicilina", "Amoxicilina genérica", "Caja 12 cápsulas", "500mg", "mg", 20, 200, false)
+                new Producto("P001", "Paracetamol", "Paracetamol genérico",
+                        "Tabletas 500mg", "500mg", "Comprimidos",
+                        10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                        "producto/P001.jpg"),
+                new Producto("P002", "Ibuprofeno", "Ibuprofeno genérico",
+                        "Tabletas 400mg", "400mg", "Comprimidos",
+                        5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                        "producto/P002.jpg"),
+                new Producto("P003", "Amoxicilina", "Amoxicilina genérica",
+                        "Caja 12 cápsulas", "500mg", "mg",
+                        20, 200, false, CategoriaProducto.ANTIBIOTICOS,
+                        "producto/P003.jpg")
         ));
     }
 
@@ -63,7 +73,7 @@ class RepositorioProductoTest {
         List<Producto> resultado = repositorioProducto.buscarPorCampos(null, null, true);
 
         assertThat(resultado).hasSize(2);
-        assertThat(resultado).allMatch(Producto::getActivo);
+        assertThat(resultado).allMatch(Producto::isActivo);
     }
 
     @Test

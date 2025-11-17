@@ -8,6 +8,7 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,11 @@ public class ServicioAppProducto {
 
         var codigos = servicioCodigo.obtenerCodigosConIdProducto(id);
         return ProductoModificado.desde(actualizado, codigos);
+    }
+
+    @Transactional
+    public void actualizarFoto(String id, MultipartFile foto) {
+        servicioProducto.guardarFoto(id, foto);
     }
 
     @Transactional

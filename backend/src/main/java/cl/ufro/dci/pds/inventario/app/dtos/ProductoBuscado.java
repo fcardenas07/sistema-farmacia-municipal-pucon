@@ -24,7 +24,7 @@ public record ProductoBuscado(
                 producto.getPresentacion(),
                 producto.getDosificacion(),
                 producto.getUnidadMedida(),
-                producto.getActivo(),
+                producto.isActivo(),
                 codigos.stream().map(CodigoBuscado::desde).toList()
         );
     }

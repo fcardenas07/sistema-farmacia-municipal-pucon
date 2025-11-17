@@ -2,9 +2,11 @@ package cl.ufro.dci.pds.inventario.app.dtos;
 
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+
 import java.util.List;
 
 @StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
@@ -40,6 +42,9 @@ public record ProductoACrear(
 
         boolean activo,
 
+        @NotNull(message = "La categoría es obligatoria")
+        CategoriaProducto categoria,
+
         @Valid
         @NotEmpty(message = "El producto debe tener al menos un código")
         List<CodigoACrear> codigos
@@ -56,6 +61,8 @@ public record ProductoACrear(
         p.setStockMinimo(stockMinimo);
         p.setStockMaximo(stockMaximo);
         p.setActivo(activo);
+        p.setCategoria(categoria);
+
         return p;
     }
 }

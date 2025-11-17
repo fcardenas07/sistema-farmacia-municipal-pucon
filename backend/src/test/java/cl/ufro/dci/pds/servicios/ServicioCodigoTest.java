@@ -3,6 +3,7 @@ package cl.ufro.dci.pds.servicios;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.*;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,9 @@ class ServicioCodigoTest {
                 "Comprimidos",
                 10,
                 100,
-                true
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0001.jpg"
         );
 
         codigoEntidad = new Codigo(

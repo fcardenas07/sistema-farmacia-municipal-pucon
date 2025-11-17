@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.repositorios;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
@@ -32,11 +33,14 @@ class RepositorioLoteTest {
 
         var productoParacetamol = new Producto(
                 "P001", "Paracetamol", "Paracetamol genérico",
-                "Tabletas 500mg", "500mg", "Comprimidos", 10, 100, true
+                "Tabletas 500mg", "500mg", "Comprimidos",
+                10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "producto/P001.jpg"
         );
+
         var productoIbuprofeno = new Producto(
                 "P002", "Ibuprofeno", "Ibuprofeno genérico",
-                "Tabletas 400mg", "400mg", "Comprimidos", 5, 50, true
+                "Tabletas 400mg", "400mg", "Comprimidos",
+                5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "producto/P002.jpg"
         );
 
         repositorioProducto.saveAll(List.of(productoParacetamol, productoIbuprofeno));

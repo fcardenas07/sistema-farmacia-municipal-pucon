@@ -1,17 +1,16 @@
 package cl.ufro.dci.pds.integraciones;
 
-import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
-import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
+import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.RepositorioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,156 +18,192 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class ControladorProductoIntegradoTest {
+    @SpringBootTest
+    @AutoConfigureMockMvc
+    class ControladorProductoIntegradoTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private RepositorioProducto repositorioProducto;
+        @Autowired
+        private RepositorioProducto repositorioProducto;
 
-    @Autowired
-    private RepositorioCodigo repositorioCodigo;
+        @Autowired
+        private RepositorioCodigo repositorioCodigo;
 
-    @Autowired
-    private RepositorioLote repositorioLote;
+        @Autowired
+        private RepositorioLote repositorioLote;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        repositorioCodigo.deleteAll();
-        repositorioLote.deleteAll();
-        repositorioProducto.deleteAll();
+        @BeforeEach
+        void setUp() throws IOException {
+            repositorioCodigo.deleteAll();
+            repositorioLote.deleteAll();
+            repositorioProducto.deleteAll();
 
-        var producto1 = new Producto(
-                "P001",
-                "Paracetamol 500mg",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
-                10,
-                100,
-                true
-        );
-        repositorioProducto.save(producto1);
+            var fotosDir = Paths.get("src/test/resources/assets-test/productos");
+            if (Files.exists(fotosDir)) {
+                Files.walk(fotosDir)
+                        .filter(Files::isRegularFile)
+                        .forEach(f -> {
+                            try { Files.delete(f); }
+                            catch (IOException e) { e.printStackTrace(); }
+                        });
+            }
 
-        var codigo1 = new Codigo();
-        codigo1.setIdCodigo("C001");
-        codigo1.setCodigoBarra("1234567890123");
-        codigo1.setTipoCodigo("EAN");
-        codigo1.setActivo(true);
-        codigo1.setProducto(producto1);
-        repositorioCodigo.save(codigo1);
+            var producto1 = new Producto(
+                    "P001",
+                    "Paracetamol 500mg",
+                    "Paracetamol genérico",
+                    "Tabletas 500mg",
+                    "500mg",
+                    "Comprimidos",
+                    10,
+                    100,
+                    true,
+                    CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                    null
+            );
 
-        var lote1 = new Lote();
-        lote1.setIdLote("L001");
-        lote1.setProducto(producto1);
-        lote1.setNumeroLote("NUM001");
-        lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
-        lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
-        lote1.setEstado("DISPONIBLE");
+            repositorioProducto.save(producto1);
 
-        var stock1 = new Stock();
-        stock1.setIdStock("S001");
-        stock1.setCantidadInicial(500);
-        stock1.setCantidadActual(300);
-        stock1.setLote(lote1);
-        lote1.setStock(stock1);
+            var codigo1 = new Codigo();
+            codigo1.setIdCodigo("C001");
+            codigo1.setCodigoBarra("1234567890123");
+            codigo1.setTipoCodigo("EAN");
+            codigo1.setActivo(true);
+            codigo1.setProducto(producto1);
+            repositorioCodigo.save(codigo1);
 
-        repositorioLote.save(lote1);
+            var lote1 = new Lote();
+            lote1.setIdLote("L001");
+            lote1.setProducto(producto1);
+            lote1.setNumeroLote("NUM001");
+            lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
+            lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
+            lote1.setEstado("DISPONIBLE");
 
-        var producto2 = new Producto(
-                "P002",
-                "Ibuprofeno 400mg",
-                "Ibuprofeno genérico",
-                "Caja con 10 tabletas",
-                "400mg",
-                "mg",
-                5,
-                50,
-                true
-        );
-        repositorioProducto.save(producto2);
+            var stock1 = new Stock();
+            stock1.setIdStock("S001");
+            stock1.setCantidadInicial(500);
+            stock1.setCantidadActual(300);
+            stock1.setLote(lote1);
+            lote1.setStock(stock1);
 
-        var codigo2 = new Codigo();
-        codigo2.setIdCodigo("C002");
-        codigo2.setCodigoBarra("9876543210987");
-        codigo2.setTipoCodigo("EAN");
-        codigo2.setActivo(true);
-        codigo2.setProducto(producto2);
-        repositorioCodigo.save(codigo2);
+            repositorioLote.save(lote1);
 
-        var lote2 = new Lote();
-        lote2.setIdLote("L002");
-        lote2.setProducto(producto2);
-        lote2.setNumeroLote("NUM002");
-        lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
-        lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
-        lote2.setEstado("DISPONIBLE");
+            var producto2 = new Producto(
+                    "P002",
+                    "Ibuprofeno 400mg",
+                    "Ibuprofeno genérico",
+                    "Caja con 10 tabletas",
+                    "400mg",
+                    "mg",
+                    5,
+                    50,
+                    true,
+                    CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                    null
+            );
 
-        var stock2 = new Stock();
-        stock2.setIdStock("S002");
-        stock2.setCantidadInicial(500);
-        stock2.setCantidadActual(100);
-        stock2.setLote(lote2);
-        lote2.setStock(stock2);
+            repositorioProducto.save(producto2);
 
-        repositorioLote.save(lote2);
+            var codigo2 = new Codigo();
+            codigo2.setIdCodigo("C002");
+            codigo2.setCodigoBarra("9876543210987");
+            codigo2.setTipoCodigo("EAN");
+            codigo2.setActivo(true);
+            codigo2.setProducto(producto2);
+            repositorioCodigo.save(codigo2);
 
-        var producto3 = new Producto(
-                "P003",
-                "Amoxicilina 500mg",
-                "Amoxicilina genérica",
-                "Caja con 12 cápsulas",
-                "500mg",
-                "mg",
-                0,
-                0,
-                false
-        );
-        repositorioProducto.save(producto3);
+            var lote2 = new Lote();
+            lote2.setIdLote("L002");
+            lote2.setProducto(producto2);
+            lote2.setNumeroLote("NUM002");
+            lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
+            lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
+            lote2.setEstado("DISPONIBLE");
 
-        var codigo3 = new Codigo();
-        codigo3.setIdCodigo("C003");
-        codigo3.setCodigoBarra("1112223334445");
-        codigo3.setTipoCodigo("EAN");
-        codigo3.setActivo(true);
-        codigo3.setProducto(producto3);
-        repositorioCodigo.save(codigo3);
+            var stock2 = new Stock();
+            stock2.setIdStock("S002");
+            stock2.setCantidadInicial(500);
+            stock2.setCantidadActual(100);
+            stock2.setLote(lote2);
+            lote2.setStock(stock2);
 
-        var lote3 = new Lote();
-        lote3.setIdLote("L003");
-        lote3.setProducto(producto3);
-        lote3.setNumeroLote("NUM003");
-        lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
-        lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
-        lote3.setEstado("NO_DISPONIBLE");
+            repositorioLote.save(lote2);
 
-        var stock3 = new Stock();
-        stock3.setIdStock("S003");
-        stock3.setCantidadInicial(200);
-        stock3.setCantidadActual(20);
-        stock3.setLote(lote3);
-        lote3.setStock(stock3);
+            var producto3 = new Producto(
+                    "P003",
+                    "Amoxicilina 500mg",
+                    "Amoxicilina genérica",
+                    "Caja con 12 cápsulas",
+                    "500mg",
+                    "mg",
+                    0,
+                    0,
+                    false,
+                    CategoriaProducto.ANTIBIOTICOS,
+                    null
+            );
 
-        repositorioLote.save(lote3);
-    }
+            repositorioProducto.save(producto3);
+
+            var codigo3 = new Codigo();
+            codigo3.setIdCodigo("C003");
+            codigo3.setCodigoBarra("1112223334445");
+            codigo3.setTipoCodigo("EAN");
+            codigo3.setActivo(true);
+            codigo3.setProducto(producto3);
+            repositorioCodigo.save(codigo3);
+
+            var lote3 = new Lote();
+            lote3.setIdLote("L003");
+            lote3.setProducto(producto3);
+            lote3.setNumeroLote("NUM003");
+            lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
+            lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
+            lote3.setEstado("NO_DISPONIBLE");
+
+            var stock3 = new Stock();
+            stock3.setIdStock("S003");
+            stock3.setCantidadInicial(200);
+            stock3.setCantidadActual(20);
+            stock3.setLote(lote3);
+            lote3.setStock(stock3);
+
+            repositorioLote.save(lote3);
+        }
+
+        @AfterEach
+        void limpiarFotos() throws IOException {
+            var fotosDir = Paths.get("src/test/resources/assets/productos");
+            if (Files.exists(fotosDir)) {
+                Files.walk(fotosDir)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            }
+        }
 
     @Test
     @DisplayName("Crear producto con un body vacío devuelve 400")
@@ -196,7 +231,7 @@ class ControladorProductoIntegradoTest {
     void crearProductoConBodyVacioJSON() throws Exception {
         ProductoACrear dtoVacio = new ProductoACrear(
                 null, null, null, null, null, null,
-                null, null, false, List.of()
+                null, null, false, null, List.of()
         );
 
         mockMvc.perform(post("/productos")
@@ -215,7 +250,7 @@ class ControladorProductoIntegradoTest {
     void crearProductoConCamposVacios() throws Exception {
         ProductoACrear dtoCamposVacios = new ProductoACrear(
                 "", "", "", null, null, null,
-                null, null, false, List.of()
+                null, null, false, null, List.of()
         );
 
         mockMvc.perform(post("/productos")
@@ -248,9 +283,9 @@ class ControladorProductoIntegradoTest {
     }
 
     @Test
-    @DisplayName("Crear producto válido devuelve 201")
-    void crearProductoValido() throws Exception {
-        var nuevoProducto = new ProductoACrear(
+    @DisplayName("Crear producto válido devuelve 201 (integración)")
+    void crearProductoValidoIntegracion() throws Exception {
+        var dto = new ProductoACrear(
                 "P004",
                 "Diclofenaco 50mg",
                 "Diclofenaco genérico",
@@ -260,17 +295,19 @@ class ControladorProductoIntegradoTest {
                 5,
                 50,
                 true,
-                List.of(new CodigoACrear("C004", "D50A", "EAN", true))
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(new CodigoACrear("C004", "9990001112223", "EAN", true))
         );
-
-        String nuevoProductoJson = objectMapper.writeValueAsString(nuevoProducto);
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(nuevoProductoJson))
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.idProducto").value("P004"))
-                .andExpect(jsonPath("$.activo").value(true));
+                .andExpect(jsonPath("$.nombreComercial").value("Diclofenaco 50mg"))
+                .andExpect(jsonPath("$.activo").value(true))
+                .andExpect(jsonPath("$.urlFoto").doesNotExist());
     }
 
     @Test
@@ -285,8 +322,11 @@ class ControladorProductoIntegradoTest {
                 "Comprimidos",
                 5,
                 50,
-                true
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P001.jpg"
         );
+
         repositorioProducto.save(productoExistente);
 
         var codigoExistente = new Codigo();
@@ -297,7 +337,7 @@ class ControladorProductoIntegradoTest {
         codigoExistente.setProducto(productoExistente);
         repositorioCodigo.save(codigoExistente);
 
-        ProductoACrear dto = new ProductoACrear(
+        var dto = new ProductoACrear(
                 "P003",
                 "Diclofenaco 50mg",
                 "Diclofenaco genérico",
@@ -307,6 +347,7 @@ class ControladorProductoIntegradoTest {
                 5,
                 50,
                 true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C002", "9876543210987", "EAN", true))
         );
 
@@ -331,6 +372,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 false,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", null, true))
         );
 
@@ -357,8 +399,11 @@ class ControladorProductoIntegradoTest {
                 "mg",
                 5,
                 50,
-                true
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
         );
+
         repositorioProducto.save(producto);
 
         var codigo1 = new Codigo();
@@ -386,6 +431,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 false,
+                null,
                 List.of(
                         new CodigoAModificar("C101", "1111111111111", null, true),
                         new CodigoAModificar("C102", "2222222222222", null, true)
@@ -419,6 +465,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 100,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -441,8 +488,11 @@ class ControladorProductoIntegradoTest {
                 "mg",
                 5,
                 50,
-                true
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
         );
+
         repositorioProducto.save(producto);
 
         var dto = new ProductoAModificar(
@@ -454,6 +504,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true))
         );
 
@@ -467,8 +518,34 @@ class ControladorProductoIntegradoTest {
     @Test
     @DisplayName("Actualizar producto con código que no pertenece al producto devuelve 404")
     void actualizarProductoConCodigoNoPertenece() throws Exception {
-        var producto1 = new Producto("P011", "Prod 1", "Gen 1", "Pres", "10mg", "mg", 5, 50, true);
-        var producto2 = new Producto("P012", "Prod 2", "Gen 2", "Pres", "10mg", "mg", 5, 50, true);
+        var producto1 = new Producto(
+                "P011",
+                "Prod 1",
+                "Gen 1",
+                "Pres",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        var producto2 = new Producto(
+                "P012",
+                "Prod 2",
+                "Gen 2",
+                "Pres",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                null
+        );
+
         repositorioProducto.save(producto1);
         repositorioProducto.save(producto2);
 
@@ -489,6 +566,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C002", "7800987654321", "EAN", true))
         );
 
@@ -511,8 +589,11 @@ class ControladorProductoIntegradoTest {
                 "mg",
                 5,
                 50,
-                true
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
         );
+
         repositorioProducto.save(producto);
 
         var codigo = new Codigo();
@@ -532,6 +613,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 false,
+                null,
                 null
         );
 
@@ -559,6 +641,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 100,
                 true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C001", "1234567890123", "EAN", true))
         );
 
@@ -583,6 +666,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C010", "1234567890123", "EAN", true))
         );
 
@@ -607,6 +691,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIVIRALES,
                 List.of(new CodigoACrear("C011", "1234567890124", "EAN", true))
         );
 
@@ -631,6 +716,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 10,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C013", "1234567890126", "EAN", true))
         );
 
@@ -656,6 +742,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C014", "1234567890127", "EAN", true))
         );
 
@@ -681,6 +768,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C016", "1234567890129", "EAN", true))
         );
 
@@ -706,6 +794,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C017", "1234567890130", "EAN", true))
         );
 
@@ -731,6 +820,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIFUNGICOS,
                 List.of(new CodigoACrear("C018", "1234567890131", "EAN", true))
         );
 
@@ -756,6 +846,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.DERMATOLOGICOS,
                 List.of(new CodigoACrear("C019", "1234567890132", "EAN", true))
         );
 
@@ -780,6 +871,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 -1,
                 true,
+                CategoriaProducto.ANTIFUNGICOS,
                 List.of(new CodigoACrear("C015", "1234567890128", "EAN", true))
         );
 
@@ -805,6 +897,7 @@ class ControladorProductoIntegradoTest {
                 -1,
                 50,
                 true,
+                CategoriaProducto.DERMATOLOGICOS,
                 List.of(new CodigoACrear("C012", "1234567890125", "EAN", true))
         );
 
@@ -829,6 +922,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.DERMATOLOGICOS,
                 List.of()
         );
 
@@ -852,6 +946,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.DERMATOLOGICOS,
                 List.of(new CodigoACrear("", "1234567890123", "EAN", true))
         );
 
@@ -876,6 +971,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIHISTAMINICOS,
                 List.of(new CodigoACrear("C100", "", "EAN", true))
         );
 
@@ -901,6 +997,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C101", codigoLargo, "EAN", true))
         );
 
@@ -926,6 +1023,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIVIRALES,
                 List.of(new CodigoACrear("C102", "1234567890123", "", true))
         );
 
@@ -952,6 +1050,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C103", "1234567890123", tipoLargo, true))
         );
 
@@ -978,6 +1077,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 10,
                 true,
+                CategoriaProducto.ANTIVIRALES,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1004,6 +1104,7 @@ class ControladorProductoIntegradoTest {
                 -5,
                 10,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1029,6 +1130,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 -5,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1055,6 +1157,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1081,6 +1184,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1107,6 +1211,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1133,6 +1238,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1159,6 +1265,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -1183,6 +1290,7 @@ class ControladorProductoIntegradoTest {
                 null,
                 10,
                 50,
+                null,
                 null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
@@ -1209,6 +1317,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                null,
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true))
         );
 
@@ -1228,7 +1337,7 @@ class ControladorProductoIntegradoTest {
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
-                10, 50, true,
+                10, 50, true, null,
                 List.of(dto)
         );
 
@@ -1250,7 +1359,7 @@ class ControladorProductoIntegradoTest {
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
-                10, 50, true,
+                10, 50, true, null,
                 List.of(dto)
         );
 
@@ -1272,7 +1381,7 @@ class ControladorProductoIntegradoTest {
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
-                10, 50, true,
+                10, 50, true, null,
                 List.of(dto)
         );
 
@@ -1295,7 +1404,7 @@ class ControladorProductoIntegradoTest {
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
-                10, 50, true,
+                10, 50, true, null,
                 List.of(codigo1, codigo2, codigoDuplicado)
         );
 
@@ -1324,6 +1433,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(codigo1, codigo2, codigoDuplicado)
         );
 
@@ -1348,6 +1458,7 @@ class ControladorProductoIntegradoTest {
                 100_000_001,
                 50,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C999", "1234567890123", "EAN", true))
         );
 
@@ -1372,6 +1483,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 100_000_001,
                 true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("C998", "1234567890456", "EAN", true))
         );
 
@@ -1396,6 +1508,7 @@ class ControladorProductoIntegradoTest {
                 100_000_001,
                 null,
                 true,
+                null,
                 null
         );
 
@@ -1418,6 +1531,7 @@ class ControladorProductoIntegradoTest {
                 null,
                 100_000_001,
                 true,
+                null,
                 null
         );
 
@@ -1443,6 +1557,7 @@ class ControladorProductoIntegradoTest {
                 0,
                 0,
                 false,
+                null,
                 List.of(codigo)
         );
 
@@ -1525,5 +1640,142 @@ class ControladorProductoIntegradoTest {
                         .param("nombreComercial", "NoExiste"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    @DisplayName("Crear producto (JSON) y luego subir imagen funciona (200) [integración]")
+    void crearProductoYLuegoSubirImagen() throws Exception {
+        var dto = new ProductoACrear(
+                "P020", "Prueba Producto", "Genérico Prueba",
+                "Caja", "50mg", "mg",
+                5, 100, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(new CodigoACrear("C020", "0001112223334", "EAN", true))
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idProducto").value("P020"))
+                .andExpect(jsonPath("$.urlFoto").doesNotExist());
+
+        var foto = new MockMultipartFile(
+                "foto",
+                "imagen.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "contenido-de-prueba".getBytes()
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P020")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        var producto = repositorioProducto.findById("P020").orElseThrow();
+        assertThat(producto.getUrlFoto()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen del producto devuelve 200 (integración)")
+    void actualizarImagenDelProducto() throws Exception {
+        var foto = new MockMultipartFile(
+                "foto",
+                "ok.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "bytes".getBytes()
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        var producto = repositorioProducto.findById("P001").orElseThrow();
+        assertThat(producto.getUrlFoto()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen con formato no permitido devuelve 400 (integración)")
+    void actualizarImagenFormatoNoPermitido() throws Exception {
+        var foto = new MockMultipartFile(
+                "foto",
+                "archivo.txt",
+                "text/plain",
+                "hola".getBytes()
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo debe ser una imagen PNG o JPG"));
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen con nombre vacío devuelve 400 (integración)")
+    void actualizarImagenNombreVacio() throws Exception {
+        var foto = new MockMultipartFile(
+                "foto",
+                "   ",
+                MediaType.IMAGE_JPEG_VALUE,
+                "bytes".getBytes()
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo debe tener un nombre válido"));
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen muy grande devuelve 400 por validación")
+    void actualizarImagenMuyGrande() throws Exception {
+        var gigante = new byte[20_000_000];
+
+        var foto = new MockMultipartFile(
+                "foto",
+                "ok.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                gigante
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto").value("El archivo no puede superar los 10 MB"));
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen sin enviar archivo devuelve 400 (integración)")
+    void actualizarImagenSinArchivo() throws Exception {
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo no puede estar vacío"));
+    }
+
+    @Test
+    @DisplayName("Actualizar imagen con archivo vacío devuelve 400 (integración)")
+    void actualizarImagenArchivoVacio() throws Exception {
+        var foto = new MockMultipartFile(
+                "foto",
+                "imagen.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                new byte[0]
+        );
+
+        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+                        .file(foto)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo no puede estar vacío"));
     }
 }

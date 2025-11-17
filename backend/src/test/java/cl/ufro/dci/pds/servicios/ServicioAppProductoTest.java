@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.servicios;
 
+import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.*;
@@ -10,6 +11,7 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,11 +39,61 @@ class ServicioAppProductoTest {
         servicioLote = mock(ServicioLote.class);
         servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo, servicioLote);
 
-        var productoParacetamol = new Producto("P001","Paracetamol","Paracetamol genérico","Tabletas 500mg","500mg","Comprimidos",10,100,true);
-        var productoIbuprofeno = new Producto("P002","Ibuprofeno","Ibuprofeno genérico","Tabletas 400mg","400mg","Comprimidos",5,50,true);
-        var productoAmoxicilina = new Producto("P003","Amoxicilina","Amoxicilina genérica","Caja 12 cápsulas","500mg","mg",20,200,false);
+        var productoParacetamol = new Producto(
+                "P001",
+                "Paracetamol",
+                "Paracetamol genérico",
+                "Tabletas 500mg",
+                "500mg",
+                "Comprimidos",
+                10,
+                100,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0001.jpg"
+        );
 
-        productoEntidad = productoParacetamol;
+        var productoIbuprofeno = new Producto(
+                "P002",
+                "Ibuprofeno",
+                "Ibuprofeno genérico",
+                "Tabletas 400mg",
+                "400mg",
+                "Comprimidos",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0002.jpg"
+        );
+
+        var productoAmoxicilina = new Producto(
+                "P003",
+                "Amoxicilina",
+                "Amoxicilina genérica",
+                "Caja 12 cápsulas",
+                "500mg",
+                "mg",
+                20,
+                200,
+                false,
+                CategoriaProducto.ANTIBIOTICOS,
+                "producto/P0003.jpg"
+        );
+
+        productoEntidad = new Producto(
+                productoParacetamol.getIdProducto(),
+                productoParacetamol.getNombreComercial(),
+                productoParacetamol.getNombreGenerico(),
+                productoParacetamol.getPresentacion(),
+                productoParacetamol.getDosificacion(),
+                productoParacetamol.getUnidadMedida(),
+                productoParacetamol.getStockMinimo(),
+                productoParacetamol.getStockMaximo(),
+                productoParacetamol.isActivo(),
+                productoParacetamol.getCategoriaProducto(),
+                null
+        );
 
         codigoEntidad = new Codigo("C001","1234567890123","EAN",true, productoEntidad);
 
@@ -72,18 +124,20 @@ class ServicioAppProductoTest {
     void crearProductoValido() {
         var dto = new ProductoACrear("P001", "Paracetamol", "Paracetamol genérico",
                 "Tabletas 500mg", "500mg", "Comprimidos", 10, 100, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C001", "1234567890123", "EAN", true)));
 
         when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
         when(servicioCodigo.crear(eq(productoEntidad), any(CodigoACrear.class))).thenReturn(codigoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto("P001")).thenReturn(List.of(codigoEntidad));
 
-        ProductoCreado creado = servicioAppProducto.crearProducto(dto);
+        var creado = servicioAppProducto.crearProducto(dto);
 
         assertEquals("P001", creado.idProducto());
         assertEquals("Paracetamol", creado.nombreComercial());
         assertEquals(1, creado.codigos().size());
         assertEquals("C001", creado.codigos().getFirst().idCodigo());
+        assertNull(creado.urlFoto());
 
         verify(servicioCodigo).crear(eq(productoEntidad), any(CodigoACrear.class));
     }
@@ -93,6 +147,7 @@ class ServicioAppProductoTest {
     void crearProductoCodigoDuplicado() {
         var dto = new ProductoACrear("P002", "Ibuprofeno", "Ibuprofeno genérico",
                 "Tabletas 400mg", "400mg", "Comprimidos", 5, 50, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C002", "9876543210987", "EAN", true)));
 
         when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
@@ -105,7 +160,7 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar producto válido devuelve ProductoModificado")
     void actualizarProductoValido() {
-        String id = "P001";
+        var id = "P001";
 
         var dto = new ProductoAModificar(
                 "Nuevo Nombre",
@@ -116,6 +171,7 @@ class ServicioAppProductoTest {
                 10,
                 50,
                 false,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", null, true))
         );
 
@@ -139,7 +195,7 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar los códigos de un producto válido devuelve ProductoModificado")
     void actualizarCodigosProductoValido() {
-        String id = "P001";
+        var id = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -150,6 +206,7 @@ class ServicioAppProductoTest {
                 10,
                 50,
                 false,
+                null,
                 List.of(
                         new CodigoAModificar("C001", "1234567890123", null, true),
                         new CodigoAModificar("C002", "7800987654321", null, true)
@@ -180,9 +237,10 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar producto inexistente lanza ProductoNoEncontradoException")
     void actualizarProductoNoExistente() {
-        String id = "P999";
+        var id = "P999";
         var dto = new ProductoAModificar("Paracetamol Modificado", "Paracetamol genérico",
                 "Tabletas 500mg", "500mg", "Comprimidos", 10, 100, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true)));
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class)))
@@ -194,9 +252,10 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar producto con código inexistente lanza CodigoNoEncontradoException")
     void actualizarProductoConCodigoNoExistente() {
-        String id = "P001";
+        var id = "P001";
         var dto = new ProductoAModificar("Nombre Nuevo", null, null, null, null,
                 10, 50, true,
+                null,
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true)));
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
@@ -209,9 +268,9 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar producto con código que no pertenece al producto lanza CodigoNoPerteneceProductoException")
     void actualizarProductoConCodigoNoPertenece() {
-        String id = "P001";
+        var id = "P001";
         var dto = new ProductoAModificar("Nombre Nuevo", null, null, null, null,
-                10, 50, true,
+                10, 50, true, null,
                 List.of(new CodigoAModificar("C002", "7800987654321", "EAN", true)));
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
@@ -224,9 +283,9 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Actualizar producto con lista de códigos nula no modifica códigos y devuelve ProductoModificado")
     void actualizarProductoConCodigosNulosNoModifica() {
-        String id = "P001";
+        var id = "P001";
         var dto = new ProductoAModificar("Nombre Nuevo", null, null, null, null,
-                10, 50, true, null);
+                10, 50, true, null, null);
 
         productoEntidad.setNombreComercial("Nombre Nuevo");
         productoEntidad.setActivo(true);
@@ -309,7 +368,7 @@ class ServicioAppProductoTest {
     void buscarProductosActivosDevuelveSoloActivos() {
         when(servicioProducto.buscarPorCampos(null, null, true))
                 .thenReturn(productosEntidadesFiltrados.stream()
-                        .filter(Producto::getActivo)
+                        .filter(Producto::isActivo)
                         .toList());
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
@@ -338,5 +397,35 @@ class ServicioAppProductoTest {
         var resultado = servicioAppProducto.buscarProductosFiltrados("X", null, null);
 
         assertTrue(resultado.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Actualizar foto del producto llama a guardarFoto en servicioProducto")
+    void actualizarFotoValida() {
+        var foto = mock(MultipartFile.class);
+        when(foto.getOriginalFilename()).thenReturn("nueva.jpg");
+
+        doNothing().when(servicioProducto).guardarFoto("P001", foto);
+
+        servicioAppProducto.actualizarFoto("P001", foto);
+
+        verify(servicioProducto).guardarFoto("P001", foto);
+    }
+
+    @Test
+    @DisplayName("Error al actualizar foto propaga ImagenAlmacenadaException")
+    void actualizarFotoFalla() {
+
+        var foto = mock(MultipartFile.class);
+        when(foto.getOriginalFilename()).thenReturn("error.jpg");
+
+        doThrow(new ImagenAlmacenadaException())
+                .when(servicioProducto)
+                .guardarFoto("P001", foto);
+
+        assertThrows(
+                ImagenAlmacenadaException.class,
+                () -> servicioAppProducto.actualizarFoto("P001", foto)
+        );
     }
 }

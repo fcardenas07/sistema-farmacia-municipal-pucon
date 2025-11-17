@@ -36,11 +36,19 @@ public class Producto {
     @Column(name = "activo")
     private boolean activo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria")
+    private CategoriaProducto categoria;
+
+    @Column(name = "url_foto")
+    private String urlFoto;
+
     public Producto() {
     }
 
     public Producto(String idProducto, String nombreComercial, String nombreGenerico, String presentacion,
-                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo, boolean activo) {
+                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
+                    boolean activo, CategoriaProducto categoria, String urlFoto) {
         this.idProducto = idProducto;
         this.nombreComercial = nombreComercial;
         this.nombreGenerico = nombreGenerico;
@@ -50,6 +58,8 @@ public class Producto {
         this.stockMinimo = stockMinimo;
         this.stockMaximo = stockMaximo;
         this.activo = activo;
+        this.categoria = categoria;
+        this.urlFoto = urlFoto;
     }
 
     public String getIdProducto() {
@@ -116,12 +126,32 @@ public class Producto {
         this.stockMaximo = stockMaximo;
     }
 
-    public boolean getActivo() {
+    public boolean isActivo() {
         return activo;
     }
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getCategoria() {
+        return categoria.getNombreLegible();
+    }
+
+    public CategoriaProducto getCategoriaProducto() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaProducto categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
     }
 
     @Override
@@ -137,6 +167,16 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto{" + "idProducto='" + idProducto + '\'' + ", nombreComercial='" + nombreComercial + '\'' + ", nombreGenerico='" + nombreGenerico + '\'' + ", presentacion='" + presentacion + '\'' + ", dosificacion='" + dosificacion + '\'' + ", unidadMedida='" + unidadMedida + '\'' + ", stockMinimo=" + stockMinimo + ", stockMaximo=" + stockMaximo + ", activo='" + activo + '}';
+        return "Producto{" + "idProducto='" + idProducto + '\'' +
+                ", nombreComercial='" + nombreComercial + '\'' +
+                ", nombreGenerico='" + nombreGenerico + '\'' +
+                ", presentacion='" + presentacion + '\'' +
+                ", dosificacion='" + dosificacion + '\'' +
+                ", unidadMedida='" + unidadMedida + '\'' +
+                ", stockMinimo=" + stockMinimo + '\'' +
+                ", stockMaximo=" + stockMaximo + '\'' +
+                ", activo='" + activo + '\'' +
+                ", categoría='" + categoria + '\'' +
+                ", url foto=" + urlFoto + '}';
     }
 }
