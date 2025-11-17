@@ -1,4 +1,4 @@
-﻿# movimientos
+# movimientos
 
 ## Descripción
 Directorio para el módulo **movimientos**.

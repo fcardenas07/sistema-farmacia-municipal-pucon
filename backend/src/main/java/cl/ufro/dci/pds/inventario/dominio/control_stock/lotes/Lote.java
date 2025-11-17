@@ -1,0 +1,106 @@
+package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
+
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Entity
+@Table(name = "lote")
+public class Lote {
+
+    @Id
+    @Column(name = "id_lote")
+    private String idLote;
+
+    @Column(name = "fecha_elaboracion", nullable = false)
+    private LocalDate fechaElaboracion;
+
+    @Column(name = "fecha_vencimiento", nullable = false)
+    private LocalDate fechaVencimiento;
+
+    @Column(name = "numero_lote", nullable = false, unique = true)
+    private String numeroLote;
+
+    @Column(name = "estado", nullable = false)
+    private String estado;
+
+    @ManyToOne
+    @JoinColumn(name = "id_producto", nullable = false)
+    private Producto producto;
+
+    public Lote() {
+    }
+
+    public String getIdLote() {
+        return idLote;
+    }
+
+    public void setIdLote(String idLote) {
+        this.idLote = idLote;
+    }
+
+    public LocalDate getFechaElaboracion() {
+        return fechaElaboracion;
+    }
+
+    public void setFechaElaboracion(LocalDate fechaElaboracion) {
+        this.fechaElaboracion = fechaElaboracion;
+    }
+
+    public LocalDate getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public String getNumeroLote() {
+        return numeroLote;
+    }
+
+    public void setNumeroLote(String numeroLote) {
+        this.numeroLote = numeroLote;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Lote lote)) return false;
+        return Objects.equals(idLote, lote.idLote);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idLote);
+    }
+
+    @Override
+    public String toString() {
+        return "Lote{" +
+                "idLote='" + idLote + '\'' +
+                ", fechaElaboracion=" + fechaElaboracion +
+                ", fechaVencimiento=" + fechaVencimiento +
+                ", numeroLote='" + numeroLote + '\'' +
+                ", estado='" + estado + '\'' +
+                ", producto=" + producto + '\'' +
+                '}';
+    }
+}

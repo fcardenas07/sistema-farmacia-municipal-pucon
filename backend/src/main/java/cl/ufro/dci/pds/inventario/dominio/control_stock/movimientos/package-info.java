@@ -1,0 +1,1 @@
+package cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos;

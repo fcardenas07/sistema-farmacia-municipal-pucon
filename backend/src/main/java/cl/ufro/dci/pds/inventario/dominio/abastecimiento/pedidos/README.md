@@ -1,4 +1,4 @@
-﻿# pedidos
+# pedidos
 
 ## Descripción
 Directorio para el módulo **pedidos**.
