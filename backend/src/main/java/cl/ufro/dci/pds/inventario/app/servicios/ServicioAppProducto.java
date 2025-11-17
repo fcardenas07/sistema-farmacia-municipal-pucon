@@ -56,6 +56,22 @@ public class ServicioAppProducto {
     }
 
     @Transactional
+    public ProductoBuscado obtenerProductoPorId(String id) {
+        var producto = servicioProducto.obtenerPorId(id);
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(id);
+        int stockTotal = calcularStockTotal(id);
+
+        return ProductoBuscado.desde(producto, codigos, stockTotal);
+    }
+
+    private int calcularStockTotal(String idProducto) {
+        var lotes = servicioLote.obtenerLotesDeProductos(List.of(idProducto));
+        return lotes.stream()
+                .mapToInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
+                .sum();
+    }
+
+    @Transactional
     public List<ProductoFiltrado> buscarProductosFiltrados(
             String nombreComercial,
             String nombreGenerico,

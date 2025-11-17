@@ -4,7 +4,10 @@ import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.infraestructura.ServicioAlmacenamientoImagen;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.*;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -264,13 +267,13 @@ class ServicioProductoTest {
         when(repositorioProducto.findById("P001"))
                 .thenReturn(Optional.of(producto));
 
-        when(servicioAlmacenamientoImagen.guardarFoto(foto, "producto", "P"))
-                .thenReturn("producto/P0001.jpg");
+        when(servicioAlmacenamientoImagen.guardarFoto(foto, "productos", "P"))
+                .thenReturn("productos/P0001.jpg");
 
         servicioProducto.guardarFoto("P001", foto);
 
-        assertEquals("producto/P0001.jpg", producto.getUrlFoto());
-        verify(servicioAlmacenamientoImagen).guardarFoto(foto, "producto", "P");
+        assertEquals("productos/P0001.jpg", producto.getUrlFoto());
+        verify(servicioAlmacenamientoImagen).guardarFoto(foto, "productos", "P");
         verify(repositorioProducto).save(producto);
     }
 
@@ -303,12 +306,36 @@ class ServicioProductoTest {
         when(repositorioProducto.findById("P001"))
                 .thenReturn(Optional.of(producto));
 
-        when(servicioAlmacenamientoImagen.guardarFoto(foto, "producto", "P"))
+        when(servicioAlmacenamientoImagen.guardarFoto(foto, "productos", "P"))
                 .thenThrow(new ImagenAlmacenadaException());
 
         assertThrows(ImagenAlmacenadaException.class,
                 () -> servicioProducto.guardarFoto("P001", foto));
 
         verify(repositorioProducto, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("obtenerPorId devuelve el producto si existe")
+    void obtenerPorIdExistente() {
+        when(repositorioProducto.findById("P001")).thenReturn(Optional.of(productoEntidad));
+
+        Producto resultado = servicioProducto.obtenerPorId("P001");
+
+        assertNotNull(resultado);
+        assertEquals("P001", resultado.getIdProducto());
+        assertEquals("Paracetamol", resultado.getNombreComercial());
+
+        verify(repositorioProducto).findById("P001");
+    }
+
+    @Test
+    @DisplayName("obtenerPorId lanza ProductoNoEncontradoException si no existe")
+    void obtenerPorIdNoExistente() {
+        when(repositorioProducto.findById("P999")).thenReturn(Optional.empty());
+
+        assertThrows(ProductoNoEncontradoException.class, () -> servicioProducto.obtenerPorId("P999"));
+
+        verify(repositorioProducto).findById("P999");
     }
 }

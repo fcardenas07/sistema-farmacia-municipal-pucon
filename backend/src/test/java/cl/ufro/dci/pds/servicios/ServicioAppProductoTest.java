@@ -428,4 +428,32 @@ class ServicioAppProductoTest {
                 () -> servicioAppProducto.actualizarFoto("P001", foto)
         );
     }
+
+    @Test
+    @DisplayName("Obtener producto por ID devuelve ProductoBuscado con stockTotal correcto")
+    void obtenerProductoPorId() {
+        var codigos = List.of(new Codigo("C001", "123", "EAN", true, productoEntidad));
+        when(servicioProducto.obtenerPorId("P001")).thenReturn(productoEntidad);
+        when(servicioCodigo.obtenerCodigosConIdProducto("P001")).thenReturn(codigos);
+        when(servicioLote.obtenerLotesDeProductos(List.of("P001"))).thenReturn(List.of(
+                crearLoteConStock("L001", productoEntidad, 100)
+        ));
+
+        var resultado = servicioAppProducto.obtenerProductoPorId("P001");
+
+        assertEquals("P001", resultado.idProducto());
+        assertEquals(100, resultado.stockTotal());
+        assertTrue(resultado.isDisponible());
+        assertEquals(1, resultado.codigos().size());
+    }
+
+    @Test
+    @DisplayName("Obtener producto por ID inexistente lanza ProductoNoEncontradoException")
+    void obtenerProductoPorId_inexistente() {
+        when(servicioProducto.obtenerPorId("P999"))
+                .thenThrow(new ProductoNoEncontradoException("P999"));
+
+        assertThrows(ProductoNoEncontradoException.class,
+                () -> servicioAppProducto.obtenerProductoPorId("P999"));
+    }
 }

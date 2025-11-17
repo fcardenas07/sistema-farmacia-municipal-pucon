@@ -1629,4 +1629,43 @@ public class ControladorProductoTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.foto").value("El archivo no puede estar vacío"));
     }
+
+    @Test
+    @DisplayName("Obtener producto por ID devuelve 200 y el producto esperado")
+    void obtenerProductoPorId() throws Exception {
+        var codigos = List.of(new CodigoBuscado("C001", "1234567890123"));
+        var productoBuscado = new ProductoBuscado(
+                "P001",
+                "Producto Test",
+                "Genérico Test",
+                "Caja",
+                "50mg",
+                "mg",
+                true,
+                10,
+                null,
+                codigos
+        );
+
+        when(servicioAppProducto.obtenerProductoPorId("P001")).thenReturn(productoBuscado);
+
+        mockMvc.perform(get("/productos/{id}", "P001")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idProducto").value("P001"))
+                .andExpect(jsonPath("$.nombreComercial").value("Producto Test"))
+                .andExpect(jsonPath("$.stockTotal").value(10))
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"));
+    }
+
+    @Test
+    @DisplayName("Obtener producto por ID inexistente devuelve 404")
+    void obtenerProductoPorIdNoExistente() throws Exception {
+        when(servicioAppProducto.obtenerProductoPorId("P999"))
+                .thenThrow(new ProductoNoEncontradoException("P999"));
+
+        mockMvc.perform(get("/productos/{id}", "P999").with(csrf()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("No se encontró producto con id = P999"));
+    }
 }

@@ -1,7 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.controladores;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
-import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.Imagen;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
@@ -13,17 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -61,6 +56,12 @@ public class ControladorProducto {
     ) {
         servicioAppProducto.actualizarFoto(id, dto.foto());
         return ResponseEntity.ok(Map.of("mensaje", "Foto subida correctamente"));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoBuscado> obtenerProducto(@PathVariable String id) {
+        var resultado = servicioAppProducto.obtenerProductoPorId(id);
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/buscar")

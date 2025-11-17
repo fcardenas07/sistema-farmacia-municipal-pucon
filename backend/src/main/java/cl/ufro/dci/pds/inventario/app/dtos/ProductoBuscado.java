@@ -13,10 +13,16 @@ public record ProductoBuscado(
         String dosificacion,
         String unidadMedida,
         boolean activo,
+        int stockTotal,
+        String urlFoto,
         List<CodigoBuscado> codigos
 ) {
 
-    public static ProductoBuscado desde(Producto producto, List<Codigo> codigos) {
+    public boolean isDisponible() {
+        return stockTotal > 0 && activo;
+    }
+
+    public static ProductoBuscado desde(Producto producto, List<Codigo> codigos, int stockTotal) {
         return new ProductoBuscado(
                 producto.getIdProducto(),
                 producto.getNombreComercial(),
@@ -25,6 +31,8 @@ public record ProductoBuscado(
                 producto.getDosificacion(),
                 producto.getUnidadMedida(),
                 producto.isActivo(),
+                stockTotal,
+                producto.getUrlFoto(),
                 codigos.stream().map(CodigoBuscado::desde).toList()
         );
     }
