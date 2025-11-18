@@ -10,7 +10,7 @@ export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
     {path: 'productos-vendedor', component: ProductosVendedorPageComponent},
-    {path: 'Home-bodega', component: BodegaHomeComponent},
+    {path: 'home-bodega', component: BodegaHomeComponent},
     {path: 'ingreso-codigo-pedido',component: IngresoCodigoPedidoPageComponent},
     {path: 'agregar-stock-pedido',component: AgregarStockPedidoPageComponent},
     {path: 'resumen-pedido',component: ResumenPedidoPageComponent},

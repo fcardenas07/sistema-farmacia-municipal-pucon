@@ -1,0 +1,139 @@
+.resumen-container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.summary-header {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 3rem;
+  margin-top: 0;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 280px 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1.5rem;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.product-info-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  background: white;
+  width: fit-content;
+}
+
+.product-info-card .card-image img {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+}
+
+.product-info-card .card-details h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  color: #000;
+}
+
+.product-info-card .card-details .subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0 0 5px 0;
+}
+
+.product-info-card .card-details .meta {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 600;
+  margin: 0;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-details .detail-text {
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 600;
+  margin: 0;
+}
+
+.item-details .detail-text span {
+  font-weight: normal;
+  color: #333;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+}
+
+.delete-button:hover {
+  color: #e53935;
+}
+
+.delete-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.footer-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4rem;
+}
+
+.btn-completed {
+  background-color: #6B5BF2;
+  color: white;
+  border: none;
+  padding: 15px 60px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(107, 91, 242, 0.2);
+}
+
+.btn-completed:hover {
+  background-color: #5343d6;
+}
+
+.empty-message {
+  font-size: 1.2rem;
+  color: #666;
+  text-align: center;
+  margin-top: 3rem;
+}
