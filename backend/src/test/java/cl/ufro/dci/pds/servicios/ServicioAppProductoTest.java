@@ -11,6 +11,7 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -306,97 +307,122 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Buscar todos los productos sin filtros devuelve todos los productos con stockTotal y disponible")
     void buscarTodosLosProductosSinFiltros() {
-        when(servicioProducto.buscarPorCampos(null, null, null))
-                .thenReturn(productosEntidadesFiltrados);
+        var productosPage = new PageImpl<>(productosEntidadesFiltrados);
+        when(servicioProducto.buscarPorCampos(null, null, null, null, 0))
+                .thenReturn(productosPage);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(lotesSimulados);
 
-        var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, null);
+        var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, null, null, 0);
 
-        assertEquals(3, resultado.size());
+        assertEquals(3, resultado.getContent().size());
 
-        assertEquals("P001", resultado.getFirst().idProducto());
-        assertEquals(100, resultado.get(0).stockTotal());
-        assertTrue(resultado.get(0).isDisponible());
+        ProductoFiltrado p1 = resultado.getContent().getFirst();
+        assertEquals("P001", p1.idProducto());
+        assertEquals(100, p1.stockTotal());
+        assertTrue(p1.isDisponible());
 
-        assertEquals("P002", resultado.get(1).idProducto());
-        assertEquals(50, resultado.get(1).stockTotal());
-        assertTrue(resultado.get(1).isDisponible());
+        ProductoFiltrado p2 = resultado.getContent().get(1);
+        assertEquals("P002", p2.idProducto());
+        assertEquals(50, p2.stockTotal());
+        assertTrue(p2.isDisponible());
 
-        assertEquals("P003", resultado.get(2).idProducto());
-        assertEquals(200, resultado.get(2).stockTotal());
-        assertFalse(resultado.get(2).isDisponible());
+        ProductoFiltrado p3 = resultado.getContent().get(2);
+        assertEquals("P003", p3.idProducto());
+        assertEquals(200, p3.stockTotal());
+        assertFalse(p3.isDisponible());
     }
 
     @Test
     @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercialDevuelveCoincidencias() {
-        when(servicioProducto.buscarPorCampos("Paracetamol", null, null))
-                .thenReturn(List.of(productosEntidadesFiltrados.getFirst()));
+        var pageMock = new PageImpl<>(List.of(productosEntidadesFiltrados.getFirst()));
+        when(servicioProducto.buscarPorCampos("Paracetamol", null, null, null, 0))
+                .thenReturn(pageMock);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(lotesSimulados);
 
-        var resultado = servicioAppProducto.buscarProductosFiltrados("Paracetamol", null, null);
+        var resultado = servicioAppProducto.buscarProductosFiltrados("Paracetamol", null, null, null, 0);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Paracetamol", resultado.getFirst().nombreComercial());
-        assertEquals(100, resultado.getFirst().stockTotal());
-        assertTrue(resultado.getFirst().isDisponible());
+        assertEquals(1, resultado.getContent().size());
+        ProductoFiltrado p = resultado.getContent().getFirst();
+        assertEquals("Paracetamol", p.nombreComercial());
+        assertEquals(100, p.stockTotal());
+        assertTrue(p.isDisponible());
     }
 
     @Test
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenericoDevuelveCoincidencias() {
-        when(servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null))
-                .thenReturn(List.of(productosEntidadesFiltrados.get(1)));
+        var pageMockGen = new PageImpl<>(List.of(productosEntidadesFiltrados.get(1)));
+        when(servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, 0))
+                .thenReturn(pageMockGen);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(lotesSimulados);
 
-        var resultado = servicioAppProducto.buscarProductosFiltrados(null, "Ibuprofeno genérico", null);
-
-        assertEquals(1, resultado.size());
-        assertEquals("Ibuprofeno genérico", resultado.getFirst().nombreGenerico());
-        assertEquals(50, resultado.getFirst().stockTotal());
-        assertTrue(resultado.getFirst().isDisponible());
+        var resultadoGen = servicioAppProducto.buscarProductosFiltrados(null, "Ibuprofeno genérico", null, null, 0);
+        ProductoFiltrado pGen = resultadoGen.getContent().getFirst();
+        assertEquals("Ibuprofeno genérico", pGen.nombreGenerico());
+        assertEquals(50, pGen.stockTotal());
+        assertTrue(pGen.isDisponible());
     }
 
     @Test
     @DisplayName("Buscar productos activos devuelve solo productos activos")
     void buscarProductosActivosDevuelveSoloActivos() {
-        when(servicioProducto.buscarPorCampos(null, null, true))
-                .thenReturn(productosEntidadesFiltrados.stream()
-                        .filter(Producto::isActivo)
-                        .toList());
+        var pageActivos = new PageImpl<>(productosEntidadesFiltrados.stream()
+                .filter(Producto::isActivo)
+                .toList());
+
+        when(servicioProducto.buscarPorCampos(null, null, true, null, 0))
+                .thenReturn(pageActivos);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(lotesSimulados);
 
-        var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, true);
+        var resultadoActivos = servicioAppProducto.buscarProductosFiltrados(null, null, true, null, 0);
+        assertEquals(2, resultadoActivos.getContent().size());
+        assertTrue(resultadoActivos.getContent().stream().allMatch(ProductoFiltrado::activo));
+    }
 
-        assertEquals(2, resultado.size());
-        assertTrue(resultado.stream().allMatch(ProductoFiltrado::activo));
+    @Test
+    @DisplayName("Buscar productos por categoría devuelve coincidencias")
+    void buscarProductosPorCategoriaDevuelveCoincidaciones() {
+        var categoria = CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS;
 
-        assertEquals(100, resultado.get(0).stockTotal());
-        assertEquals(50, resultado.get(1).stockTotal());
-        assertTrue(resultado.get(0).isDisponible());
-        assertTrue(resultado.get(1).isDisponible());
+        var filtrados = productosEntidadesFiltrados.stream()
+                .filter(p -> p.getCategoriaProducto() == categoria)
+                .toList();
+
+        when(servicioProducto.buscarPorCampos(null, null, null, categoria, 0))
+                .thenReturn(new PageImpl<>(filtrados));
+
+        when(servicioLote.obtenerLotesDeProductos(anyList()))
+                .thenReturn(lotesSimulados);
+
+        var resultado = servicioAppProducto.buscarProductosFiltrados(null, null, null, categoria, 0);
+
+        assertEquals(filtrados.size(), resultado.getContent().size());
+
+        assertTrue(resultado.getContent().stream()
+                .allMatch(p -> p.categoria().equals(categoria.getNombreLegible())));
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
     void buscarProductosSinCoincidenciasDevuelveListaVacia() {
-        when(servicioProducto.buscarPorCampos("X", null, null))
-                .thenReturn(List.of());
+        var pageVacia = new PageImpl<Producto>(List.of());
+        when(servicioProducto.buscarPorCampos("X", null, null, null, 0))
+                .thenReturn(pageVacia);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(List.of());
 
-        var resultado = servicioAppProducto.buscarProductosFiltrados("X", null, null);
-
-        assertTrue(resultado.isEmpty());
+        var resultadoVacio = servicioAppProducto.buscarProductosFiltrados("X", null, null, null, 0);
+        assertTrue(resultadoVacio.getContent().isEmpty());
     }
 
     @Test

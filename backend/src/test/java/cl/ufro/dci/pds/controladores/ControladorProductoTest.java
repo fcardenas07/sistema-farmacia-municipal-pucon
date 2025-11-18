@@ -19,6 +19,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -53,7 +55,6 @@ public class ControladorProductoTest {
     private ProductoACrear productoValido;
 
     private List<ProductoFiltrado> productosFiltrados;
-
 
     @BeforeEach
     void setUp() {
@@ -1384,105 +1385,128 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Buscar productos sin filtros devuelve todos los productos con urlFoto")
     void buscarProductosSinFiltros() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, null))
-                .thenReturn(productosFiltrados);
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, null, null, 0))
+                .thenReturn(new PageImpl<>(productosFiltrados, PageRequest.of(0, 4), productosFiltrados.size()));
 
         mockMvc.perform(get("/productos/buscar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(productosFiltrados.size()))
-
-                .andExpect(jsonPath("$[0].idProducto").value("P001"))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true))
-                .andExpect(jsonPath("$[0].urlFoto").value("producto/P001.jpg"))
-
-                .andExpect(jsonPath("$[1].idProducto").value("P002"))
-                .andExpect(jsonPath("$[1].stockTotal").value(100))
-                .andExpect(jsonPath("$[1].disponible").value(true))
-                .andExpect(jsonPath("$[1].urlFoto").value("producto/P002.jpg"))
-
-                .andExpect(jsonPath("$[2].idProducto").value("P003"))
-                .andExpect(jsonPath("$[2].stockTotal").value(20))
-                .andExpect(jsonPath("$[2].disponible").value(false))
-                .andExpect(jsonPath("$[2].urlFoto").value("producto/P003.jpg"));
+                .andExpect(jsonPath("$.content.length()").value(productosFiltrados.size()))
+                .andExpect(jsonPath("$.content[0].idProducto").value("P001"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"))
+                .andExpect(jsonPath("$.content[1].idProducto").value("P002"))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true))
+                .andExpect(jsonPath("$.content[1].urlFoto").value("producto/P002.jpg"))
+                .andExpect(jsonPath("$.content[2].idProducto").value("P003"))
+                .andExpect(jsonPath("$.content[2].stockTotal").value(20))
+                .andExpect(jsonPath("$.content[2].disponible").value(false))
+                .andExpect(jsonPath("$.content[2].urlFoto").value("producto/P003.jpg"));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Ibuprofeno", null, null))
-                .thenReturn(
-                        productosFiltrados.stream()
-                                .filter(p -> p.nombreComercial().equalsIgnoreCase("Ibuprofeno"))
-                                .toList()
-                );
+        var filtrados = productosFiltrados.stream()
+                .filter(p -> p.nombreComercial().equalsIgnoreCase("Ibuprofeno"))
+                .toList();
+
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Ibuprofeno", null, null, null, 0))
+                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
 
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "Ibuprofeno"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreComercial").value("Ibuprofeno"))
-                .andExpect(jsonPath("$[0].stockTotal").value(100))
-                .andExpect(jsonPath("$[0].disponible").value(true))
-                .andExpect(jsonPath("$[0].urlFoto").value("producto/P002.jpg"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nombreComercial").value("Ibuprofeno"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P002.jpg"));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol genérico", null))
-                .thenReturn(
-                        productosFiltrados.stream()
-                                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol genérico"))
-                                .toList()
-                );
+        var filtrados = productosFiltrados.stream()
+                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol genérico"))
+                .toList();
+
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol genérico", null, null, 0))
+                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
 
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreGenerico", "Paracetamol genérico"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreGenerico").value("Paracetamol genérico"))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true))
-                .andExpect(jsonPath("$[0].urlFoto").value("producto/P001.jpg"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nombreGenerico").value("Paracetamol genérico"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"));
+    }
+
+    @Test
+    @DisplayName("Buscar productos por categoría devuelve coincidencias")
+    void buscarProductosPorCategoria() throws Exception {
+        var categoria = CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible();
+
+        var filtrados = productosFiltrados.stream()
+                .filter(p -> p.categoria().equalsIgnoreCase(categoria))
+                .toList();
+
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(
+                null,
+                null,
+                null,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                0
+        )).thenReturn(new PageImpl<>(
+                filtrados,
+                PageRequest.of(0, 4),
+                filtrados.size()
+        ));
+
+        mockMvc.perform(get("/productos/buscar")
+                        .param("categoria", CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(filtrados.size()))
+                .andExpect(jsonPath("$.content[0].categoria").value(categoria));
     }
 
     @Test
     @DisplayName("Buscar productos por activo devuelve coincidencias")
     void buscarProductosPorActivo() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, true))
-                .thenReturn(
-                        productosFiltrados.stream()
-                                .filter(ProductoFiltrado::activo)
-                                .toList()
-                );
+        var filtrados = productosFiltrados.stream()
+                .filter(ProductoFiltrado::activo)
+                .toList();
+
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, true, null, 0))
+                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
 
         mockMvc.perform(get("/productos/buscar")
                         .param("activo", "true"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-
-                .andExpect(jsonPath("$[0].activo").value(true))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true))
-                .andExpect(jsonPath("$[0].urlFoto").value("producto/P001.jpg"))
-
-                .andExpect(jsonPath("$[1].activo").value(true))
-                .andExpect(jsonPath("$[1].stockTotal").value(100))
-                .andExpect(jsonPath("$[1].disponible").value(true))
-                .andExpect(jsonPath("$[1].urlFoto").value("producto/P002.jpg"));
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].activo").value(true))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"))
+                .andExpect(jsonPath("$.content[1].activo").value(true))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true))
+                .andExpect(jsonPath("$.content[1].urlFoto").value("producto/P002.jpg"));
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
     void buscarProductosSinCoincidencias() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados("NoExiste", null, null))
-                .thenReturn(List.of());
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados("NoExiste", null, null, null, 0))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 4), 0));
 
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "NoExiste"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 
     @Test

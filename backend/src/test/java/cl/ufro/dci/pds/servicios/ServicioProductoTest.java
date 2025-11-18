@@ -11,6 +11,8 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -166,15 +168,22 @@ class ServicioProductoTest {
     @Test
     @DisplayName("Buscar productos sin filtros devuelve todos los productos con campos correctos")
     void buscarProductosSinFiltros() {
-        when(repositorioProducto.buscarPorCampos(null, null, null)).thenReturn(productosFiltrados);
+        var productosPage = new PageImpl<>(productosFiltrados);
+        when(repositorioProducto.buscarPorCampos(
+                eq(null),
+                eq(null),
+                eq(null),
+                eq(null),
+                any(Pageable.class)
+        )).thenReturn(productosPage);
 
-        var resultado = servicioProducto.buscarPorCampos(null, null, null);
+        var resultado = servicioProducto.buscarPorCampos(null, null, null, null, 0);
 
-        assertEquals(productosFiltrados.size(), resultado.size());
+        assertEquals(productosPage.getContent().size(), resultado.getContent().size());
 
-        for (int i = 0; i < productosFiltrados.size(); i++) {
-            var esperado = productosFiltrados.get(i);
-            var actual = resultado.get(i);
+        for (int i = 0; i < productosPage.getContent().size(); i++) {
+            var esperado = productosPage.getContent().get(i);
+            var actual = resultado.getContent().get(i);
 
             assertEquals(esperado.getIdProducto(), actual.getIdProducto());
             assertEquals(esperado.getNombreComercial(), actual.getNombreComercial());
@@ -184,75 +193,112 @@ class ServicioProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias con campos correctos")
+    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() {
-        var productoEsperado = productosFiltrados.getFirst();
-        when(repositorioProducto.buscarPorCampos("Paracetamol", null, null))
-                .thenReturn(List.of(productoEsperado));
+        var pageMock = new PageImpl<>(List.of(productosFiltrados.getFirst()));
+        when(repositorioProducto.buscarPorCampos(
+                eq("Paracetamol"),
+                eq(null),
+                eq(null),
+                eq(null),
+                any(Pageable.class)
+        )).thenReturn(pageMock);
 
-        var resultado = servicioProducto.buscarPorCampos("Paracetamol", null, null);
+        var resultado = servicioProducto.buscarPorCampos("Paracetamol", null, null, null, 0);
 
-        assertEquals(1, resultado.size());
-        var actual = resultado.getFirst();
+        assertEquals(1, resultado.getContent().size());
+        var actual = resultado.getContent().getFirst();
 
-        assertEquals(productoEsperado.getIdProducto(), actual.getIdProducto());
-        assertEquals(productoEsperado.getNombreComercial(), actual.getNombreComercial());
-        assertEquals(productoEsperado.getNombreGenerico(), actual.getNombreGenerico());
-        assertEquals(productoEsperado.isActivo(), actual.isActivo());
+        assertEquals("P001", actual.getIdProducto());
+        assertEquals("Paracetamol", actual.getNombreComercial());
+        assertEquals("Paracetamol genérico", actual.getNombreGenerico());
+        assertTrue(actual.isActivo());
     }
 
     @Test
-    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias con campos correctos")
+    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() {
-        var productoEsperado = productosFiltrados.get(1);
-        when(repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null))
-                .thenReturn(List.of(productoEsperado));
+        var pageMockGen = new PageImpl<>(List.of(productosFiltrados.get(1)));
+        when(repositorioProducto.buscarPorCampos(
+                eq(null),
+                eq("Ibuprofeno genérico"),
+                eq(null),
+                eq(null),
+                any(Pageable.class)
+        )).thenReturn(pageMockGen);
 
-        var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null);
+        var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, 0);
+        var actual = resultado.getContent().getFirst();
 
-        assertEquals(1, resultado.size());
-        var actual = resultado.getFirst();
-
-        assertEquals(productoEsperado.getIdProducto(), actual.getIdProducto());
-        assertEquals(productoEsperado.getNombreComercial(), actual.getNombreComercial());
-        assertEquals(productoEsperado.getNombreGenerico(), actual.getNombreGenerico());
-        assertEquals(productoEsperado.isActivo(), actual.isActivo());
+        assertEquals("P002", actual.getIdProducto());
+        assertEquals("Ibuprofeno", actual.getNombreComercial());
+        assertEquals("Ibuprofeno genérico", actual.getNombreGenerico());
+        assertTrue(actual.isActivo());
     }
 
     @Test
-    @DisplayName("Buscar productos por activo devuelve coincidencias con campos correctos")
-    void buscarProductosPorActivo() {
-        var productosEsperados = productosFiltrados.stream()
-                .filter(Producto::isActivo)
+    @DisplayName("Buscar productos por categoría devuelve coincidencias")
+    void buscarProductosPorCategoria() {
+        var categoria = CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS;
+        var productosCategoria = productosFiltrados.stream()
+                .filter(p -> p.getCategoriaProducto() == categoria)
                 .toList();
 
-        when(repositorioProducto.buscarPorCampos(null, null, true))
-                .thenReturn(productosEsperados);
+        var pageMockCategoria = new PageImpl<>(productosCategoria);
 
-        var resultado = servicioProducto.buscarPorCampos(null, null, true);
+        when(repositorioProducto.buscarPorCampos(
+                eq(null),
+                eq(null),
+                eq(null),
+                eq(categoria),
+                any(Pageable.class)
+        )).thenReturn(pageMockCategoria);
 
-        assertEquals(productosEsperados.size(), resultado.size());
+        var resultado = servicioProducto.buscarPorCampos(null, null, null, categoria, 0);
 
-        for (int i = 0; i < productosEsperados.size(); i++) {
-            var esperado = productosEsperados.get(i);
-            var actual = resultado.get(i);
+        assertEquals(productosCategoria.size(), resultado.getContent().size());
 
-            assertEquals(esperado.getIdProducto(), actual.getIdProducto());
-            assertEquals(esperado.getNombreComercial(), actual.getNombreComercial());
-            assertEquals(esperado.getNombreGenerico(), actual.getNombreGenerico());
-            assertEquals(esperado.isActivo(), actual.isActivo());
+        for (var producto : resultado.getContent()) {
+            assertEquals(categoria, producto.getCategoriaProducto());
         }
+    }
+
+    @Test
+    @DisplayName("Buscar productos activos devuelve solo productos activos")
+    void buscarProductosPorActivo() {
+        var pageActivos = new PageImpl<>(productosFiltrados.stream()
+                .filter(Producto::isActivo)
+                .toList());
+
+        when(repositorioProducto.buscarPorCampos(
+                eq(null),
+                eq(null),
+                eq(true),
+                eq(null),
+                any(Pageable.class)
+        )).thenReturn(pageActivos);
+
+        var resultado = servicioProducto.buscarPorCampos(null, null, true, null, 0);
+
+        assertEquals(pageActivos.getContent().size(), resultado.getContent().size());
+        assertTrue(resultado.getContent().stream().allMatch(Producto::isActivo));
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
     void buscarProductosSinCoincidencias() {
-        when(repositorioProducto.buscarPorCampos("X", null, null))
-                .thenReturn(List.of());
+        var pageVacia = new PageImpl<Producto>(List.of());
+        when(repositorioProducto.buscarPorCampos(
+                eq("X"),
+                eq(null),
+                eq(null),
+                eq(null),
+                any(Pageable.class)
+        )).thenReturn(pageVacia);
 
-        var resultado = servicioProducto.buscarPorCampos("X", null, null);
+        var resultado = servicioProducto.buscarPorCampos("X", null, null, null, 0);
 
-        assertTrue(resultado.isEmpty());
+        assertTrue(resultado.getContent().isEmpty());
     }
 
     @Test

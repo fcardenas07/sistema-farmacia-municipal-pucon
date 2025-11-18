@@ -2,11 +2,14 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,22 +75,28 @@ public class ServicioAppProducto {
     }
 
     @Transactional
-    public List<ProductoFiltrado> buscarProductosFiltrados(
+    public Page<ProductoFiltrado> buscarProductosFiltrados(
             String nombreComercial,
             String nombreGenerico,
-            Boolean activo
+            Boolean activo,
+            CategoriaProducto categoria,
+            int numeroPagina
     ) {
-        var productos = servicioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo);
+        Page<Producto> productosPage = servicioProducto.buscarPorCampos(
+                nombreComercial, nombreGenerico, activo, categoria, numeroPagina
+        );
 
-        var ids = productos.stream()
+        var ids = productosPage.getContent().stream()
                 .map(Producto::getIdProducto)
                 .toList();
 
         var stockPorProducto = agruparStockPorProducto(ids);
 
-        return productos.stream()
+        List<ProductoFiltrado> filtrados = productosPage.getContent().stream()
                 .map(p -> mapearProductoFiltrado(p, stockPorProducto))
                 .toList();
+
+        return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
     }
 
     private Map<String, Integer> agruparStockPorProducto(List<String> ids) {

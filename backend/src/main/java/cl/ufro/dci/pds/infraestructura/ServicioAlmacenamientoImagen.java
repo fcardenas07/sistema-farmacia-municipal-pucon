@@ -71,4 +71,3 @@ public class ServicioAlmacenamientoImagen {
         return nombreArchivo.substring(nombreArchivo.lastIndexOf('.') + 1).toLowerCase();
     }
 }
-

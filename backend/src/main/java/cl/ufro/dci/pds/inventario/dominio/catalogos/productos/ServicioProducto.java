@@ -3,10 +3,10 @@ package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 import cl.ufro.dci.pds.infraestructura.ServicioAlmacenamientoImagen;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 public class ServicioProducto {
@@ -53,11 +53,15 @@ public class ServicioProducto {
         repositorioProducto.save(producto);
     }
 
-    public List<Producto> buscarPorCampos(
+    public Page<Producto> buscarPorCampos(
             String nombreComercial,
             String nombreGenerico,
-            Boolean activo
+            Boolean activo,
+            CategoriaProducto categoria,
+            int numeroPagina
     ) {
-        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo);
+        var pageable = PageRequest.of(numeroPagina, 4);
+        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
     }
+
 }

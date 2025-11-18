@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -42,7 +43,8 @@ class RepositorioProductoTest {
     @Test
     @DisplayName("buscar por campos con todos los filtros nulos devuelve todos los productos")
     void buscarProductosSinFiltros() {
-        List<Producto> resultado = repositorioProducto.buscarPorCampos(null, null, null);
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos(null, null, null, null, pageable);
 
         assertThat(resultado).hasSize(3);
         assertThat(resultado).extracting(Producto::getIdProducto)
@@ -52,35 +54,62 @@ class RepositorioProductoTest {
     @Test
     @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() {
-        List<Producto> resultado = repositorioProducto.buscarPorCampos("Paracetamol", null, null);
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos("Paracetamol", null, null, null, pageable);
 
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.getFirst().getNombreComercial()).isEqualTo("Paracetamol");
+        assertThat(resultado.getContent()).hasSize(1);
+
+        assertThat(resultado.getContent().getFirst().getNombreComercial()).isEqualTo("Paracetamol");
     }
 
     @Test
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() {
-        List<Producto> resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null);
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, pageable);
 
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.getFirst().getNombreGenerico()).isEqualTo("Ibuprofeno genérico");
+        assertThat(resultado.getContent()).hasSize(1);
+        assertThat(resultado.getContent().getFirst().getNombreGenerico()).isEqualTo("Ibuprofeno genérico");
+    }
+
+    @Test
+    @DisplayName("Buscar productos por categoría devuelve coincidencias")
+    void buscarProductosPorCategoria() {
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos(
+                null,
+                null,
+                null,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                pageable
+        );
+
+        assertThat(resultado.getContent()).hasSize(2);
+
+        assertThat(resultado.getContent())
+                .allMatch(p -> p.getCategoriaProducto() == CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS);
+
+        assertThat(resultado.getContent())
+                .extracting(Producto::getIdProducto)
+                .containsExactlyInAnyOrder("P001", "P002");
     }
 
     @Test
     @DisplayName("Buscar productos por activo devuelve coincidencias")
     void buscarProductosPorActivo() {
-        List<Producto> resultado = repositorioProducto.buscarPorCampos(null, null, true);
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos(null, null, true, null, pageable);
 
-        assertThat(resultado).hasSize(2);
-        assertThat(resultado).allMatch(Producto::isActivo);
+        assertThat(resultado.getContent()).hasSize(2);
+        assertThat(resultado.getContent()).allMatch(Producto::isActivo);
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
     void buscarProductosSinCoincidencias() {
-        List<Producto> resultado = repositorioProducto.buscarPorCampos("NoExiste", null, null);
+        var pageable = PageRequest.of(0, 4);
+        var resultado = repositorioProducto.buscarPorCampos("NoExiste", null, null, null, pageable);
 
-        assertThat(resultado).isEmpty();
+        assertThat(resultado.getContent()).isEmpty();
     }
 }

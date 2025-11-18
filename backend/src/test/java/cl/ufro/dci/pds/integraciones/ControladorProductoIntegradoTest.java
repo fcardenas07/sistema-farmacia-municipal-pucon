@@ -35,175 +35,178 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-    @SpringBootTest
-    @AutoConfigureMockMvc
-    class ControladorProductoIntegradoTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+class ControladorProductoIntegradoTest {
 
-        @Autowired
-        private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-        @Autowired
-        private RepositorioProducto repositorioProducto;
+    @Autowired
+    private RepositorioProducto repositorioProducto;
 
-        @Autowired
-        private RepositorioCodigo repositorioCodigo;
+    @Autowired
+    private RepositorioCodigo repositorioCodigo;
 
-        @Autowired
-        private RepositorioLote repositorioLote;
+    @Autowired
+    private RepositorioLote repositorioLote;
 
-        @Autowired
-        private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        @BeforeEach
-        void setUp() throws IOException {
-            repositorioCodigo.deleteAll();
-            repositorioLote.deleteAll();
-            repositorioProducto.deleteAll();
+    @BeforeEach
+    void setUp() throws IOException {
+        repositorioCodigo.deleteAll();
+        repositorioLote.deleteAll();
+        repositorioProducto.deleteAll();
 
-            var fotosDir = Paths.get("src/test/resources/assets-test/productos");
-            if (Files.exists(fotosDir)) {
-                Files.walk(fotosDir)
-                        .filter(Files::isRegularFile)
-                        .forEach(f -> {
-                            try { Files.delete(f); }
-                            catch (IOException e) { e.printStackTrace(); }
-                        });
-            }
-
-            var producto1 = new Producto(
-                    "P001",
-                    "Paracetamol 500mg",
-                    "Paracetamol genérico",
-                    "Tabletas 500mg",
-                    "500mg",
-                    "Comprimidos",
-                    10,
-                    100,
-                    true,
-                    CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                    null
-            );
-
-            repositorioProducto.save(producto1);
-
-            var codigo1 = new Codigo();
-            codigo1.setIdCodigo("C001");
-            codigo1.setCodigoBarra("1234567890123");
-            codigo1.setTipoCodigo("EAN");
-            codigo1.setActivo(true);
-            codigo1.setProducto(producto1);
-            repositorioCodigo.save(codigo1);
-
-            var lote1 = new Lote();
-            lote1.setIdLote("L001");
-            lote1.setProducto(producto1);
-            lote1.setNumeroLote("NUM001");
-            lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
-            lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
-            lote1.setEstado("DISPONIBLE");
-
-            var stock1 = new Stock();
-            stock1.setIdStock("S001");
-            stock1.setCantidadInicial(500);
-            stock1.setCantidadActual(300);
-            stock1.setLote(lote1);
-            lote1.setStock(stock1);
-
-            repositorioLote.save(lote1);
-
-            var producto2 = new Producto(
-                    "P002",
-                    "Ibuprofeno 400mg",
-                    "Ibuprofeno genérico",
-                    "Caja con 10 tabletas",
-                    "400mg",
-                    "mg",
-                    5,
-                    50,
-                    true,
-                    CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                    null
-            );
-
-            repositorioProducto.save(producto2);
-
-            var codigo2 = new Codigo();
-            codigo2.setIdCodigo("C002");
-            codigo2.setCodigoBarra("9876543210987");
-            codigo2.setTipoCodigo("EAN");
-            codigo2.setActivo(true);
-            codigo2.setProducto(producto2);
-            repositorioCodigo.save(codigo2);
-
-            var lote2 = new Lote();
-            lote2.setIdLote("L002");
-            lote2.setProducto(producto2);
-            lote2.setNumeroLote("NUM002");
-            lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
-            lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
-            lote2.setEstado("DISPONIBLE");
-
-            var stock2 = new Stock();
-            stock2.setIdStock("S002");
-            stock2.setCantidadInicial(500);
-            stock2.setCantidadActual(100);
-            stock2.setLote(lote2);
-            lote2.setStock(stock2);
-
-            repositorioLote.save(lote2);
-
-            var producto3 = new Producto(
-                    "P003",
-                    "Amoxicilina 500mg",
-                    "Amoxicilina genérica",
-                    "Caja con 12 cápsulas",
-                    "500mg",
-                    "mg",
-                    0,
-                    0,
-                    false,
-                    CategoriaProducto.ANTIBIOTICOS,
-                    null
-            );
-
-            repositorioProducto.save(producto3);
-
-            var codigo3 = new Codigo();
-            codigo3.setIdCodigo("C003");
-            codigo3.setCodigoBarra("1112223334445");
-            codigo3.setTipoCodigo("EAN");
-            codigo3.setActivo(true);
-            codigo3.setProducto(producto3);
-            repositorioCodigo.save(codigo3);
-
-            var lote3 = new Lote();
-            lote3.setIdLote("L003");
-            lote3.setProducto(producto3);
-            lote3.setNumeroLote("NUM003");
-            lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
-            lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
-            lote3.setEstado("NO_DISPONIBLE");
-
-            var stock3 = new Stock();
-            stock3.setIdStock("S003");
-            stock3.setCantidadInicial(200);
-            stock3.setCantidadActual(20);
-            stock3.setLote(lote3);
-            lote3.setStock(stock3);
-
-            repositorioLote.save(lote3);
+        var fotosDir = Paths.get("src/test/resources/assets-test/productos");
+        if (Files.exists(fotosDir)) {
+            Files.walk(fotosDir)
+                    .filter(Files::isRegularFile)
+                    .forEach(f -> {
+                        try {
+                            Files.delete(f);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
         }
 
-        @AfterEach
-        void limpiarFotos() throws IOException {
-            var fotosDir = Paths.get("src/test/resources/assets/productos");
-            if (Files.exists(fotosDir)) {
-                Files.walk(fotosDir)
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            }
+        var producto1 = new Producto(
+                "P001",
+                "Paracetamol 500mg",
+                "Paracetamol genérico",
+                "Tabletas 500mg",
+                "500mg",
+                "Comprimidos",
+                10,
+                100,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        repositorioProducto.save(producto1);
+
+        var codigo1 = new Codigo();
+        codigo1.setIdCodigo("C001");
+        codigo1.setCodigoBarra("1234567890123");
+        codigo1.setTipoCodigo("EAN");
+        codigo1.setActivo(true);
+        codigo1.setProducto(producto1);
+        repositorioCodigo.save(codigo1);
+
+        var lote1 = new Lote();
+        lote1.setIdLote("L001");
+        lote1.setProducto(producto1);
+        lote1.setNumeroLote("NUM001");
+        lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
+        lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
+        lote1.setEstado("DISPONIBLE");
+
+        var stock1 = new Stock();
+        stock1.setIdStock("S001");
+        stock1.setCantidadInicial(500);
+        stock1.setCantidadActual(300);
+        stock1.setLote(lote1);
+        lote1.setStock(stock1);
+
+        repositorioLote.save(lote1);
+
+        var producto2 = new Producto(
+                "P002",
+                "Ibuprofeno 400mg",
+                "Ibuprofeno genérico",
+                "Caja con 10 tabletas",
+                "400mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        repositorioProducto.save(producto2);
+
+        var codigo2 = new Codigo();
+        codigo2.setIdCodigo("C002");
+        codigo2.setCodigoBarra("9876543210987");
+        codigo2.setTipoCodigo("EAN");
+        codigo2.setActivo(true);
+        codigo2.setProducto(producto2);
+        repositorioCodigo.save(codigo2);
+
+        var lote2 = new Lote();
+        lote2.setIdLote("L002");
+        lote2.setProducto(producto2);
+        lote2.setNumeroLote("NUM002");
+        lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
+        lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
+        lote2.setEstado("DISPONIBLE");
+
+        var stock2 = new Stock();
+        stock2.setIdStock("S002");
+        stock2.setCantidadInicial(500);
+        stock2.setCantidadActual(100);
+        stock2.setLote(lote2);
+        lote2.setStock(stock2);
+
+        repositorioLote.save(lote2);
+
+        var producto3 = new Producto(
+                "P003",
+                "Amoxicilina 500mg",
+                "Amoxicilina genérica",
+                "Caja con 12 cápsulas",
+                "500mg",
+                "mg",
+                0,
+                0,
+                false,
+                CategoriaProducto.ANTIBIOTICOS,
+                null
+        );
+
+        repositorioProducto.save(producto3);
+
+        var codigo3 = new Codigo();
+        codigo3.setIdCodigo("C003");
+        codigo3.setCodigoBarra("1112223334445");
+        codigo3.setTipoCodigo("EAN");
+        codigo3.setActivo(true);
+        codigo3.setProducto(producto3);
+        repositorioCodigo.save(codigo3);
+
+        var lote3 = new Lote();
+        lote3.setIdLote("L003");
+        lote3.setProducto(producto3);
+        lote3.setNumeroLote("NUM003");
+        lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
+        lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
+        lote3.setEstado("NO_DISPONIBLE");
+
+        var stock3 = new Stock();
+        stock3.setIdStock("S003");
+        stock3.setCantidadInicial(200);
+        stock3.setCantidadActual(20);
+        stock3.setLote(lote3);
+        lote3.setStock(stock3);
+
+        repositorioLote.save(lote3);
+    }
+
+    @AfterEach
+    void limpiarFotos() throws IOException {
+        var fotosDir = Paths.get("src/test/resources/assets/productos");
+        if (Files.exists(fotosDir)) {
+            Files.walk(fotosDir)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
         }
+    }
 
     @Test
     @DisplayName("Crear producto con un body vacío devuelve 400")
@@ -1577,19 +1580,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void buscarProductosSinFiltros() throws Exception {
         mockMvc.perform(get("/productos/buscar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(3))
 
-                .andExpect(jsonPath("$[0].idProducto").value("P001"))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].idProducto").value("P001"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
 
-                .andExpect(jsonPath("$[1].idProducto").value("P002"))
-                .andExpect(jsonPath("$[1].stockTotal").value(100))
-                .andExpect(jsonPath("$[1].disponible").value(true))
+                .andExpect(jsonPath("$.content[1].idProducto").value("P002"))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true))
 
-                .andExpect(jsonPath("$[2].idProducto").value("P003"))
-                .andExpect(jsonPath("$[2].stockTotal").value(20))
-                .andExpect(jsonPath("$[2].disponible").value(false));
+                .andExpect(jsonPath("$.content[2].idProducto").value("P003"))
+                .andExpect(jsonPath("$.content[2].stockTotal").value(20))
+                .andExpect(jsonPath("$.content[2].disponible").value(false));
     }
 
     @Test
@@ -1598,10 +1602,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "Ibuprofeno 400mg"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreComercial").value("Ibuprofeno 400mg"))
-                .andExpect(jsonPath("$[0].stockTotal").value(100))
-                .andExpect(jsonPath("$[0].disponible").value(true));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nombreComercial").value("Ibuprofeno 400mg"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[0].disponible").value(true));
     }
 
     @Test
@@ -1610,10 +1615,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreGenerico", "Paracetamol genérico"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].nombreGenerico").value("Paracetamol genérico"))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nombreGenerico").value("Paracetamol genérico"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true));
+    }
+
+    @Test
+    @DisplayName("Buscar productos por categoría devuelve coincidencias")
+    void buscarProductosPorCategoria() throws Exception {
+        mockMvc.perform(get("/productos/buscar")
+                        .param("categoria", CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+
+                .andExpect(jsonPath("$.content[0].categoria")
+                        .value(CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible()))
+                .andExpect(jsonPath("$.content[0].idProducto").value("P001"))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+
+                .andExpect(jsonPath("$.content[1].categoria")
+                        .value(CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible()))
+                .andExpect(jsonPath("$.content[1].idProducto").value("P002"))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true));
     }
 
     @Test
@@ -1622,15 +1650,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/productos/buscar")
                         .param("activo", "true"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
 
-                .andExpect(jsonPath("$[0].activo").value(true))
-                .andExpect(jsonPath("$[0].stockTotal").value(300))
-                .andExpect(jsonPath("$[0].disponible").value(true))
+                .andExpect(jsonPath("$.content[0].activo").value(true))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
 
-                .andExpect(jsonPath("$[1].activo").value(true))
-                .andExpect(jsonPath("$[1].stockTotal").value(100))
-                .andExpect(jsonPath("$[1].disponible").value(true));
+                .andExpect(jsonPath("$.content[1].activo").value(true))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true));
     }
 
     @Test
@@ -1639,7 +1668,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "NoExiste"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test

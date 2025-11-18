@@ -5,9 +5,11 @@ import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoPerteneceProductoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,13 +66,15 @@ public class ControladorProducto {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<ProductoFiltrado>> buscarProductos(
+    public ResponseEntity<Page<ProductoFiltrado>> buscarProductos(
             @RequestParam(required = false) String nombreComercial,
             @RequestParam(required = false) String nombreGenerico,
-            @RequestParam(required = false) Boolean activo
+            @RequestParam(required = false) Boolean activo,
+            @RequestParam(required = false) CategoriaProducto categoria,
+            @RequestParam(defaultValue = "0") int pagina
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
-                nombreComercial, nombreGenerico, activo
+                nombreComercial, nombreGenerico, activo, categoria, pagina
         );
 
         return ResponseEntity.ok(productos);
