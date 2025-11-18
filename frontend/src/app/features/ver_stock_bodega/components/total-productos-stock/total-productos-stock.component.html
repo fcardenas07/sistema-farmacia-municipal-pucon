@@ -1,0 +1,43 @@
+<div class="stock-container">
+  
+  <div class="header">
+    <h2>Stock Total</h2>
+    <div class="nav-controls">
+      <button class="nav-btn">◀</button>
+      <button class="nav-btn">▶</button>
+    </div>
+  </div>
+
+  <div class="cards-list">
+    @for (product of products; track product.id) {
+      <div class="product-card">
+        
+        <div class="img-section">
+          <img [src]="product.imageUrl" alt="Producto">
+        </div>
+
+        <div class="info-section">
+          <h3>{{ product.name }}</h3>
+          <span class="generic">{{ product.generic }}</span>
+          <span class="details">{{ product.details }}</span>
+        </div>
+
+        <div class="tags-section">
+          <span class="tag tag-dark">{{ product.category }}</span>
+          <span class="tag" [ngClass]="getStatusClass(product.status)">
+            {{ product.status }}
+          </span>
+        </div>
+
+        <div class="units-section">
+          <span>{{ product.units }} Unidades</span>
+        </div>
+
+        <div class="action-section">
+          <button class="btn-update" (click)="updateProduct(product)">ACTUALIZAR</button>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>

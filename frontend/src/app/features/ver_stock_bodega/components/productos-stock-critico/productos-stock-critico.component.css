@@ -1,0 +1,140 @@
+.stock-container {
+  background-color: #dcdcdc;
+  padding: 40px;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    padding-left: 80px;
+  }
+}
+
+.nav-controls {
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  overflow: hidden;
+  
+  .nav-btn {
+    background: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #666;
+    
+    &:hover {
+      background-color: #f0f0f0;
+    }
+    &:first-child {
+      border-right: 1px solid #eee;
+    }
+  }
+}
+
+.cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: 100px 1.5fr 1.5fr 1fr auto; 
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.img-section img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+  }
+  .generic {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #999;
+    margin-bottom: 4px;
+  }
+  .details {
+    font-size: 0.9rem;
+    color: #333;
+  }
+}
+
+.tags-section {
+  display: flex;
+  gap: 10px;
+  
+  .tag {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .tag-dark {
+    background-color: #1e212d;
+  }
+
+  .tag-medium {
+    background-color: #c0ca33;
+  }
+
+  .tag-low {
+    background-color: #b71c1c;
+  }
+}
+
+.units-section {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1a1a1a;
+}
+
+.btn-update {
+  background-color: #1e212d;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &:hover {
+    background-color: #333;
+  }
+}
