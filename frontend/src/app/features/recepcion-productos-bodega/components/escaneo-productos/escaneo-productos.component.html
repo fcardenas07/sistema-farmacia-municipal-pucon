@@ -1,0 +1,45 @@
+<div class="scan-container">
+  
+  <div class="left-panel">
+    <form [formGroup]="scanForm">
+      
+      <div class="form-group">
+        <label class="header-text">Escanee el código de los productos</label>
+        <input type="text" formControlName="code" placeholder="Código" class="input-box">
+      </div>
+
+      <div class="form-group">
+        <label class="header-text">Ingrese cantidad de unidades del producto</label>
+        <input type="number" formControlName="quantity" class="input-box">
+      </div>
+
+      <button type="button" class="btn-add-batch" (click)="addBatch()">
+        Añadir otro lote 
+        <span class="plus-icon">+</span>
+      </button>
+
+    </form>
+  </div>
+
+  <div class="right-panel">
+    <h2 class="header-text">Producto</h2>
+    
+    @if (scannedProduct) {
+      <div class="product-card">
+        <div class="card-image">
+          <img [src]="scannedProduct.imageUrl" alt="Producto">
+        </div>
+        <div class="card-details">
+          <h3>{{ scannedProduct.name }}</h3>
+          <p class="subtitle">{{ scannedProduct.genericName }}</p>
+          <p class="meta">{{ scannedProduct.details }}</p>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <div class="footer-action">
+    <button class="btn-finalize" (click)="finalize()">Finalizar</button>
+  </div>
+
+</div>
