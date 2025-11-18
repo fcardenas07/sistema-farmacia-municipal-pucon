@@ -5,6 +5,7 @@ import { ProductosVendedorPageComponent } from './features/ventas_facturacion_bo
 import { BodegaHomeComponent } from './features/home/pages/bodega-home/bodega-home.component';
 import { IngresoCodigoPedidoPageComponent } from './features/recepcion-productos-bodega/pages/ingreso-codigo-pedido-page/ingreso-codigo-pedido-page.component';
 import { AgregarStockPedidoPageComponent } from './features/recepcion-productos-bodega/pages/agregar-stock-pedido-page/agregar-stock-pedido-page.component';
+import { ResumenPedidoPageComponent } from './features/recepcion-productos-bodega/pages/resumen-pedido-page/resumen-pedido-page.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
@@ -12,5 +13,6 @@ export const routes: Routes = [
     {path: 'Home-bodega', component: BodegaHomeComponent},
     {path: 'ingreso-codigo-pedido',component: IngresoCodigoPedidoPageComponent},
     {path: 'agregar-stock-pedido',component: AgregarStockPedidoPageComponent},
+    {path: 'resumen-pedido',component: ResumenPedidoPageComponent},
     {path: '**', redirectTo: 'login' }
 ];
