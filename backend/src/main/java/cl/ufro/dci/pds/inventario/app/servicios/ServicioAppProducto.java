@@ -1,6 +1,7 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
@@ -19,11 +20,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ServicioAppProducto {
+
     private final ServicioProducto servicioProducto;
     private final ServicioCodigo servicioCodigo;
     private final ServicioLote servicioLote;
 
-    public ServicioAppProducto(ServicioProducto servicioProducto, ServicioCodigo servicioCodigo, ServicioLote servicioLote) {
+    public ServicioAppProducto(ServicioProducto servicioProducto,
+                               ServicioCodigo servicioCodigo,
+                               ServicioLote servicioLote) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
@@ -59,19 +63,12 @@ public class ServicioAppProducto {
     }
 
     @Transactional
-    public ProductoBuscado obtenerProductoPorId(String id) {
-        var producto = servicioProducto.obtenerPorId(id);
-        var codigos = servicioCodigo.obtenerCodigosConIdProducto(id);
-        int stockTotal = calcularStockTotal(id);
+    public ProductoBuscado obtenerProductoPorId(String idProducto) {
+        var producto = servicioProducto.obtenerPorId(idProducto);
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(idProducto);
+        int stockTotal = calcularStockTotal(codigos);
 
         return ProductoBuscado.desde(producto, codigos, stockTotal);
-    }
-
-    private int calcularStockTotal(String idProducto) {
-        var lotes = servicioLote.obtenerLotesDeProductos(List.of(idProducto));
-        return lotes.stream()
-                .mapToInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
-                .sum();
     }
 
     @Transactional
@@ -86,35 +83,48 @@ public class ServicioAppProducto {
                 nombreComercial, nombreGenerico, activo, categoria, numeroPagina
         );
 
-        var ids = productosPage.getContent().stream()
+        var idsProducto = productosPage.getContent().stream()
                 .map(Producto::getIdProducto)
                 .toList();
 
-        var stockPorProducto = agruparStockPorProducto(ids);
+        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
+        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
+        var stockPorProducto = agruparStockPorProducto(lotes, codigosPorProducto);
 
         List<ProductoFiltrado> filtrados = productosPage.getContent().stream()
-                .map(p -> mapearProductoFiltrado(p, stockPorProducto))
+                .map(p -> {
+                    int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
+                    return ProductoFiltrado.desde(p, stockTotal);
+                })
                 .toList();
 
         return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
     }
 
-    private Map<String, Integer> agruparStockPorProducto(List<String> ids) {
-        var lotes = servicioLote.obtenerLotesDeProductos(ids);
+    private Map<String, Producto> mapearCodigosPorProducto(List<String> idsProducto) {
+        return servicioCodigo.obtenerCodigosConIdProductoEn(idsProducto)
+                .stream()
+                .collect(Collectors.toMap(Codigo::getIdCodigo, Codigo::getProducto));
+    }
+
+    private List<Lote> obtenerLotesDeCodigos(List<String> idsCodigos) {
+        if (idsCodigos == null || idsCodigos.isEmpty()) return List.of();
+        return servicioLote.obtenerLotesDeCodigos(idsCodigos);
+    }
+
+    private Map<String, Integer> agruparStockPorProducto(List<Lote> lotes, Map<String, Producto> codigosPorProducto) {
         return lotes.stream()
                 .collect(Collectors.groupingBy(
-                        l -> l.getProducto().getIdProducto(),
-                        Collectors.summingInt(this::stockActual)
+                        l -> codigosPorProducto.get(l.getCodigo().getIdCodigo()).getIdProducto(),
+                        Collectors.summingInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
                 ));
     }
 
-    private int stockActual(Lote lote) {
-        var stock = lote.getStock();
-        return (stock != null) ? stock.getCantidadActual() : 0;
-    }
-
-    private ProductoFiltrado mapearProductoFiltrado(Producto p, Map<String, Integer> stockPorProducto) {
-        int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
-        return ProductoFiltrado.desde(p, stockTotal);
+    private int calcularStockTotal(List<Codigo> codigos) {
+        var idsCodigos = codigos.stream().map(Codigo::getIdCodigo).toList();
+        var lotes = obtenerLotesDeCodigos(idsCodigos);
+        return lotes.stream()
+                .mapToInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
+                .sum();
     }
 }

@@ -126,4 +126,37 @@ class ServicioCodigoTest {
         assertEquals("C001", codigos.getFirst().getIdCodigo());
         verify(repositorioCodigo).findAllByProducto_IdProducto("P001");
     }
+
+    @Test
+    @DisplayName("Obtener códigos por varios productos devuelve los códigos correctos")
+    void obtenerCodigosPorVariosProductos() {
+        var producto2 = new Producto(
+                "Ibuprofeno",
+                "Ibuprofeno Genérico",
+                "20 Comprimidos",
+                "400",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0002.jpg"
+        );
+
+        ReflectionTestUtils.setField(producto2, "idProducto", "P002");
+
+        var codigo2 = new Codigo("9876543210987", "EAN", true, producto2);
+        ReflectionTestUtils.setField(codigo2, "idCodigo", "C002");
+
+        when(repositorioCodigo.findAllByProducto_IdProductoIn(List.of("P001", "P002")))
+                .thenReturn(List.of(codigoEntidad, codigo2));
+
+        var codigos = servicioCodigo.obtenerCodigosConIdProductoEn(List.of("P001", "P002"));
+
+        assertEquals(2, codigos.size());
+        assertTrue(codigos.contains(codigoEntidad));
+        assertTrue(codigos.contains(codigo2));
+
+        verify(repositorioCodigo).findAllByProducto_IdProductoIn(List.of("P001", "P002"));
+    }
 }

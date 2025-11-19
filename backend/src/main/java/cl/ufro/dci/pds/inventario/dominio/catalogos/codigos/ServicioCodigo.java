@@ -36,4 +36,11 @@ public class ServicioCodigo {
     public List<Codigo> obtenerCodigosConIdProducto(String idProducto) {
         return repositorioCodigo.findAllByProducto_IdProducto(idProducto);
     }
+
+    public List<Codigo> obtenerCodigosConIdProductoEn(List<String> idsProducto) {
+        if (idsProducto == null || idsProducto.isEmpty()) {
+            return List.of();
+        }
+        return repositorioCodigo.findAllByProducto_IdProductoIn(idsProducto);
+    }
 }

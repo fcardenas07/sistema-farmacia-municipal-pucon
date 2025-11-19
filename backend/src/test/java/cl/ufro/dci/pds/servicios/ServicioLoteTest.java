@@ -24,39 +24,39 @@ class ServicioLoteTest {
     }
 
     @Test
-    @DisplayName("obtenerLotesDeProductos delega correctamente al repositorio")
-    void obtenerLotesDeProductosDelegacionCorrecta() {
-        List<String> ids = List.of("P1", "P2");
+    @DisplayName("obtenerLotesDeCodigos delega correctamente al repositorio")
+    void obtenerLotesDeCodigosDelegacionCorrecta() {
+        List<String> idsCodigo = List.of("C1", "C2");
 
         var lote1 = mock(Lote.class);
         var lote2 = mock(Lote.class);
         var lotesRespuesta = List.of(lote1, lote2);
 
-        when(repo.findByProducto_IdProductoIn(ids)).thenReturn(lotesRespuesta);
+        when(repo.findByCodigo_IdCodigoIn(idsCodigo)).thenReturn(lotesRespuesta);
 
-        List<Lote> resultado = servicio.obtenerLotesDeProductos(ids);
+        List<Lote> resultado = servicio.obtenerLotesDeCodigos(idsCodigo);
 
         assertEquals(2, resultado.size());
         assertSame(lote1, resultado.get(0));
         assertSame(lote2, resultado.get(1));
 
-        verify(repo, times(1)).findByProducto_IdProductoIn(ids);
+        verify(repo, times(1)).findByCodigo_IdCodigoIn(idsCodigo);
     }
 
     @Test
-    @DisplayName("obtenerLotesDeProductos con lista vacía retorna lista vacía sin llamar al repositorio")
+    @DisplayName("obtenerLotesDeCodigos con lista vacía retorna lista vacía sin llamar al repositorio")
     void obtenerLotesConListaVacia() {
-        List<Lote> resultado = servicio.obtenerLotesDeProductos(List.of());
+        List<Lote> resultado = servicio.obtenerLotesDeCodigos(List.of());
 
         assertTrue(resultado.isEmpty());
-        verify(repo, never()).findByProducto_IdProductoIn(any());
+        verify(repo, never()).findByCodigo_IdCodigoIn(any());
     }
 
     @Test
-    @DisplayName("obtenerLotesDeProductos con lista nula retorna lista vacía sin llamar al repositorio")
+    @DisplayName("obtenerLotesDeCodigos con lista nula retorna lista vacía sin llamar al repositorio")
     void obtenerLotesConListaNula() {
-        var resultado = servicio.obtenerLotesDeProductos(null);
+        var resultado = servicio.obtenerLotesDeCodigos(null);
         assertTrue(resultado.isEmpty());
-        verify(repo, never()).findByProducto_IdProductoIn(any());
+        verify(repo, never()).findByCodigo_IdCodigoIn(any());
     }
 }

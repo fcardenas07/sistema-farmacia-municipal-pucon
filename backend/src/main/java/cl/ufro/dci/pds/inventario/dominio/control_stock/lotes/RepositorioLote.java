@@ -8,11 +8,11 @@ import java.util.List;
 public interface RepositorioLote extends JpaRepository<Lote, String> {
 
     @Query("""
-            SELECT DISTINCT l
-            FROM Lote l
-            JOIN FETCH l.producto p
-            LEFT JOIN FETCH l.stock s
-            WHERE p.idProducto IN :ids
-            """)
-    List<Lote> findByProducto_IdProductoIn(List<String> ids);
+        SELECT DISTINCT l
+        FROM Lote l
+        JOIN FETCH l.codigo c
+        LEFT JOIN FETCH l.stock s
+        WHERE c.idCodigo IN :ids
+        """)
+    List<Lote> findByCodigo_IdCodigoIn(List<String> ids);
 }

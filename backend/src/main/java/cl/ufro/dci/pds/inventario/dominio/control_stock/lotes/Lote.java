@@ -1,6 +1,6 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -28,8 +28,8 @@ public class Lote {
     private String estado;
 
     @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
-    private Producto producto;
+    @JoinColumn(name = "id_codigo", nullable = false)
+    private Codigo codigo;
 
     @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL)
     private Stock stock;
@@ -81,12 +81,12 @@ public class Lote {
         this.stock = stock;
     }
 
-    public Producto getProducto() {
-        return producto;
+    public Codigo getCodigo() {
+        return codigo;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+    public void setCodigo(Codigo codigo) {
+        this.codigo = codigo;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class Lote {
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
-                ", producto=" + producto + '\'' +
+                ", codigo=" + codigo + '\'' +
                 ", stock=" + stock + '\'' +
                 '}';
     }

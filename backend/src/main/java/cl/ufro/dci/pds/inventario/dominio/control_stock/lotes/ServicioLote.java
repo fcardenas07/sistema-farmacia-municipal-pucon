@@ -12,10 +12,10 @@ public class ServicioLote {
         this.repositorioLote = repositorioLote;
     }
 
-    public List<Lote> obtenerLotesDeProductos(List<String> idsProducto) {
-        if (idsProducto == null || idsProducto.isEmpty()) {
+    public List<Lote> obtenerLotesDeCodigos(List<String> idsCodigo) {
+        if (idsCodigo == null || idsCodigo.isEmpty()) {
             return List.of();
         }
-        return repositorioLote.findByProducto_IdProductoIn(idsProducto);
+        return repositorioLote.findByCodigo_IdCodigoIn(idsCodigo);
     }
 }

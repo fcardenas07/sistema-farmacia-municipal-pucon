@@ -61,8 +61,8 @@ class ControladorProductoIntegradoTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        repositorioCodigo.deleteAll();
         repositorioLote.deleteAll();
+        repositorioCodigo.deleteAll();
         repositorioProducto.deleteAll();
         idsProductos = new ArrayList<>();
         idsCodigos = new ArrayList<>();
@@ -81,18 +81,12 @@ class ControladorProductoIntegradoTest {
         }
 
         var producto1 = new Producto(
-                "Paracetamol",
-                "Paracetamol",
-                "Tabletas",
-                "500",
-                "mg",
-                10,
-                100,
-                true,
+                "Paracetamol", "Paracetamol",
+                "Tabletas", "500", "mg",
+                10, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 null
         );
-
         producto1 = repositorioProducto.save(producto1);
         idsProductos.add(producto1.getIdProducto());
 
@@ -105,7 +99,7 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo1.getIdCodigo());
 
         var lote1 = new Lote();
-        lote1.setProducto(producto1);
+        lote1.setCodigo(codigo1);
         lote1.setNumeroLote("NUM001");
         lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
         lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
@@ -120,18 +114,12 @@ class ControladorProductoIntegradoTest {
         repositorioLote.save(lote1);
 
         var producto2 = new Producto(
-                "Advil",
-                "Ibuprofeno",
-                "Tabletas",
-                "400",
-                "mg",
-                5,
-                50,
-                true,
+                "Advil", "Ibuprofeno",
+                "Tabletas", "400", "mg",
+                5, 50, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 "producto/P0002.jpg"
         );
-
         producto2 = repositorioProducto.save(producto2);
         idsProductos.add(producto2.getIdProducto());
 
@@ -144,7 +132,7 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo2.getIdCodigo());
 
         var lote2 = new Lote();
-        lote2.setProducto(producto2);
+        lote2.setCodigo(codigo2);
         lote2.setNumeroLote("NUM002");
         lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
         lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
@@ -159,18 +147,12 @@ class ControladorProductoIntegradoTest {
         repositorioLote.save(lote2);
 
         var producto3 = new Producto(
-                "Amoxil",
-                "Amoxicilina",
-                "Caja 12 cápsulas",
-                "500",
-                "mg",
-                20,
-                200,
-                false,
+                "Amoxil", "Amoxicilina",
+                "Caja 12 cápsulas", "500", "mg",
+                20, 200, false,
                 CategoriaProducto.ANTIBIOTICOS,
                 "producto/P0003.jpg"
         );
-
         producto3 = repositorioProducto.save(producto3);
         idsProductos.add(producto3.getIdProducto());
 
@@ -183,7 +165,7 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo3.getIdCodigo());
 
         var lote3 = new Lote();
-        lote3.setProducto(producto3);
+        lote3.setCodigo(codigo3);
         lote3.setNumeroLote("NUM003");
         lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
         lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
