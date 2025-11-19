@@ -17,10 +17,6 @@ public class ServicioCodigo {
     }
 
     public Codigo crear(Producto producto, CodigoACrear nuevoCodigo) {
-        if (repositorioCodigo.existsById(nuevoCodigo.idCodigo())) {
-            throw new CodigoDuplicadoException(nuevoCodigo.idCodigo());
-        }
-
         var codigo = nuevoCodigo.aEntidad(producto);
         return repositorioCodigo.save(codigo);
     }

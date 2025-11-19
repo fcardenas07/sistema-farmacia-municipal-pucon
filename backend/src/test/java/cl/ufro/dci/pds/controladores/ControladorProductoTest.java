@@ -70,8 +70,8 @@ public class ControladorProductoTest {
                 true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(
-                        new CodigoACrear("C001", "1234567890123", "EAN", true),
-                        new CodigoACrear("C002", "7800987654321", "EAN13", true)
+                        new CodigoACrear("1234567890123", "EAN", true),
+                        new CodigoACrear("7800987654321", "EAN13", true)
                 )
         );
 
@@ -120,8 +120,7 @@ public class ControladorProductoTest {
                         .content(bodyVacioJSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
-                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
-                .andExpect(jsonPath("$.codigos").value("El producto debe tener al menos un código"));
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
     }
 
     @Test
@@ -643,54 +642,6 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Crear producto sin código devuelve devuelve 400")
-    void crearProductoSinCodigos() throws Exception {
-        var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                List.of()
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.codigos").value("El producto debe tener al menos un código"));
-    }
-
-    @Test
-    @DisplayName("Crear producto con id código vacío devuelve 400")
-    void crearProductoConIdCodigoVacio() throws Exception {
-        var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                List.of(new CodigoACrear("", "1234567890123", "EAN", true))
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['codigos[0].idCodigo']").value("El id del código no puede estar vacío"));
-    }
-
-    @Test
     @DisplayName("Crear producto con código de barra vacío devuelve 400")
     void crearProductoConCodigoBarraVacio() throws Exception {
         var dto = new ProductoACrear(
@@ -703,7 +654,7 @@ public class ControladorProductoTest {
                 productoValido.stockMaximo(),
                 productoValido.activo(),
                 productoValido.categoria(),
-                List.of(new CodigoACrear("C001", "", "EAN", true))
+                List.of(new CodigoACrear("", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -728,7 +679,7 @@ public class ControladorProductoTest {
                 productoValido.stockMaximo(),
                 productoValido.activo(),
                 productoValido.categoria(),
-                List.of(new CodigoACrear("C001", codigoLargo, "EAN", true))
+                List.of(new CodigoACrear( codigoLargo, "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -752,7 +703,7 @@ public class ControladorProductoTest {
                 productoValido.stockMaximo(),
                 productoValido.activo(),
                 productoValido.categoria(),
-                List.of(new CodigoACrear("C001", "1234567890123", "", true))
+                List.of(new CodigoACrear("1234567890123", "", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -777,7 +728,7 @@ public class ControladorProductoTest {
                 productoValido.stockMaximo(),
                 productoValido.activo(),
                 productoValido.categoria(),
-                List.of(new CodigoACrear("C001", "1234567890123", tipoLargo, true))
+                List.of(new CodigoACrear("1234567890123", tipoLargo, true))
         );
 
         mockMvc.perform(post("/productos")
@@ -1159,34 +1110,6 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Crear producto con códigos duplicados devuelve 400")
-    void crearProductoConCodigosDuplicadosDevuelve400() throws Exception {
-        var codigo1 = new CodigoACrear("C001", "123", "TipoA", true);
-        var codigo2 = new CodigoACrear("C002", "456", "TipoB", true);
-        var codigoDuplicado = new CodigoACrear("C001", "789", "TipoC", true);
-
-        var productoDto = new ProductoACrear(
-                "Producto A",
-                "Genérico A",
-                "Presentación",
-                "Dosificación",
-                "Unidad",
-                10,
-                50,
-                true,
-                null,
-                List.of(codigo1, codigo2, codigoDuplicado)
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(productoDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.codigosUnicos").value("No se pueden repetir los IDs de los códigos"));
-    }
-
-    @Test
     @DisplayName("Crear producto con stock mínimo máximo permitido devuelve 400 si supera el límite")
     void crearProductoConStockMinimoExcedido() throws Exception {
         var dto = new ProductoACrear(
@@ -1281,7 +1204,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con todos los campos en blanco devuelve 400")
     void crearProductoConTodosLosCamposEnBlanco() throws Exception {
-        var codigo = new CodigoACrear("   ", "   ", "   ", true);
+        var codigo = new CodigoACrear("   ", "   ", true);
 
         var dto = new ProductoACrear(
                 "   ",
@@ -1441,7 +1364,7 @@ public class ControladorProductoTest {
                 "Caja", "50mg", "mg",
                 5, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C020", "0001112223334", "EAN", true))
+                List.of(new CodigoACrear("0001112223334", "EAN", true))
         );
 
         var creado = new ProductoCreado(
@@ -1615,5 +1538,32 @@ public class ControladorProductoTest {
         mockMvc.perform(get("/productos/{id}", "P999").with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No se encontró producto con id = P999"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con código de barras duplicado devuelve error de validación")
+    void crearProductoCodigoDuplicado_validaCodigosUnicos() throws Exception {
+        var dto = new ProductoACrear(
+                "Paracetamol",
+                "Paracetamol Genérico",
+                "Tabletas 500mg",
+                "500",
+                "mg",
+                10,
+                100,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(
+                        new CodigoACrear("1234567890123", "EAN", true),
+                        new CodigoACrear("1234567890123", "EAN", true)
+                )
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigosBarraUnicos").value("No puede haber códigos de barra duplicados"));
     }
 }

@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +33,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,6 +57,7 @@ class ControladorProductoIntegradoTest {
     private ObjectMapper objectMapper;
 
     private List<String> idsProductos;
+    private List<String> idsCodigos;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -69,6 +65,7 @@ class ControladorProductoIntegradoTest {
         repositorioLote.deleteAll();
         repositorioProducto.deleteAll();
         idsProductos = new ArrayList<>();
+        idsCodigos = new ArrayList<>();
 
         var fotosDir = Paths.get("src/test/resources/assets-test/productos");
         if (Files.exists(fotosDir)) {
@@ -100,12 +97,12 @@ class ControladorProductoIntegradoTest {
         idsProductos.add(producto1.getIdProducto());
 
         var codigo1 = new Codigo();
-        codigo1.setIdCodigo("C001");
         codigo1.setCodigoBarra("1234567890123");
         codigo1.setTipoCodigo("EAN");
         codigo1.setActivo(true);
         codigo1.setProducto(producto1);
-        repositorioCodigo.save(codigo1);
+        codigo1 = repositorioCodigo.save(codigo1);
+        idsCodigos.add(codigo1.getIdCodigo());
 
         var lote1 = new Lote();
         lote1.setIdLote("L001");
@@ -141,12 +138,12 @@ class ControladorProductoIntegradoTest {
         idsProductos.add(producto2.getIdProducto());
 
         var codigo2 = new Codigo();
-        codigo2.setIdCodigo("C002");
         codigo2.setCodigoBarra("9876543210987");
         codigo2.setTipoCodigo("EAN");
         codigo2.setActivo(true);
         codigo2.setProducto(producto2);
-        repositorioCodigo.save(codigo2);
+        codigo2 = repositorioCodigo.save(codigo2);
+        idsCodigos.add(codigo2.getIdCodigo());
 
         var lote2 = new Lote();
         lote2.setIdLote("L002");
@@ -182,12 +179,12 @@ class ControladorProductoIntegradoTest {
         idsProductos.add(producto3.getIdProducto());
 
         var codigo3 = new Codigo();
-        codigo3.setIdCodigo("C003");
         codigo3.setCodigoBarra("1112223334445");
         codigo3.setTipoCodigo("EAN");
         codigo3.setActivo(true);
         codigo3.setProducto(producto3);
-        repositorioCodigo.save(codigo3);
+        codigo3 = repositorioCodigo.save(codigo3);
+        idsCodigos.add(codigo3.getIdCodigo());
 
         var lote3 = new Lote();
         lote3.setIdLote("L003");
@@ -253,8 +250,7 @@ class ControladorProductoIntegradoTest {
                         .content(objectMapper.writeValueAsString(dtoVacio)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
-                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
-                .andExpect(jsonPath("$.codigos").value("El producto debe tener al menos un código"));
+                .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
     }
 
     @Test
@@ -306,7 +302,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C004", "9990001112223", "EAN", true))
+                List.of(new CodigoACrear("9990001112223", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -323,7 +319,8 @@ class ControladorProductoIntegradoTest {
     @Test
     @DisplayName("Actualizar producto válido devuelve 200")
     void actualizarProductoValido() throws Exception {
-        var idProducto = idsProductos.get(0);
+        var idProducto = idsProductos.getFirst();
+        var idCodigo = idsCodigos.getFirst();
 
         var dto = new ProductoAModificar(
                 "Nuevo Nombre",
@@ -335,8 +332,10 @@ class ControladorProductoIntegradoTest {
                 50,
                 false,
                 null,
-                List.of(new CodigoAModificar("C001", "1234567890123", null, true))
+                List.of(new CodigoAModificar(idCodigo, "1234567890123", null, true))
         );
+
+        System.out.println(idCodigo);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -345,7 +344,7 @@ class ControladorProductoIntegradoTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombreComercial").value("Nuevo Nombre"))
                 .andExpect(jsonPath("$.activo").value(false))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"))
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo))
                 .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"));
     }
 
@@ -369,20 +368,20 @@ class ControladorProductoIntegradoTest {
         var idProducto = productoGuardado.getIdProducto();
 
         var codigo1 = new Codigo();
-        codigo1.setIdCodigo("C101");
         codigo1.setCodigoBarra("1111111111111");
         codigo1.setTipoCodigo("EAN");
         codigo1.setActivo(true);
         codigo1.setProducto(producto);
-        repositorioCodigo.save(codigo1);
+        codigo1 = repositorioCodigo.save(codigo1);
+        var idCodigo1 = codigo1.getIdCodigo();
 
         var codigo2 = new Codigo();
-        codigo2.setIdCodigo("C102");
         codigo2.setCodigoBarra("2222222222222");
         codigo2.setTipoCodigo("EAN");
         codigo2.setActivo(true);
         codigo2.setProducto(producto);
-        repositorioCodigo.save(codigo2);
+        codigo2 = repositorioCodigo.save(codigo2);
+        var idCodigo2 = codigo2.getIdCodigo();
 
         var dto = new ProductoAModificar(
                 "Nombre Modificado",
@@ -395,8 +394,8 @@ class ControladorProductoIntegradoTest {
                 false,
                 null,
                 List.of(
-                        new CodigoAModificar("C101", "1111111111111", null, true),
-                        new CodigoAModificar("C102", "2222222222222", null, true)
+                        new CodigoAModificar(idCodigo1, "1111111111111", null, true),
+                        new CodigoAModificar(idCodigo2, "2222222222222", null, true)
                 )
         );
 
@@ -407,9 +406,9 @@ class ControladorProductoIntegradoTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombreComercial").value("Nombre Modificado"))
                 .andExpect(jsonPath("$.activo").value(false))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C101"))
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo1))
                 .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1111111111111"))
-                .andExpect(jsonPath("$.codigos[1].idCodigo").value("C102"))
+                .andExpect(jsonPath("$.codigos[1].idCodigo").value(idCodigo2))
                 .andExpect(jsonPath("$.codigos[1].codigoBarra").value("2222222222222"));
     }
 
@@ -509,7 +508,6 @@ class ControladorProductoIntegradoTest {
         repositorioProducto.save(producto2);
 
         var codigo = new Codigo();
-        codigo.setIdCodigo("C002");
         codigo.setCodigoBarra("7800987654321");
         codigo.setTipoCodigo("EAN");
         codigo.setActivo(true);
@@ -556,12 +554,12 @@ class ControladorProductoIntegradoTest {
         var productoId = producto.getIdProducto();
 
         var codigo = new Codigo();
-        codigo.setIdCodigo("C001");
-        codigo.setCodigoBarra("1234567890123");
+        codigo.setCodigoBarra("130320101203");
         codigo.setTipoCodigo("EAN");
         codigo.setActivo(true);
         codigo.setProducto(producto);
-        repositorioCodigo.save(codigo);
+        codigo = repositorioCodigo.save(codigo);
+        var idCodigo = codigo.getIdCodigo();
 
         var dto = new ProductoAModificar(
                 "Nombre Modificado",
@@ -583,8 +581,8 @@ class ControladorProductoIntegradoTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombreComercial").value("Nombre Modificado"))
                 .andExpect(jsonPath("$.activo").value(false))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"))
-                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"));
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo))
+                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("130320101203"));
     }
 
     @Test
@@ -600,7 +598,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C010", "1234567890123", "EAN", true))
+                List.of(new CodigoACrear("1234567890123", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -624,7 +622,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIVIRALES,
-                List.of(new CodigoACrear("C011", "1234567890124", "EAN", true))
+                List.of(new CodigoACrear("1234567890124", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -648,7 +646,7 @@ class ControladorProductoIntegradoTest {
                 10,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C013", "1234567890126", "EAN", true))
+                List.of(new CodigoACrear("1234567890126", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -673,7 +671,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C014", "1234567890127", "EAN", true))
+                List.of(new CodigoACrear("1234567890127", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -698,7 +696,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C016", "1234567890129", "EAN", true))
+                List.of(new CodigoACrear("1234567890129", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -723,7 +721,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C017", "1234567890130", "EAN", true))
+                List.of(new CodigoACrear("1234567890130", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -748,7 +746,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIFUNGICOS,
-                List.of(new CodigoACrear("C018", "1234567890131", "EAN", true))
+                List.of(new CodigoACrear("1234567890131", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -773,7 +771,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.DERMATOLOGICOS,
-                List.of(new CodigoACrear("C019", "1234567890132", "EAN", true))
+                List.of(new CodigoACrear("1234567890132", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -797,7 +795,7 @@ class ControladorProductoIntegradoTest {
                 -1,
                 true,
                 CategoriaProducto.ANTIFUNGICOS,
-                List.of(new CodigoACrear("C015", "1234567890128", "EAN", true))
+                List.of(new CodigoACrear("1234567890128", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -822,7 +820,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.DERMATOLOGICOS,
-                List.of(new CodigoACrear("C012", "1234567890125", "EAN", true))
+                List.of(new CodigoACrear("1234567890125", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -831,53 +829,6 @@ class ControladorProductoIntegradoTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.stockMinimo").value("El stock mínimo no puede ser negativo"));
-    }
-
-    @Test
-    @DisplayName("Crear producto sin códigos devuelve 400")
-    void crearProductoSinCodigos() throws Exception {
-        var dto = new ProductoACrear(
-                "Nombre Comercial",
-                "Nombre Genérico",
-                "Caja 10",
-                "10mg",
-                "mg",
-                10,
-                50,
-                true,
-                CategoriaProducto.DERMATOLOGICOS,
-                List.of()
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Crear producto con id código vacío devuelve 400")
-    void crearProductoConIdCodigoVacio() throws Exception {
-        var dto = new ProductoACrear(
-                "Nombre Comercial",
-                "Nombre Genérico",
-                "Caja 10",
-                "10mg",
-                "mg",
-                10,
-                50,
-                true,
-                CategoriaProducto.DERMATOLOGICOS,
-                List.of(new CodigoACrear("", "1234567890123", "EAN", true))
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['codigos[0].idCodigo']").value("El id del código no puede estar vacío"));
     }
 
     @Test
@@ -893,7 +844,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIHISTAMINICOS,
-                List.of(new CodigoACrear("C100", "", "EAN", true))
+                List.of(new CodigoACrear("", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -918,7 +869,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C101", codigoLargo, "EAN", true))
+                List.of(new CodigoACrear(codigoLargo, "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -943,7 +894,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIVIRALES,
-                List.of(new CodigoACrear("C102", "1234567890123", "", true))
+                List.of(new CodigoACrear( "1234567890123", "", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -969,7 +920,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C103", "1234567890123", tipoLargo, true))
+                List.of(new CodigoACrear("1234567890123", tipoLargo, true))
         );
 
         mockMvc.perform(post("/productos")
@@ -1335,34 +1286,6 @@ class ControladorProductoIntegradoTest {
     }
 
     @Test
-    @DisplayName("Crear producto con códigos duplicados devuelve 400")
-    void crearProductoConCodigosDuplicadosDevuelve400() throws Exception {
-        var codigo1 = new CodigoACrear("C001", "123", "TipoA", true);
-        var codigo2 = new CodigoACrear("C002", "456", "TipoB", true);
-        var codigoDuplicado = new CodigoACrear("C001", "789", "TipoC", true);
-
-        var productoDto = new ProductoACrear(
-                "Producto A",
-                "Genérico A",
-                "Presentación",
-                "Dosificación",
-                "Unidad",
-                10,
-                50,
-                true,
-                CategoriaProducto.ANTIBIOTICOS,
-                List.of(codigo1, codigo2, codigoDuplicado)
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(productoDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.codigosUnicos").value("No se pueden repetir los IDs de los códigos"));
-    }
-
-    @Test
     @DisplayName("Crear producto con stock mínimo máximo permitido devuelve 400 si supera el límite")
     void crearProductoConStockMinimoExcedido() throws Exception {
         var dto = new ProductoACrear(
@@ -1375,7 +1298,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C999", "1234567890123", "EAN", true))
+                List.of(new CodigoACrear("1234567890123", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -1399,7 +1322,7 @@ class ControladorProductoIntegradoTest {
                 100_000_001,
                 true,
                 CategoriaProducto.ANTIBIOTICOS,
-                List.of(new CodigoACrear("C998", "1234567890456", "EAN", true))
+                List.of(new CodigoACrear("1234567890456", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -1460,7 +1383,7 @@ class ControladorProductoIntegradoTest {
     @Test
     @DisplayName("Crear producto con todos los campos en blanco devuelve 400")
     void crearProductoConTodosLosCamposEnBlanco() throws Exception {
-        var codigo = new CodigoACrear("   ", "   ", "   ", true);
+        var codigo = new CodigoACrear("   ", "   ", true);
 
         ProductoACrear dto = new ProductoACrear(
                 "   ",
@@ -1588,7 +1511,7 @@ class ControladorProductoIntegradoTest {
                 "Caja", "50mg", "mg",
                 5, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C020", "0001112223334", "EAN", true))
+                List.of(new CodigoACrear("0001112223334", "EAN", true))
         );
 
         var resultadoCreacion = mockMvc.perform(post("/productos")
@@ -1722,5 +1645,32 @@ class ControladorProductoIntegradoTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.foto")
                         .value("El archivo no puede estar vacío"));
+    }
+
+    @Test
+    @DisplayName("Crear producto con código de barras duplicado devuelve error de validación")
+    void crearProductoCodigoDuplicado_validaCodigosUnicos() throws Exception {
+        var dto = new ProductoACrear(
+                "Paracetamol",
+                "Paracetamol Genérico",
+                "Tabletas 500mg",
+                "500",
+                "mg",
+                10,
+                100,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(
+                        new CodigoACrear("1234567890123", "EAN", true),
+                        new CodigoACrear("1234567890123", "EAN", true)
+                )
+        );
+
+        mockMvc.perform(post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigosBarraUnicos").value("No puede haber códigos de barra duplicados"));
     }
 }

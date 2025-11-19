@@ -8,6 +8,7 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,43 +43,31 @@ class ServicioCodigoTest {
         );
 
         codigoEntidad = new Codigo(
-                "C001",
                 "1234567890123",
                 "EAN",
                 true,
                 productoEntidad
         );
+
+        ReflectionTestUtils.setField(codigoEntidad, "idCodigo", "C001");
+        ReflectionTestUtils.setField(productoEntidad, "idProducto", "P001");
     }
 
     @Test
     @DisplayName("Crear código válido guarda y devuelve el código")
     void crearCodigoValido() {
-        var dto = new CodigoACrear("C001", "1234567890123", "EAN", true);
+        var dto = new CodigoACrear("1234567890123", "EAN", true);
 
         when(repositorioCodigo.existsById("C001")).thenReturn(false);
         when(repositorioCodigo.save(any(Codigo.class))).thenReturn(codigoEntidad);
 
-        Codigo creado = servicioCodigo.crear(productoEntidad, dto);
+        var creado = servicioCodigo.crear(productoEntidad, dto);
 
         assertEquals("C001", creado.getIdCodigo());
         assertEquals("EAN", creado.getTipoCodigo());
         assertEquals(productoEntidad, creado.getProducto());
 
-        verify(repositorioCodigo).existsById("C001");
         verify(repositorioCodigo).save(any(Codigo.class));
-    }
-
-    @Test
-    @DisplayName("Crear código duplicado lanza CodigoDuplicadoException")
-    void crearCodigoDuplicado() {
-        var dto = new CodigoACrear("C001", "1234567890123", "EAN", true);
-
-        when(repositorioCodigo.existsById("C001")).thenReturn(true);
-
-        assertThrows(CodigoDuplicadoException.class, () -> servicioCodigo.crear(productoEntidad, dto));
-
-        verify(repositorioCodigo).existsById("C001");
-        verify(repositorioCodigo, never()).save(any());
     }
 
     @Test

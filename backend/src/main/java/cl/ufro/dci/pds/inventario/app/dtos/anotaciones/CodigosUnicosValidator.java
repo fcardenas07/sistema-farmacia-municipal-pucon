@@ -1,16 +1,16 @@
 package cl.ufro.dci.pds.inventario.app.dtos.anotaciones;
 
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoConCodigos;
+import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class CodigosUnicosValidator implements ConstraintValidator<CodigosUnicos, ProductoConCodigos> {
+public class CodigosUnicosValidator implements ConstraintValidator<CodigosUnicos, ProductoAModificar> {
 
     @Override
-    public boolean isValid(ProductoConCodigos producto, ConstraintValidatorContext context) {
+    public boolean isValid(ProductoAModificar producto, ConstraintValidatorContext context) {
         var codigos = producto.codigos();
         if (codigos == null || codigos.isEmpty()) {
             return true;

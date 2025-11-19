@@ -10,6 +10,7 @@ import java.util.Objects;
 public class Codigo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_codigo")
     private String idCodigo;
 
@@ -28,8 +29,7 @@ public class Codigo {
 
     public Codigo() {}
 
-    public Codigo(String idCodigo, String codigoBarra, String tipoCodigo, boolean activo, Producto producto) {
-        this.idCodigo = idCodigo;
+    public Codigo(String codigoBarra, String tipoCodigo, boolean activo, Producto producto) {
         this.codigoBarra = codigoBarra;
         this.tipoCodigo = tipoCodigo;
         this.activo = activo;
@@ -38,10 +38,6 @@ public class Codigo {
 
     public String getIdCodigo() {
         return idCodigo;
-    }
-
-    public void setIdCodigo(String idCodigo) {
-        this.idCodigo = idCodigo;
     }
 
     public String getCodigoBarra() {

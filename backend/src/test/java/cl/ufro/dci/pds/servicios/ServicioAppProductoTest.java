@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -92,7 +93,7 @@ class ServicioAppProductoTest {
                 null
         );
 
-        codigoEntidad = new Codigo("C001","1234567890123","EAN",true, productoEntidad);
+        codigoEntidad = new Codigo("1234567890123","EAN",true, productoEntidad);
 
         productosEntidadesFiltrados = List.of(productoParacetamol, productoIbuprofeno, productoAmoxicilina);
 
@@ -101,6 +102,13 @@ class ServicioAppProductoTest {
                 crearLoteConStock("L002", productoIbuprofeno, 50),
                 crearLoteConStock("L003", productoAmoxicilina, 200)
         );
+
+        ReflectionTestUtils.setField(productoParacetamol, "idProducto", "P001");
+        ReflectionTestUtils.setField(productoIbuprofeno, "idProducto", "P002");
+        ReflectionTestUtils.setField(productoAmoxicilina, "idProducto", "P003");
+        ReflectionTestUtils.setField(productoEntidad, "idProducto", "P001");
+
+        ReflectionTestUtils.setField(codigoEntidad, "idCodigo", "C001");
     }
 
     private Lote crearLoteConStock(String idLote, Producto producto, int cantidadStock) {
@@ -122,7 +130,7 @@ class ServicioAppProductoTest {
         var dto = new ProductoACrear("Paracetamol", "Paracetamol",
                 "Tabletas", "500", "mg", 10, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C001", "1234567890123", "EAN", true)));
+                List.of(new CodigoACrear("1234567890123", "EAN", true)));
 
         when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
         when(servicioCodigo.crear(eq(productoEntidad), any(CodigoACrear.class))).thenReturn(codigoEntidad);
@@ -198,10 +206,14 @@ class ServicioAppProductoTest {
         productoEntidad.setNombreComercial("Nombre Nuevo");
         productoEntidad.setActivo(false);
 
+        var codigo2 = new Codigo("7800987654321", "EAN", true, productoEntidad);
+
         var codigos = List.of(
                 codigoEntidad,
-                new Codigo("C002", "7800987654321", "EAN", true, productoEntidad)
+                codigo2
         );
+
+        ReflectionTestUtils.setField(codigo2, "idCodigo", "C002");
 
         when(servicioProducto.actualizar(eq(id), any(ProductoAModificar.class))).thenReturn(productoEntidad);
         when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class))).thenReturn(codigoEntidad);
@@ -440,7 +452,7 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Obtener producto por ID devuelve ProductoBuscado con stockTotal correcto")
     void obtenerProductoPorId() {
-        var codigos = List.of(new Codigo("C001", "123", "EAN", true, productoEntidad));
+        var codigos = List.of(new Codigo("123", "EAN", true, productoEntidad));
         when(servicioProducto.obtenerPorId("P001")).thenReturn(productoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto("P001")).thenReturn(codigos);
         when(servicioLote.obtenerLotesDeProductos(List.of("P001"))).thenReturn(List.of(
