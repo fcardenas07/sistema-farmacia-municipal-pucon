@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Lote {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_lote")
     private String idLote;
 
@@ -38,10 +39,6 @@ public class Lote {
 
     public String getIdLote() {
         return idLote;
-    }
-
-    public void setIdLote(String idLote) {
-        this.idLote = idLote;
     }
 
     public LocalDate getFechaElaboracion() {

@@ -98,9 +98,9 @@ class ServicioAppProductoTest {
         productosEntidadesFiltrados = List.of(productoParacetamol, productoIbuprofeno, productoAmoxicilina);
 
         lotesSimulados = List.of(
-                crearLoteConStock("L001", productoParacetamol, 100),
-                crearLoteConStock("L002", productoIbuprofeno, 50),
-                crearLoteConStock("L003", productoAmoxicilina, 200)
+                crearLoteConStock(productoParacetamol, 100),
+                crearLoteConStock(productoIbuprofeno, 50),
+                crearLoteConStock(productoAmoxicilina, 200)
         );
 
         ReflectionTestUtils.setField(productoParacetamol, "idProducto", "P001");
@@ -111,9 +111,8 @@ class ServicioAppProductoTest {
         ReflectionTestUtils.setField(codigoEntidad, "idCodigo", "C001");
     }
 
-    private Lote crearLoteConStock(String idLote, Producto producto, int cantidadStock) {
+    private Lote crearLoteConStock(Producto producto, int cantidadStock) {
         var lote = new Lote();
-        lote.setIdLote(idLote);
         lote.setProducto(producto);
 
         var stock = new Stock();
@@ -456,7 +455,7 @@ class ServicioAppProductoTest {
         when(servicioProducto.obtenerPorId("P001")).thenReturn(productoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto("P001")).thenReturn(codigos);
         when(servicioLote.obtenerLotesDeProductos(List.of("P001"))).thenReturn(List.of(
-                crearLoteConStock("L001", productoEntidad, 100)
+                crearLoteConStock(productoEntidad, 100)
         ));
 
         var resultado = servicioAppProducto.obtenerProductoPorId("P001");

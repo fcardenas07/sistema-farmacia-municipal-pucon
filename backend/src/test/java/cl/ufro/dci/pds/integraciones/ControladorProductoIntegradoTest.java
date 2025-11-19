@@ -105,7 +105,6 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo1.getIdCodigo());
 
         var lote1 = new Lote();
-        lote1.setIdLote("L001");
         lote1.setProducto(producto1);
         lote1.setNumeroLote("NUM001");
         lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
@@ -113,7 +112,6 @@ class ControladorProductoIntegradoTest {
         lote1.setEstado("DISPONIBLE");
 
         var stock1 = new Stock();
-        stock1.setIdStock("S001");
         stock1.setCantidadInicial(500);
         stock1.setCantidadActual(300);
         stock1.setLote(lote1);
@@ -146,7 +144,6 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo2.getIdCodigo());
 
         var lote2 = new Lote();
-        lote2.setIdLote("L002");
         lote2.setProducto(producto2);
         lote2.setNumeroLote("NUM002");
         lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
@@ -154,7 +151,6 @@ class ControladorProductoIntegradoTest {
         lote2.setEstado("DISPONIBLE");
 
         var stock2 = new Stock();
-        stock2.setIdStock("S002");
         stock2.setCantidadInicial(500);
         stock2.setCantidadActual(100);
         stock2.setLote(lote2);
@@ -187,7 +183,6 @@ class ControladorProductoIntegradoTest {
         idsCodigos.add(codigo3.getIdCodigo());
 
         var lote3 = new Lote();
-        lote3.setIdLote("L003");
         lote3.setProducto(producto3);
         lote3.setNumeroLote("NUM003");
         lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
@@ -195,7 +190,6 @@ class ControladorProductoIntegradoTest {
         lote3.setEstado("NO_DISPONIBLE");
 
         var stock3 = new Stock();
-        stock3.setIdStock("S003");
         stock3.setCantidadInicial(200);
         stock3.setCantidadActual(20);
         stock3.setLote(lote3);

@@ -53,7 +53,6 @@ class RepositorioLoteTest {
         idIbuprofeno = productoIbuprofeno.getIdProducto();
 
         var loteParacetamol1 = new Lote();
-        loteParacetamol1.setIdLote("L001");
         loteParacetamol1.setProducto(productoParacetamol);
         loteParacetamol1.setNumeroLote("N001");
         loteParacetamol1.setEstado("Disponible");
@@ -61,7 +60,6 @@ class RepositorioLoteTest {
         loteParacetamol1.setFechaVencimiento(LocalDate.now().plusMonths(6));
 
         var loteParacetamol2 = new Lote();
-        loteParacetamol2.setIdLote("L002");
         loteParacetamol2.setProducto(productoParacetamol);
         loteParacetamol2.setNumeroLote("N002");
         loteParacetamol2.setEstado("Disponible");
@@ -69,7 +67,6 @@ class RepositorioLoteTest {
         loteParacetamol2.setFechaVencimiento(LocalDate.now().plusMonths(6));
 
         var loteIbuprofeno = new Lote();
-        loteIbuprofeno.setIdLote("L003");
         loteIbuprofeno.setProducto(productoIbuprofeno);
         loteIbuprofeno.setNumeroLote("N003");
         loteIbuprofeno.setEstado("Disponible");
@@ -77,19 +74,16 @@ class RepositorioLoteTest {
         loteIbuprofeno.setFechaVencimiento(LocalDate.now().plusMonths(12));
 
         var stockParacetamol1 = new Stock();
-        stockParacetamol1.setIdStock("S001");
         stockParacetamol1.setCantidadActual(50);
         stockParacetamol1.setLote(loteParacetamol1);
         loteParacetamol1.setStock(stockParacetamol1);
 
         var stockParacetamol2 = new Stock();
-        stockParacetamol2.setIdStock("S002");
         stockParacetamol2.setCantidadActual(50);
         stockParacetamol2.setLote(loteParacetamol2);
         loteParacetamol2.setStock(stockParacetamol2);
 
         var stockIbuprofeno = new Stock();
-        stockIbuprofeno.setIdStock("S003");
         stockIbuprofeno.setCantidadActual(50);
         stockIbuprofeno.setLote(loteIbuprofeno);
         loteIbuprofeno.setStock(stockIbuprofeno);
