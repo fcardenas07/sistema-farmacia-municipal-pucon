@@ -12,4 +12,5 @@ public interface RepositorioCodigo extends JpaRepository<Codigo, String> {
     boolean existsByIdCodigoAndProducto_IdProducto(String idCodigo, String idProducto);
     Optional<Codigo> findByIdCodigoAndProducto_IdProducto(String idCodigo, String idProducto);
     List<Codigo> findAllByProducto_IdProducto(String idProducto);
+    List<Codigo> findAllByProducto_IdProductoIn(List<String> idsProductos);
 }

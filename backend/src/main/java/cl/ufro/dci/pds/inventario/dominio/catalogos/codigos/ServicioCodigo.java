@@ -17,10 +17,6 @@ public class ServicioCodigo {
     }
 
     public Codigo crear(Producto producto, CodigoACrear nuevoCodigo) {
-        if (repositorioCodigo.existsById(nuevoCodigo.idCodigo())) {
-            throw new CodigoDuplicadoException(nuevoCodigo.idCodigo());
-        }
-
         var codigo = nuevoCodigo.aEntidad(producto);
         return repositorioCodigo.save(codigo);
     }
@@ -39,5 +35,12 @@ public class ServicioCodigo {
 
     public List<Codigo> obtenerCodigosConIdProducto(String idProducto) {
         return repositorioCodigo.findAllByProducto_IdProducto(idProducto);
+    }
+
+    public List<Codigo> obtenerCodigosConIdProductoEn(List<String> idsProducto) {
+        if (idsProducto == null || idsProducto.isEmpty()) {
+            return List.of();
+        }
+        return repositorioCodigo.findAllByProducto_IdProductoIn(idsProducto);
     }
 }

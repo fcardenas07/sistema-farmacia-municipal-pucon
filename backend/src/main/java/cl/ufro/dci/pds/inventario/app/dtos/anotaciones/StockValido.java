@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = StockValidoValidator.class)
 public @interface StockValido {
-    String message() default "Stock inválido";
+    String message() default "El stock máximo debe ser mayor o igual al stock mínimo";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
