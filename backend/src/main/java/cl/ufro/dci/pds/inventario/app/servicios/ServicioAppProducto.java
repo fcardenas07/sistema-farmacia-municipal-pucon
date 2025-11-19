@@ -101,6 +101,20 @@ public class ServicioAppProducto {
         return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
     }
 
+    @Transactional
+    public void darBajaProducto(String idProducto) {
+        servicioProducto.darBaja(idProducto);
+
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(idProducto);
+        codigos.forEach(codigo -> servicioCodigo.darBaja(codigo.getIdCodigo()));
+
+        var idsCodigos = codigos.stream().map(Codigo::getIdCodigo).toList();
+        var lotes = servicioLote.obtenerLotesDeCodigos(idsCodigos);
+        var idsLotes = lotes.stream().map(Lote::getIdLote).toList();
+
+        idsLotes.forEach(servicioLote::darBaja);
+    }
+
     private Map<String, Producto> mapearCodigosPorProducto(List<String> idsProducto) {
         return servicioCodigo.obtenerCodigosConIdProductoEn(idsProducto)
                 .stream()

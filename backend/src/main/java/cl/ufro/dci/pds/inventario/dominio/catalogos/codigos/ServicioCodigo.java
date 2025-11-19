@@ -43,4 +43,12 @@ public class ServicioCodigo {
         }
         return repositorioCodigo.findAllByProducto_IdProductoIn(idsProducto);
     }
+
+    public void darBaja(String idCodigo) {
+        var codigo = repositorioCodigo.findById(idCodigo)
+                .orElseThrow(() -> new CodigoNoEncontradoException(idCodigo));
+
+        codigo.setActivo(false);
+        repositorioCodigo.save(codigo);
+    }
 }

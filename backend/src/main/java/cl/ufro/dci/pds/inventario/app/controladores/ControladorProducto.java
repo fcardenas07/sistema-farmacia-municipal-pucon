@@ -80,6 +80,12 @@ public class ControladorProducto {
         return ResponseEntity.ok(productos);
     }
 
+    @PatchMapping("dar-de-baja/{id}")
+    public ResponseEntity<Void> darBaja(@PathVariable String id) {
+        servicioAppProducto.darBajaProducto(id);
+        return ResponseEntity.ok().build();
+    }
+
     @ExceptionHandler({CodigoDuplicadoException.class})
     public ResponseEntity<String> manejarConflicto(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
