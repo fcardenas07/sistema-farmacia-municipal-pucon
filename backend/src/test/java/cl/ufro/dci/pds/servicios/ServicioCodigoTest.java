@@ -29,12 +29,11 @@ class ServicioCodigoTest {
         servicioCodigo = new ServicioCodigo(repositorioCodigo);
 
         productoEntidad = new Producto(
-                "P001",
                 "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
+                "Paracetamol",
+                "30 Comprimidos",
+                "500",
+                "mg",
                 10,
                 100,
                 true,

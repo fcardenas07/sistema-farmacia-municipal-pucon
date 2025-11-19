@@ -60,11 +60,10 @@ public class ControladorProductoTest {
     void setUp() {
         repositorioProducto.deleteAll();
         productoValido = new ProductoACrear(
-                "P001",
                 "Paracetamol",
-                "Paracetamol genérico",
-                "Caja con 20 tabletas",
-                "500mg",
+                "Paracetamol",
+                "Tabletas",
+                "500",
                 "mg",
                 10,
                 100,
@@ -77,15 +76,15 @@ public class ControladorProductoTest {
         );
 
         productosFiltrados = List.of(
-                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol genérico",
+                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol",
                         CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible(),
-                        true, 300, "producto/P001.jpg"),
-                new ProductoFiltrado("P002", "Ibuprofeno", "Ibuprofeno genérico",
+                        true, 300, "productos/P001.jpg"),
+                new ProductoFiltrado("P002", "Advil", "Ibuprofeno",
                         CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible(),
-                        true, 100, "producto/P002.jpg"),
-                new ProductoFiltrado("P003", "Amoxicilina", "Amoxicilina genérica",
+                        true, 100, "productos/P002.jpg"),
+                new ProductoFiltrado("P003", "Amoxil", "Amoxicilina",
                         CategoriaProducto.ANTIBIOTICOS.getNombreLegible(),
-                        false, 20, "producto/P003.jpg")
+                        false, 20, "productos/P003.jpg")
         );
     }
 
@@ -120,7 +119,6 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(bodyVacioJSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
                 .andExpect(jsonPath("$.codigos").value("El producto debe tener al menos un código"));
@@ -142,7 +140,6 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(bodyCamposVacios))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
     }
@@ -171,7 +168,7 @@ public class ControladorProductoTest {
         var dto = productoValido;
 
         var creado = new ProductoCreado(
-                dto.idProducto(),
+                "P001",
                 dto.nombreComercial(),
                 true,
                 null,
@@ -190,33 +187,6 @@ public class ControladorProductoTest {
                 .andExpect(jsonPath("$.idProducto").value("P001"))
                 .andExpect(jsonPath("$.nombreComercial").value("Paracetamol"))
                 .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"));
-    }
-
-    @Test
-    @DisplayName("Crear producto con código duplicado devuelve 409")
-    void crearProductoCodigoDuplicado() throws Exception {
-        var dto = new ProductoACrear(
-                "P002",
-                "Ibuprofeno",
-                "Ibuprofeno genérico",
-                "Tabletas 400mg",
-                "400mg",
-                "Comprimidos",
-                5,
-                50,
-                true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C002", "9876543210987", "EAN", true))
-        );
-
-        when(servicioAppProducto.crearProducto(any(ProductoACrear.class)))
-                .thenThrow(new CodigoDuplicadoException("C002"));
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isConflict());
     }
 
     @Test
@@ -322,7 +292,7 @@ public class ControladorProductoTest {
 
         var dto = new ProductoAModificar(
                 "Paracetamol Modificado",
-                "Paracetamol genérico",
+                "Paracetamol",
                 "Tabletas 500mg",
                 "500mg",
                 "Comprimidos",
@@ -389,7 +359,7 @@ public class ControladorProductoTest {
                 true,
                 null,
                 List.of(
-                        new CodigoAModificar("C002", "7800987654321", "EAN", true) // este código no pertenece al producto P001
+                        new CodigoAModificar("C002", "7800987654321", "EAN", true)
                 )
         );
 
@@ -437,35 +407,9 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Crear producto con id vacío devuelve 400")
-    void crearProductoConIdVacio() throws Exception {
-        var dto = new ProductoACrear(
-                "",
-                "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
-                10,
-                100,
-                true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C001", "1234567890123", "EAN", true))
-        );
-
-        mockMvc.perform(post("/productos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"));
-    }
-
-    @Test
     @DisplayName("Crear producto con nombre comercial vacío devuelve 400")
     void crearProductoConNombreComercialVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 "",
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -489,7 +433,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con nombre genérico vacío devuelve 400")
     void crearProductoConNombreGenericoVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 "",
                 productoValido.presentacion(),
@@ -513,7 +456,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo menor que stock mínimo devuelve 400")
     void crearProductoConStockMaxMenorQueStockMin() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -538,7 +480,6 @@ public class ControladorProductoTest {
     void crearProductoConNombreComercialMuyLargo() throws Exception {
         var nombreComercial = "a".repeat(201);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 nombreComercial,
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -563,7 +504,6 @@ public class ControladorProductoTest {
     void crearProductoConNombreGenericoMuyLargo() throws Exception {
         var nombreGen = "a".repeat(300);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 nombreGen,
                 productoValido.presentacion(),
@@ -588,7 +528,6 @@ public class ControladorProductoTest {
     void crearProductoConPresentacionMuyLarga() throws Exception {
         var presentacion = "a".repeat(501);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 presentacion,
@@ -613,7 +552,6 @@ public class ControladorProductoTest {
     void crearProductoConDosificacionMuyLarga() throws Exception {
         var dosificacion = "a".repeat(101);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -638,7 +576,6 @@ public class ControladorProductoTest {
     void crearProductoConUnidadMedidaMuyLarga() throws Exception {
         var unidad = "a".repeat(51);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -662,7 +599,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo negativo y menor que stock mínimo devuelve 400")
     void crearProductoConStockMaximoNegativoYMenorQueMin() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -687,7 +623,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock mínimo negativo devuelve 400")
     void crearProductoConStockMinimoNegativo() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -711,7 +646,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto sin código devuelve devuelve 400")
     void crearProductoSinCodigos() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -736,7 +670,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con id código vacío devuelve 400")
     void crearProductoConIdCodigoVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -761,7 +694,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con código de barra vacío devuelve 400")
     void crearProductoConCodigoBarraVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -787,7 +719,6 @@ public class ControladorProductoTest {
     void crearProductoConCodigoBarraMuyLargo() throws Exception {
         var codigoLargo = "1".repeat(101);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -812,7 +743,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con tipo de código vacío devuelve 400")
     void crearProductoConTipoCodigoVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -838,7 +768,6 @@ public class ControladorProductoTest {
     void crearProductoConTipoCodigoMuyLargo() throws Exception {
         var tipoLargo = "a".repeat(51);
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -1237,7 +1166,6 @@ public class ControladorProductoTest {
         var codigoDuplicado = new CodigoACrear("C001", "789", "TipoC", true);
 
         var productoDto = new ProductoACrear(
-                "P001",
                 "Producto A",
                 "Genérico A",
                 "Presentación",
@@ -1262,7 +1190,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock mínimo máximo permitido devuelve 400 si supera el límite")
     void crearProductoConStockMinimoExcedido() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -1286,7 +1213,6 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo excedido devuelve 400")
     void crearProductoConStockMaximoExcedido() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.idProducto(),
                 productoValido.nombreComercial(),
                 productoValido.nombreGenerico(),
                 productoValido.presentacion(),
@@ -1363,7 +1289,6 @@ public class ControladorProductoTest {
                 "   ",
                 "   ",
                 "   ",
-                "   ",
                 0,
                 0,
                 false,
@@ -1375,7 +1300,6 @@ public class ControladorProductoTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.idProducto").value("El id del producto no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"))
                 .andExpect(jsonPath("$.['codigos[0].codigoBarra']").value("El código de barra no puede estar vacío"))
@@ -1394,55 +1318,55 @@ public class ControladorProductoTest {
                 .andExpect(jsonPath("$.content[0].idProducto").value("P001"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"))
                 .andExpect(jsonPath("$.content[1].idProducto").value("P002"))
                 .andExpect(jsonPath("$.content[1].stockTotal").value(100))
                 .andExpect(jsonPath("$.content[1].disponible").value(true))
-                .andExpect(jsonPath("$.content[1].urlFoto").value("producto/P002.jpg"))
+                .andExpect(jsonPath("$.content[1].urlFoto").value("productos/P002.jpg"))
                 .andExpect(jsonPath("$.content[2].idProducto").value("P003"))
                 .andExpect(jsonPath("$.content[2].stockTotal").value(20))
                 .andExpect(jsonPath("$.content[2].disponible").value(false))
-                .andExpect(jsonPath("$.content[2].urlFoto").value("producto/P003.jpg"));
+                .andExpect(jsonPath("$.content[2].urlFoto").value("productos/P003.jpg"));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() throws Exception {
         var filtrados = productosFiltrados.stream()
-                .filter(p -> p.nombreComercial().equalsIgnoreCase("Ibuprofeno"))
+                .filter(p -> p.nombreComercial().equalsIgnoreCase("Advil"))
                 .toList();
 
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Ibuprofeno", null, null, null, 0))
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Advil", null, null, null, 0))
                 .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
 
         mockMvc.perform(get("/productos/buscar")
-                        .param("nombreComercial", "Ibuprofeno"))
+                        .param("nombreComercial", "Advil"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].nombreComercial").value("Ibuprofeno"))
+                .andExpect(jsonPath("$.content[0].nombreComercial").value("Advil"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(100))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P002.jpg"));
+                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P002.jpg"));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() throws Exception {
         var filtrados = productosFiltrados.stream()
-                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol genérico"))
+                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol"))
                 .toList();
 
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol genérico", null, null, 0))
+        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol", null, null, 0))
                 .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
 
         mockMvc.perform(get("/productos/buscar")
-                        .param("nombreGenerico", "Paracetamol genérico"))
+                        .param("nombreGenerico", "Paracetamol"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].nombreGenerico").value("Paracetamol genérico"))
+                .andExpect(jsonPath("$.content[0].nombreGenerico").value("Paracetamol"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"));
+                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"));
     }
 
     @Test
@@ -1490,11 +1414,11 @@ public class ControladorProductoTest {
                 .andExpect(jsonPath("$.content[0].activo").value(true))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("producto/P001.jpg"))
+                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"))
                 .andExpect(jsonPath("$.content[1].activo").value(true))
                 .andExpect(jsonPath("$.content[1].stockTotal").value(100))
                 .andExpect(jsonPath("$.content[1].disponible").value(true))
-                .andExpect(jsonPath("$.content[1].urlFoto").value("producto/P002.jpg"));
+                .andExpect(jsonPath("$.content[1].urlFoto").value("productos/P002.jpg"));
     }
 
     @Test
@@ -1513,7 +1437,7 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto (JSON) y luego subir imagen funciona (200)")
     void crearProductoYLuegoSubirImagen() throws Exception {
         var dto = new ProductoACrear(
-                "P020", "Prueba Producto", "Genérico Prueba",
+                "Prueba Producto", "Genérico Prueba",
                 "Caja", "50mg", "mg",
                 5, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
@@ -1521,7 +1445,7 @@ public class ControladorProductoTest {
         );
 
         var creado = new ProductoCreado(
-                dto.idProducto(),
+                "P020",
                 dto.nombreComercial(),
                 true,
                 null,

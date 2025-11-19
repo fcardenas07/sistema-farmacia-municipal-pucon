@@ -80,7 +80,7 @@ public class ControladorProducto {
         return ResponseEntity.ok(productos);
     }
 
-    @ExceptionHandler({CodigoDuplicadoException.class, ProductoDuplicadoException.class})
+    @ExceptionHandler({CodigoDuplicadoException.class})
     public ResponseEntity<String> manejarConflicto(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }

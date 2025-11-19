@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Producto {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_producto")
     private String idProducto;
 
@@ -46,10 +47,9 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String idProducto, String nombreComercial, String nombreGenerico, String presentacion,
+    public Producto(String nombreComercial, String nombreGenerico, String presentacion,
                     String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
                     boolean activo, CategoriaProducto categoria, String urlFoto) {
-        this.idProducto = idProducto;
         this.nombreComercial = nombreComercial;
         this.nombreGenerico = nombreGenerico;
         this.presentacion = presentacion;
@@ -64,10 +64,6 @@ public class Producto {
 
     public String getIdProducto() {
         return idProducto;
-    }
-
-    public void setIdProducto(String idProducto) {
-        this.idProducto = idProducto;
     }
 
     public String getNombreComercial() {

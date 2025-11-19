@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -38,36 +39,60 @@ class ServicioProductoTest {
         servicioProducto = new ServicioProducto(repositorioProducto, servicioAlmacenamientoImagen);
 
         productoEntidad = new Producto(
-                "P001",
                 "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
+                "Paracetamol",
+                "Tabletas",
+                "500",
+                "mg",
                 10,
                 100,
                 true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 "producto/P0001.jpg"
         );
+        ReflectionTestUtils.setField(productoEntidad, "idProducto", "P001");
 
-        productosFiltrados = List.of(
-                productoEntidad,
-                new Producto("P002","Ibuprofeno","Ibuprofeno genérico","Tabletas 400mg","400mg","Comprimidos",5,50,true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,"producto/P0002.jpg"),
-                new Producto("P003","Amoxicilina","Amoxicilina genérica","Caja 12 cápsulas","500mg","mg",20,200,false, CategoriaProducto.ANTIBIOTICOS,"producto/P0003.jpg")
+        var producto2 = new Producto(
+                "Advil",
+                "Ibuprofeno",
+                "Tabletas",
+                "400",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0002.jpg"
         );
+        ReflectionTestUtils.setField(producto2, "idProducto", "P002");
+
+        var producto3 = new Producto(
+                "Amoxil",
+                "Amoxicilina",
+                "Caja 12 cápsulas",
+                "500",
+                "mg",
+                20,
+                200,
+                false,
+                CategoriaProducto.ANTIBIOTICOS,
+                "producto/P0003.jpg"
+        );
+        ReflectionTestUtils.setField(producto3, "idProducto", "P003");
+
+        productosFiltrados = List.of(productoEntidad, producto2, producto3);
     }
+
 
     @Test
     @DisplayName("Crear producto válido guarda y devuelve el producto")
     void crearProductoValido() {
         var dto = new ProductoACrear(
-                "P001",
                 "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
+                "Paracetamol",
+                "Tabletas",
+                "500",
+                "mg",
                 10,
                 100,
                 true,
@@ -75,41 +100,23 @@ class ServicioProductoTest {
                 null
         );
 
-        when(repositorioProducto.existsById("P001")).thenReturn(false);
-        when(repositorioProducto.save(any(Producto.class))).thenReturn(productoEntidad);
+        when(repositorioProducto.save(any(Producto.class)))
+                .thenAnswer(invocation -> {
+                    Producto p = invocation.getArgument(0);
+                    ReflectionTestUtils.setField(p, "idProducto", "P001");
+                    return p;
+                });
 
-        Producto creado = servicioProducto.crear(dto);
+        var creado = servicioProducto.crear(dto);
 
-        assertEquals("P001", creado.getIdProducto());
+        assertNotNull(creado.getIdProducto());
         assertEquals("Paracetamol", creado.getNombreComercial());
+        assertEquals("Paracetamol", creado.getNombreGenerico());
+        assertEquals("Tabletas", creado.getPresentacion());
+        assertEquals("500", creado.getDosificacion());
+        assertEquals("mg", creado.getUnidadMedida());
 
-        verify(repositorioProducto).existsById("P001");
         verify(repositorioProducto).save(any(Producto.class));
-    }
-
-    @Test
-    @DisplayName("Crear producto duplicado lanza ProductoDuplicadoException")
-    void crearProductoDuplicado() {
-        var dto = new ProductoACrear(
-                "P001",
-                "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
-                10,
-                100,
-                true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                null
-        );
-
-        when(repositorioProducto.existsById("P001")).thenReturn(true);
-
-        assertThrows(ProductoDuplicadoException.class, () -> servicioProducto.crear(dto));
-
-        verify(repositorioProducto).existsById("P001");
-        verify(repositorioProducto, never()).save(any());
     }
 
     @Test
@@ -181,11 +188,10 @@ class ServicioProductoTest {
 
         assertEquals(productosPage.getContent().size(), resultado.getContent().size());
 
-        for (int i = 0; i < productosPage.getContent().size(); i++) {
+        for (var i = 0; i < productosPage.getContent().size(); i++) {
             var esperado = productosPage.getContent().get(i);
             var actual = resultado.getContent().get(i);
-
-            assertEquals(esperado.getIdProducto(), actual.getIdProducto());
+            assertNotNull(actual.getIdProducto());
             assertEquals(esperado.getNombreComercial(), actual.getNombreComercial());
             assertEquals(esperado.getNombreGenerico(), actual.getNombreGenerico());
             assertEquals(esperado.isActivo(), actual.isActivo());
@@ -209,9 +215,8 @@ class ServicioProductoTest {
         assertEquals(1, resultado.getContent().size());
         var actual = resultado.getContent().getFirst();
 
-        assertEquals("P001", actual.getIdProducto());
         assertEquals("Paracetamol", actual.getNombreComercial());
-        assertEquals("Paracetamol genérico", actual.getNombreGenerico());
+        assertEquals("Paracetamol", actual.getNombreGenerico());
         assertTrue(actual.isActivo());
     }
 
@@ -221,18 +226,18 @@ class ServicioProductoTest {
         var pageMockGen = new PageImpl<>(List.of(productosFiltrados.get(1)));
         when(repositorioProducto.buscarPorCampos(
                 eq(null),
-                eq("Ibuprofeno genérico"),
+                eq("Ibuprofeno"),
                 eq(null),
                 eq(null),
                 any(Pageable.class)
         )).thenReturn(pageMockGen);
 
-        var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, 0);
+        var resultado = servicioProducto.buscarPorCampos(null, "Ibuprofeno", null, null, 0);
         var actual = resultado.getContent().getFirst();
 
-        assertEquals("P002", actual.getIdProducto());
-        assertEquals("Ibuprofeno", actual.getNombreComercial());
-        assertEquals("Ibuprofeno genérico", actual.getNombreGenerico());
+        assertNotNull(actual.getIdProducto());
+        assertEquals("Advil", actual.getNombreComercial());
+        assertEquals("Ibuprofeno", actual.getNombreGenerico());
         assertTrue(actual.isActivo());
     }
 
@@ -259,6 +264,7 @@ class ServicioProductoTest {
         assertEquals(productosCategoria.size(), resultado.getContent().size());
 
         for (var producto : resultado.getContent()) {
+            assertNotNull(producto.getIdProducto());
             assertEquals(categoria, producto.getCategoriaProducto());
         }
     }
@@ -308,7 +314,6 @@ class ServicioProductoTest {
         when(foto.isEmpty()).thenReturn(false);
 
         var producto = new Producto();
-        producto.setIdProducto("P001");
 
         when(repositorioProducto.findById("P001"))
                 .thenReturn(Optional.of(producto));
@@ -347,7 +352,6 @@ class ServicioProductoTest {
         when(foto.isEmpty()).thenReturn(false);
 
         var producto = new Producto();
-        producto.setIdProducto("P001");
 
         when(repositorioProducto.findById("P001"))
                 .thenReturn(Optional.of(producto));
@@ -366,7 +370,7 @@ class ServicioProductoTest {
     void obtenerPorIdExistente() {
         when(repositorioProducto.findById("P001")).thenReturn(Optional.of(productoEntidad));
 
-        Producto resultado = servicioProducto.obtenerPorId("P001");
+        var resultado = servicioProducto.obtenerPorId("P001");
 
         assertNotNull(resultado);
         assertEquals("P001", resultado.getIdProducto());

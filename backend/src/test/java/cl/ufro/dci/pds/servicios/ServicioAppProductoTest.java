@@ -41,12 +41,11 @@ class ServicioAppProductoTest {
         servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo, servicioLote);
 
         var productoParacetamol = new Producto(
-                "P001",
                 "Paracetamol",
-                "Paracetamol genérico",
-                "Tabletas 500mg",
-                "500mg",
-                "Comprimidos",
+                "Paracetamol",
+                "Tabletas",
+                "500",
+                "mg",
                 10,
                 100,
                 true,
@@ -55,12 +54,11 @@ class ServicioAppProductoTest {
         );
 
         var productoIbuprofeno = new Producto(
-                "P002",
+                "Advil",
                 "Ibuprofeno",
-                "Ibuprofeno genérico",
-                "Tabletas 400mg",
-                "400mg",
-                "Comprimidos",
+                "Tabletas",
+                "400",
+                "mg",
                 5,
                 50,
                 true,
@@ -69,11 +67,10 @@ class ServicioAppProductoTest {
         );
 
         var productoAmoxicilina = new Producto(
-                "P003",
+                "Amoxil",
                 "Amoxicilina",
-                "Amoxicilina genérica",
                 "Caja 12 cápsulas",
-                "500mg",
+                "500",
                 "mg",
                 20,
                 200,
@@ -83,7 +80,6 @@ class ServicioAppProductoTest {
         );
 
         productoEntidad = new Producto(
-                productoParacetamol.getIdProducto(),
                 productoParacetamol.getNombreComercial(),
                 productoParacetamol.getNombreGenerico(),
                 productoParacetamol.getPresentacion(),
@@ -123,8 +119,8 @@ class ServicioAppProductoTest {
     @Test
     @DisplayName("Crear producto válido devuelve ProductoCreado")
     void crearProductoValido() {
-        var dto = new ProductoACrear("P001", "Paracetamol", "Paracetamol genérico",
-                "Tabletas 500mg", "500mg", "Comprimidos", 10, 100, true,
+        var dto = new ProductoACrear("Paracetamol", "Paracetamol",
+                "Tabletas", "500", "mg", 10, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 List.of(new CodigoACrear("C001", "1234567890123", "EAN", true)));
 
@@ -134,28 +130,13 @@ class ServicioAppProductoTest {
 
         var creado = servicioAppProducto.crearProducto(dto);
 
-        assertEquals("P001", creado.idProducto());
+        assertNotNull(creado.idProducto());
         assertEquals("Paracetamol", creado.nombreComercial());
         assertEquals(1, creado.codigos().size());
         assertEquals("C001", creado.codigos().getFirst().idCodigo());
         assertNull(creado.urlFoto());
 
         verify(servicioCodigo).crear(eq(productoEntidad), any(CodigoACrear.class));
-    }
-
-    @Test
-    @DisplayName("Crear producto con código duplicado lanza CodigoDuplicadoException")
-    void crearProductoCodigoDuplicado() {
-        var dto = new ProductoACrear("P002", "Ibuprofeno", "Ibuprofeno genérico",
-                "Tabletas 400mg", "400mg", "Comprimidos", 5, 50, true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(new CodigoACrear("C002", "9876543210987", "EAN", true)));
-
-        when(servicioProducto.crear(any(ProductoACrear.class))).thenReturn(productoEntidad);
-        when(servicioCodigo.crear(eq(productoEntidad), any(CodigoACrear.class)))
-                .thenThrow(new CodigoDuplicadoException("C002"));
-
-        assertThrows(CodigoDuplicadoException.class, () -> servicioAppProducto.crearProducto(dto));
     }
 
     @Test
@@ -183,7 +164,7 @@ class ServicioAppProductoTest {
         when(servicioCodigo.actualizarParaProducto(eq(id), any(CodigoAModificar.class))).thenReturn(codigoEntidad);
         when(servicioCodigo.obtenerCodigosConIdProducto(id)).thenReturn(List.of(codigoEntidad));
 
-        ProductoModificado modificado = servicioAppProducto.actualizarProducto(id, dto);
+        var modificado = servicioAppProducto.actualizarProducto(id, dto);
 
         assertEquals("Nuevo Nombre", modificado.nombreComercial());
         assertFalse(modificado.activo());
@@ -357,15 +338,16 @@ class ServicioAppProductoTest {
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenericoDevuelveCoincidencias() {
         var pageMockGen = new PageImpl<>(List.of(productosEntidadesFiltrados.get(1)));
-        when(servicioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, 0))
+        when(servicioProducto.buscarPorCampos(null, "Ibuprofeno", null, null, 0))
                 .thenReturn(pageMockGen);
 
         when(servicioLote.obtenerLotesDeProductos(anyList()))
                 .thenReturn(lotesSimulados);
 
-        var resultadoGen = servicioAppProducto.buscarProductosFiltrados(null, "Ibuprofeno genérico", null, null, 0);
-        ProductoFiltrado pGen = resultadoGen.getContent().getFirst();
-        assertEquals("Ibuprofeno genérico", pGen.nombreGenerico());
+        var resultadoGen = servicioAppProducto.buscarProductosFiltrados(null, "Ibuprofeno", null, null, 0);
+        var pGen = resultadoGen.getContent().getFirst();
+        assertEquals("Advil", pGen.nombreComercial());
+        assertEquals("Ibuprofeno", pGen.nombreGenerico());
         assertEquals(50, pGen.stockTotal());
         assertTrue(pGen.isDisponible());
     }

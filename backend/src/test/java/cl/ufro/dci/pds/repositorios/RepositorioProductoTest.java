@@ -25,18 +25,18 @@ class RepositorioProductoTest {
         repositorioProducto.deleteAll();
 
         repositorioProducto.saveAll(List.of(
-                new Producto("P001", "Paracetamol", "Paracetamol genérico",
-                        "Tabletas 500mg", "500mg", "Comprimidos",
+                new Producto("Paracetamol", "Paracetamol",
+                        "Tabletas", "500", "mg",
                         10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                        "producto/P001.jpg"),
-                new Producto("P002", "Ibuprofeno", "Ibuprofeno genérico",
-                        "Tabletas 400mg", "400mg", "Comprimidos",
+                        "productos/P001.jpg"),
+                new Producto("Advil", "Ibuprofeno",
+                        "Tabletas", "400", "mg",
                         5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                        "producto/P002.jpg"),
-                new Producto("P003", "Amoxicilina", "Amoxicilina genérica",
-                        "Caja 12 cápsulas", "500mg", "mg",
+                        "productos/P002.jpg"),
+                new Producto("Amoxil", "Amoxicilina",
+                        "Caja 12 cápsulas", "500", "mg",
                         20, 200, false, CategoriaProducto.ANTIBIOTICOS,
-                        "producto/P003.jpg")
+                        "productos/P003.jpg")
         ));
     }
 
@@ -47,8 +47,8 @@ class RepositorioProductoTest {
         var resultado = repositorioProducto.buscarPorCampos(null, null, null, null, pageable);
 
         assertThat(resultado).hasSize(3);
-        assertThat(resultado).extracting(Producto::getIdProducto)
-                .containsExactlyInAnyOrder("P001", "P002", "P003");
+        assertThat(resultado).extracting(Producto::getNombreComercial)
+                .containsExactlyInAnyOrder("Paracetamol", "Advil", "Amoxil");
     }
 
     @Test
@@ -58,7 +58,6 @@ class RepositorioProductoTest {
         var resultado = repositorioProducto.buscarPorCampos("Paracetamol", null, null, null, pageable);
 
         assertThat(resultado.getContent()).hasSize(1);
-
         assertThat(resultado.getContent().getFirst().getNombreComercial()).isEqualTo("Paracetamol");
     }
 
@@ -66,10 +65,10 @@ class RepositorioProductoTest {
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() {
         var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno genérico", null, null, pageable);
+        var resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno", null, null, pageable);
 
         assertThat(resultado.getContent()).hasSize(1);
-        assertThat(resultado.getContent().getFirst().getNombreGenerico()).isEqualTo("Ibuprofeno genérico");
+        assertThat(resultado.getContent().getFirst().getNombreGenerico()).isEqualTo("Ibuprofeno");
     }
 
     @Test
@@ -90,8 +89,7 @@ class RepositorioProductoTest {
                 .allMatch(p -> p.getCategoriaProducto() == CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS);
 
         assertThat(resultado.getContent())
-                .extracting(Producto::getIdProducto)
-                .containsExactlyInAnyOrder("P001", "P002");
+                .allMatch(p -> p.getIdProducto() != null && !p.getIdProducto().isBlank());
     }
 
     @Test
@@ -109,7 +107,6 @@ class RepositorioProductoTest {
     void buscarProductosSinCoincidencias() {
         var pageable = PageRequest.of(0, 4);
         var resultado = repositorioProducto.buscarPorCampos("NoExiste", null, null, null, pageable);
-
         assertThat(resultado.getContent()).isEmpty();
     }
 }

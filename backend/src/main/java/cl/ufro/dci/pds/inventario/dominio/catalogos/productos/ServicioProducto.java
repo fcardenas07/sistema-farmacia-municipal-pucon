@@ -23,10 +23,6 @@ public class ServicioProducto {
     }
 
     public Producto crear(ProductoACrear dto) {
-        if (repositorioProducto.existsById(dto.idProducto())) {
-            throw new ProductoDuplicadoException(dto.idProducto());
-        }
-
         var producto = dto.aEntidad();
         return repositorioProducto.save(producto);
     }

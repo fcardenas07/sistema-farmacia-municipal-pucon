@@ -12,9 +12,6 @@ import java.util.List;
 @StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
 @CodigosUnicos(message =  "No se pueden repetir los IDs de los códigos")
 public record ProductoACrear(
-        @NotBlank(message = "El id del producto no puede estar vacío")
-        String idProducto,
-
         @NotBlank(message = "El nombre comercial no puede estar vacío")
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
@@ -52,7 +49,6 @@ public record ProductoACrear(
 ) implements ProductoConStock, ProductoConCodigos {
     public Producto aEntidad() {
         Producto p = new Producto();
-        p.setIdProducto(idProducto);
         p.setNombreComercial(nombreComercial);
         p.setNombreGenerico(nombreGenerico);
         p.setPresentacion(presentacion);

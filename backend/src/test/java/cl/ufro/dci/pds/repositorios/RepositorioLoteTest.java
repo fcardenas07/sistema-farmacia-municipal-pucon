@@ -26,24 +26,31 @@ class RepositorioLoteTest {
     @Autowired
     private RepositorioProducto repositorioProducto;
 
+    private String idParacetamol;
+    private String idIbuprofeno;
+
     @BeforeEach
     void setUp() {
         repositorioLote.deleteAll();
         repositorioProducto.deleteAll();
 
         var productoParacetamol = new Producto(
-                "P001", "Paracetamol", "Paracetamol genérico",
-                "Tabletas 500mg", "500mg", "Comprimidos",
-                10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "producto/P001.jpg"
+                "Paracetamol", "Paracetamol",
+                "Tabletas", "500", "mg",
+                10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "productos/P001.jpg"
         );
+
+        productoParacetamol = repositorioProducto.save(productoParacetamol);
+        idParacetamol = productoParacetamol.getIdProducto();
 
         var productoIbuprofeno = new Producto(
-                "P002", "Ibuprofeno", "Ibuprofeno genérico",
-                "Tabletas 400mg", "400mg", "Comprimidos",
-                5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "producto/P002.jpg"
+                "Advil", "Ibuprofeno",
+                "Tabletas", "400", "mg",
+                5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS, "productos/P002.jpg"
         );
 
-        repositorioProducto.saveAll(List.of(productoParacetamol, productoIbuprofeno));
+        productoIbuprofeno = repositorioProducto.save(productoIbuprofeno);
+        idIbuprofeno = productoIbuprofeno.getIdProducto();
 
         var loteParacetamol1 = new Lote();
         loteParacetamol1.setIdLote("L001");
@@ -93,10 +100,10 @@ class RepositorioLoteTest {
     @Test
     @DisplayName("Buscar lotes de un producto existente devuelve todos los lotes y carga el stock")
     void obtenerLotesDeProductoExistenteConStock() {
-        var lotesParacetamol = repositorioLote.findByProducto_IdProductoIn(List.of("P001"));
+        var lotesParacetamol = repositorioLote.findByProducto_IdProductoIn(List.of(idParacetamol));
 
         assertThat(lotesParacetamol).hasSize(2);
-        assertThat(lotesParacetamol).allMatch(lote -> lote.getProducto().getIdProducto().equals("P001"));
+        assertThat(lotesParacetamol).allMatch(lote -> lote.getProducto().getIdProducto().equals(idParacetamol));
         assertThat(lotesParacetamol).allMatch(lote -> lote.getStock() != null);
         assertThat(lotesParacetamol).extracting(lote -> lote.getStock().getCantidadActual())
                 .containsExactlyInAnyOrder(50, 50);
@@ -105,11 +112,11 @@ class RepositorioLoteTest {
     @Test
     @DisplayName("Buscar lotes de varios productos devuelve todos los lotes correspondientes y carga el stock")
     void obtenerLotesDeMultiplesProductos() {
-        var lotesTodosProductos = repositorioLote.findByProducto_IdProductoIn(List.of("P001", "P002"));
+        var lotesTodosProductos = repositorioLote.findByProducto_IdProductoIn(List.of(idParacetamol, idIbuprofeno));
 
         assertThat(lotesTodosProductos).hasSize(3);
         assertThat(lotesTodosProductos).extracting(lote -> lote.getProducto().getIdProducto())
-                .containsExactlyInAnyOrder("P001", "P001", "P002");
+                .containsExactlyInAnyOrder(idParacetamol, idParacetamol, idIbuprofeno);
         assertThat(lotesTodosProductos).allMatch(lote -> lote.getStock() != null);
     }
 
