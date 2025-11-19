@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Stock {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_stock")
     private String idStock;
 
@@ -29,10 +30,6 @@ public class Stock {
 
     public String getIdStock() {
         return idStock;
-    }
-
-    public void setIdStock(String idStock) {
-        this.idStock = idStock;
     }
 
     public int getCantidadInicial() {

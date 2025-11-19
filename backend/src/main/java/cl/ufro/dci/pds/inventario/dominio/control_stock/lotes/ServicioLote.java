@@ -5,6 +5,8 @@ import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ServicioLote {
 
@@ -20,6 +22,7 @@ public class ServicioLote {
         this.mapper = mapper;
     }
 
+
     public Lote crear(EntradaInventario entrada) {
 
         var existente = repositorioLote.findById(entrada.idLote());
@@ -33,4 +36,10 @@ public class ServicioLote {
         return repositorioLote.save(lote);
     }
 
+    public List<Lote> obtenerLotesDeCodigos(List<String> idsCodigo) {
+        if (idsCodigo == null || idsCodigo.isEmpty()) {
+            return List.of();
+        }
+        return repositorioLote.findByCodigo_IdCodigoIn(idsCodigo);
+    }
 }

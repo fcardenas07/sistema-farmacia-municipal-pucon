@@ -1,91 +1,194 @@
-package cl.ufro.dci.pds.controladores;
+package cl.ufro.dci.pds.integraciones;
 
-import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
-import cl.ufro.dci.pds.infraestructura.SecurityConfig;
-import cl.ufro.dci.pds.inventario.app.controladores.ControladorProducto;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
-import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoPerteneceProductoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.RepositorioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ControladorProducto.class)
-@Import(SecurityConfig.class)
-public class ControladorProductoTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+class ControladorProductoIntegradoTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private ServicioAppProducto servicioAppProducto;
-
-    @MockitoBean
+    @Autowired
     private RepositorioProducto repositorioProducto;
+
+    @Autowired
+    private RepositorioCodigo repositorioCodigo;
+
+    @Autowired
+    private RepositorioLote repositorioLote;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ProductoACrear productoValido;
-
-    private List<ProductoFiltrado> productosFiltrados;
+    private List<String> idsProductos;
+    private List<String> idsCodigos;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
+        repositorioLote.deleteAll();
+        repositorioCodigo.deleteAll();
         repositorioProducto.deleteAll();
-        productoValido = new ProductoACrear(
-                "Paracetamol",
-                "Paracetamol",
-                "Tabletas",
-                "500",
-                "mg",
-                10,
-                100,
-                true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(
-                        new CodigoACrear("1234567890123", "EAN", true),
-                        new CodigoACrear("7800987654321", "EAN13", true)
-                )
-        );
+        idsProductos = new ArrayList<>();
+        idsCodigos = new ArrayList<>();
 
-        productosFiltrados = List.of(
-                new ProductoFiltrado("P001", "Paracetamol", "Paracetamol",
-                        CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible(),
-                        true, 300, "productos/P001.jpg"),
-                new ProductoFiltrado("P002", "Advil", "Ibuprofeno",
-                        CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible(),
-                        true, 100, "productos/P002.jpg"),
-                new ProductoFiltrado("P003", "Amoxil", "Amoxicilina",
-                        CategoriaProducto.ANTIBIOTICOS.getNombreLegible(),
-                        false, 20, "productos/P003.jpg")
+        var fotosDir = Paths.get("src/test/resources/assets-test/productos");
+        if (Files.exists(fotosDir)) {
+            Files.walk(fotosDir)
+                    .filter(Files::isRegularFile)
+                    .forEach(f -> {
+                        try {
+                            Files.delete(f);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        }
+
+        var producto1 = new Producto(
+                "Paracetamol", "Paracetamol",
+                "Tabletas", "500", "mg",
+                10, 100, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
         );
+        producto1 = repositorioProducto.save(producto1);
+        idsProductos.add(producto1.getIdProducto());
+
+        var codigo1 = new Codigo();
+        codigo1.setCodigoBarra("1234567890123");
+        codigo1.setTipoCodigo("EAN");
+        codigo1.setActivo(true);
+        codigo1.setProducto(producto1);
+        codigo1 = repositorioCodigo.save(codigo1);
+        idsCodigos.add(codigo1.getIdCodigo());
+
+        var lote1 = new Lote();
+        lote1.setCodigo(codigo1);
+        lote1.setNumeroLote("NUM001");
+        lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
+        lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
+        lote1.setEstado("DISPONIBLE");
+
+        var stock1 = new Stock();
+        stock1.setCantidadInicial(500);
+        stock1.setCantidadActual(300);
+        stock1.setLote(lote1);
+        lote1.setStock(stock1);
+
+        repositorioLote.save(lote1);
+
+        var producto2 = new Producto(
+                "Advil", "Ibuprofeno",
+                "Tabletas", "400", "mg",
+                5, 50, true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                "producto/P0002.jpg"
+        );
+        producto2 = repositorioProducto.save(producto2);
+        idsProductos.add(producto2.getIdProducto());
+
+        var codigo2 = new Codigo();
+        codigo2.setCodigoBarra("9876543210987");
+        codigo2.setTipoCodigo("EAN");
+        codigo2.setActivo(true);
+        codigo2.setProducto(producto2);
+        codigo2 = repositorioCodigo.save(codigo2);
+        idsCodigos.add(codigo2.getIdCodigo());
+
+        var lote2 = new Lote();
+        lote2.setCodigo(codigo2);
+        lote2.setNumeroLote("NUM002");
+        lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
+        lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
+        lote2.setEstado("DISPONIBLE");
+
+        var stock2 = new Stock();
+        stock2.setCantidadInicial(500);
+        stock2.setCantidadActual(100);
+        stock2.setLote(lote2);
+        lote2.setStock(stock2);
+
+        repositorioLote.save(lote2);
+
+        var producto3 = new Producto(
+                "Amoxil", "Amoxicilina",
+                "Caja 12 cápsulas", "500", "mg",
+                20, 200, false,
+                CategoriaProducto.ANTIBIOTICOS,
+                "producto/P0003.jpg"
+        );
+        producto3 = repositorioProducto.save(producto3);
+        idsProductos.add(producto3.getIdProducto());
+
+        var codigo3 = new Codigo();
+        codigo3.setCodigoBarra("1112223334445");
+        codigo3.setTipoCodigo("EAN");
+        codigo3.setActivo(true);
+        codigo3.setProducto(producto3);
+        codigo3 = repositorioCodigo.save(codigo3);
+        idsCodigos.add(codigo3.getIdCodigo());
+
+        var lote3 = new Lote();
+        lote3.setCodigo(codigo3);
+        lote3.setNumeroLote("NUM003");
+        lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
+        lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
+        lote3.setEstado("NO_DISPONIBLE");
+
+        var stock3 = new Stock();
+        stock3.setCantidadInicial(200);
+        stock3.setCantidadActual(20);
+        stock3.setLote(lote3);
+        lote3.setStock(stock3);
+
+        repositorioLote.save(lote3);
+    }
+
+    @AfterEach
+    void limpiarFotos() throws IOException {
+        var fotosDir = Paths.get("src/test/resources/assets/productos");
+        if (Files.exists(fotosDir)) {
+            Files.walk(fotosDir)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
     }
 
     @Test
@@ -101,7 +204,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con un body que no es un json devuelve 400")
     void crearProductoConBodyInvalidoFormato() throws Exception {
-        var bodyInvalido = "esto no es JSON";
+        String bodyInvalido = "esto no es JSON";
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
@@ -112,12 +215,15 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con un json vacío devuelve 400")
     void crearProductoConBodyVacioJSON() throws Exception {
-        var bodyVacioJSON = "{}";
+        ProductoACrear dtoVacio = new ProductoACrear(
+                 null, null, null, null, null,
+                null, null, false, null, List.of()
+        );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
-                        .content(bodyVacioJSON))
+                        .content(objectMapper.writeValueAsString(dtoVacio)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
@@ -126,18 +232,15 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con campos vacíos devuelve 400")
     void crearProductoConCamposVacios() throws Exception {
-        var bodyCamposVacios = """
-                {
-                    "idProducto": "",
-                    "nombreComercial": "",
-                    "nombreGenerico": ""
-                }
-                """;
+        ProductoACrear dtoCamposVacios = new ProductoACrear(
+                "", "", null, null, null,
+                null, null, false, null, List.of()
+        );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
-                        .content(bodyCamposVacios))
+                        .content(objectMapper.writeValueAsString(dtoCamposVacios)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"))
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
@@ -146,14 +249,15 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con campos con tipo incorrecto devuelve 400")
     void crearProductoConCamposTipoIncorrecto() throws Exception {
-        var bodyTipoIncorrecto = """
+        String bodyTipoIncorrecto = """
                 {
                     "idProducto": "P001",
                     "nombreComercial": "Paracetamol",
-                    "nombreGenerico": "Paracetamol genérico",
+                    "nombreGenerico": "Paracetamol",
                     "stockMinimo": "no es número"
                 }
                 """;
+
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
@@ -162,36 +266,37 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Crear producto válido devuelve 201")
-    void crearProductoValido() throws Exception {
-        var dto = productoValido;
-
-        var creado = new ProductoCreado(
-                "P001",
-                dto.nombreComercial(),
+    @DisplayName("Crear producto válido devuelve 201 (integración)")
+    void crearProductoValidoIntegracion() throws Exception {
+        var dto = new ProductoACrear(
+                "Diclofenaco 50mg",
+                "Diclofenaco genérico",
+                "Caja con 10 tabletas",
+                "50mg",
+                "mg",
+                5,
+                50,
                 true,
-                null,
-                List.of(new CodigoCreado("C001", "1234567890123"))
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(new CodigoACrear("9990001112223", "EAN", true))
         );
-
-        when(servicioAppProducto.crearProducto(any(ProductoACrear.class)))
-                .thenReturn(creado);
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/productos/P001"))
-                .andExpect(jsonPath("$.idProducto").value("P001"))
-                .andExpect(jsonPath("$.nombreComercial").value("Paracetamol"))
-                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"));
+                .andExpect(jsonPath("$.idProducto").isNotEmpty())
+                .andExpect(jsonPath("$.nombreComercial").value("Diclofenaco 50mg"))
+                .andExpect(jsonPath("$.activo").value(true))
+                .andExpect(jsonPath("$.urlFoto").doesNotExist());
     }
 
     @Test
     @DisplayName("Actualizar producto válido devuelve 200")
     void actualizarProductoValido() throws Exception {
-        var idProducto = "P001";
+        var idProducto = idsProductos.getFirst();
+        var idCodigo = idsCodigos.getFirst();
 
         var dto = new ProductoAModificar(
                 "Nuevo Nombre",
@@ -202,25 +307,11 @@ public class ControladorProductoTest {
                 10,
                 50,
                 false,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                List.of(
-                        new CodigoAModificar("C001", "1234567890123", null, true),
-                        new CodigoAModificar("C002", "7800987654321", null, true)
-                )
-        );
-
-        var actualizado = new ProductoModificado(
-                dto.nombreComercial(),
-                dto.activo(),
                 null,
-                List.of(
-                        new CodigoModificado("C001", "1234567890123"),
-                        new CodigoModificado("C002", "7800987654321")
-                )
+                List.of(new CodigoAModificar(idCodigo, "1234567890123", null, true))
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenReturn(actualizado);
+        System.out.println(idCodigo);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -229,19 +320,47 @@ public class ControladorProductoTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombreComercial").value("Nuevo Nombre"))
                 .andExpect(jsonPath("$.activo").value(false))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"))
-                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"))
-                .andExpect(jsonPath("$.codigos[1].idCodigo").value("C002"))
-                .andExpect(jsonPath("$.codigos[1].codigoBarra").value("7800987654321"));
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo))
+                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"));
     }
 
     @Test
     @DisplayName("Actualizar los códigos de un producto válido devuelve 200")
     void actualizarCodigosProductoValido() throws Exception {
-        var idProducto = "P001";
+        var producto = new Producto(
+                "Producto Test",
+                "Producto Test Genérico",
+                "Presentación",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        var productoGuardado = repositorioProducto.save(producto);
+        var idProducto = productoGuardado.getIdProducto();
+
+        var codigo1 = new Codigo();
+        codigo1.setCodigoBarra("1111111111111");
+        codigo1.setTipoCodigo("EAN");
+        codigo1.setActivo(true);
+        codigo1.setProducto(producto);
+        codigo1 = repositorioCodigo.save(codigo1);
+        var idCodigo1 = codigo1.getIdCodigo();
+
+        var codigo2 = new Codigo();
+        codigo2.setCodigoBarra("2222222222222");
+        codigo2.setTipoCodigo("EAN");
+        codigo2.setActivo(true);
+        codigo2.setProducto(producto);
+        codigo2 = repositorioCodigo.save(codigo2);
+        var idCodigo2 = codigo2.getIdCodigo();
 
         var dto = new ProductoAModificar(
-                "Nuevo Nombre",
+                "Nombre Modificado",
                 null,
                 null,
                 null,
@@ -251,71 +370,66 @@ public class ControladorProductoTest {
                 false,
                 null,
                 List.of(
-                        new CodigoAModificar("C001", "1234567890123", null, true),
-                        new CodigoAModificar("C002", "7800987654321", null, true)
+                        new CodigoAModificar(idCodigo1, "1111111111111", null, true),
+                        new CodigoAModificar(idCodigo2, "2222222222222", null, true)
                 )
         );
-
-        var actualizado = new ProductoModificado(
-                dto.nombreComercial(),
-                dto.activo(),
-                null,
-                List.of(
-                        new CodigoModificado("C001", "1234567890123"),
-                        new CodigoModificado("C002", "7800987654321")
-                )
-        );
-
-        when(servicioAppProducto.actualizarProducto(
-                Mockito.eq(idProducto),
-                any(ProductoAModificar.class)))
-                .thenReturn(actualizado);
 
         mockMvc.perform(patch("/productos/{id}", idProducto)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombreComercial").value("Nuevo Nombre"))
+                .andExpect(jsonPath("$.nombreComercial").value("Nombre Modificado"))
                 .andExpect(jsonPath("$.activo").value(false))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"))
-                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1234567890123"))
-                .andExpect(jsonPath("$.codigos[1].idCodigo").value("C002"))
-                .andExpect(jsonPath("$.codigos[1].codigoBarra").value("7800987654321"));
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo1))
+                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("1111111111111"))
+                .andExpect(jsonPath("$.codigos[1].idCodigo").value(idCodigo2))
+                .andExpect(jsonPath("$.codigos[1].codigoBarra").value("2222222222222"));
     }
 
     @Test
     @DisplayName("Actualizar producto inexistente devuelve 404")
     void actualizarProductoNoExistente() throws Exception {
-        var idProductoInexistente = "P999";
+        String idProductoInexistente = "P999";
 
         var dto = new ProductoAModificar(
                 "Paracetamol Modificado",
                 "Paracetamol",
-                "Tabletas 500mg",
-                "500mg",
+                "Tabletas",
+                "500",
                 "Comprimidos",
                 10,
                 100,
                 true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProductoInexistente), any(ProductoAModificar.class)))
-                .thenThrow(new ProductoNoEncontradoException(idProductoInexistente));
-
         mockMvc.perform(patch("/productos/{id}", idProductoInexistente)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto))
-                        .with(csrf()))
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("Actualizar producto con código inexistente devuelve 404")
     void actualizarProductoConCodigoNoExistente() throws Exception {
-        var idProducto = "P001";
+        var producto = new Producto(
+                "Producto Test",
+                "Producto Test Genérico",
+                "Presentación",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        repositorioProducto.save(producto);
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -327,15 +441,10 @@ public class ControladorProductoTest {
                 50,
                 true,
                 null,
-                List.of(
-                        new CodigoAModificar("C999", "0000000000000", "EAN", true)
-                )
+                List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true))
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenThrow(new CodigoNoEncontradoException("C999"));
-
-        mockMvc.perform(patch("/productos/{id}", idProducto)
+        mockMvc.perform(patch("/productos/{id}", "P010")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
@@ -345,7 +454,41 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con código que no pertenece al producto devuelve 404")
     void actualizarProductoConCodigoNoPertenece() throws Exception {
-        var idProducto = "P001";
+        var producto1 = new Producto(
+                "Prod 1",
+                "Gen 1",
+                "Pres",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        var producto2 = new Producto(
+                "Prod 2",
+                "Gen 2",
+                "Pres",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                null
+        );
+
+        repositorioProducto.save(producto1);
+        repositorioProducto.save(producto2);
+
+        var codigo = new Codigo();
+        codigo.setCodigoBarra("7800987654321");
+        codigo.setTipoCodigo("EAN");
+        codigo.setActivo(true);
+        codigo.setProducto(producto2);
+        repositorioCodigo.save(codigo);
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -357,15 +500,10 @@ public class ControladorProductoTest {
                 50,
                 true,
                 null,
-                List.of(
-                        new CodigoAModificar("C002", "7800987654321", "EAN", true)
-                )
+                List.of(new CodigoAModificar("C002", "7800987654321", "EAN", true))
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenThrow(new CodigoNoPerteneceProductoException("C002", idProducto));
-
-        mockMvc.perform(patch("/productos/{id}", idProducto)
+        mockMvc.perform(patch("/productos/{id}", "P011")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
@@ -375,34 +513,52 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con lista de códigos nula no modifica códigos y devuelve 200")
     void actualizarProductoConCodigosNulosNoModifica() throws Exception {
-        var idProducto = "P001";
+        var producto = new Producto(
+                "Producto Test",
+                "Genérico Test",
+                "Presentación",
+                "10mg",
+                "mg",
+                5,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                null
+        );
+
+        producto = repositorioProducto.save(producto);
+        var productoId = producto.getIdProducto();
+
+        var codigo = new Codigo();
+        codigo.setCodigoBarra("130320101203");
+        codigo.setTipoCodigo("EAN");
+        codigo.setActivo(true);
+        codigo.setProducto(producto);
+        codigo = repositorioCodigo.save(codigo);
+        var idCodigo = codigo.getIdCodigo();
 
         var dto = new ProductoAModificar(
-                "Nombre Nuevo",
+                "Nombre Modificado",
                 null,
                 null,
                 null,
                 null,
                 10,
                 50,
-                true,
+                false,
                 null,
                 null
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenReturn(new ProductoModificado(
-                        dto.nombreComercial(),
-                        dto.activo(),
-                        null,
-                        List.of(new CodigoModificado("C001", "1234567890123"))
-                ));
-
-        mockMvc.perform(patch("/productos/{id}", idProducto)
+        mockMvc.perform(patch("/productos/{id}", productoId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombreComercial").value("Nombre Modificado"))
+                .andExpect(jsonPath("$.activo").value(false))
+                .andExpect(jsonPath("$.codigos[0].idCodigo").value(idCodigo))
+                .andExpect(jsonPath("$.codigos[0].codigoBarra").value("130320101203"));
     }
 
     @Test
@@ -410,19 +566,20 @@ public class ControladorProductoTest {
     void crearProductoConNombreComercialVacio() throws Exception {
         var dto = new ProductoACrear(
                 "",
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890123", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede estar vacío"));
@@ -432,20 +589,21 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con nombre genérico vacío devuelve 400")
     void crearProductoConNombreGenericoVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
+                "Nombre Comercial",
                 "",
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIVIRALES,
+                List.of(new CodigoACrear("1234567890124", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede estar vacío"));
@@ -455,20 +613,21 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo menor que stock mínimo devuelve 400")
     void crearProductoConStockMaxMenorQueStockMin() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
                 50,
                 10,
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890126", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.['stockValido']").value("El stock máximo debe ser mayor o igual al stock mínimo"));
@@ -477,22 +636,23 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con nombre comercial muy largo devuelve 400")
     void crearProductoConNombreComercialMuyLargo() throws Exception {
-        var nombreComercial = "a".repeat(201);
+        String nombreComercial = "a".repeat(201);
         var dto = new ProductoACrear(
                 nombreComercial,
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
+                List.of(new CodigoACrear("1234567890127", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreComercial").value("El nombre comercial no puede tener más de 200 caracteres"));
@@ -501,22 +661,23 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con nombre genérico muy largo devuelve 400")
     void crearProductoConNombreGenericoMuyLargo() throws Exception {
-        var nombreGen = "a".repeat(300);
+        String nombreGen = "a".repeat(201);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
+                "Nombre Comercial",
                 nombreGen,
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890129", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.nombreGenerico").value("El nombre genérico no puede tener más de 200 caracteres"));
@@ -525,22 +686,23 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con presentación muy larga devuelve 400")
     void crearProductoConPresentacionMuyLarga() throws Exception {
-        var presentacion = "a".repeat(501);
+        String presentacion = "a".repeat(501);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
+                "Nombre Comercial",
+                "Nombre Genérico",
                 presentacion,
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890130", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.presentacion").value("La presentación no puede tener más de 500 caracteres"));
@@ -549,22 +711,23 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con dosificación muy larga devuelve 400")
     void crearProductoConDosificacionMuyLarga() throws Exception {
-        var dosificacion = "a".repeat(101);
+        String dosificacion = "a".repeat(101);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
                 dosificacion,
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIFUNGICOS,
+                List.of(new CodigoACrear("1234567890131", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.dosificacion").value("La dosificación no puede tener más de 100 caracteres"));
@@ -573,22 +736,23 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con unidad de medida muy larga devuelve 400")
     void crearProductoConUnidadMedidaMuyLarga() throws Exception {
-        var unidad = "a".repeat(51);
+        String unidad = "a".repeat(51);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
                 unidad,
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                10,
+                50,
+                true,
+                CategoriaProducto.DERMATOLOGICOS,
+                List.of(new CodigoACrear("1234567890132", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.unidadMedida").value("La unidad de medida no puede tener más de 50 caracteres"));
@@ -598,20 +762,21 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo negativo y menor que stock mínimo devuelve 400")
     void crearProductoConStockMaximoNegativoYMenorQueMin() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
                 10,
                 -1,
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                true,
+                CategoriaProducto.ANTIFUNGICOS,
+                List.of(new CodigoACrear("1234567890128", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.['stockMaximo']").value("El stock máximo no puede ser negativo"))
@@ -622,38 +787,39 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock mínimo negativo devuelve 400")
     void crearProductoConStockMinimoNegativo() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
                 -1,
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                50,
+                true,
+                CategoriaProducto.DERMATOLOGICOS,
+                List.of(new CodigoACrear("1234567890125", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['stockMinimo']").value("El stock mínimo no puede ser negativo"));
+                .andExpect(jsonPath("$.stockMinimo").value("El stock mínimo no puede ser negativo"));
     }
 
     @Test
     @DisplayName("Crear producto con código de barra vacío devuelve 400")
     void crearProductoConCodigoBarraVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIHISTAMINICOS,
                 List.of(new CodigoACrear("", "EAN", true))
         );
 
@@ -668,18 +834,18 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Crear producto con código de barra demasiado largo devuelve 400")
     void crearProductoConCodigoBarraMuyLargo() throws Exception {
-        var codigoLargo = "1".repeat(101);
+        String codigoLargo = "1".repeat(101);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                List.of(new CodigoACrear( codigoLargo, "EAN", true))
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear(codigoLargo, "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -687,23 +853,24 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['codigos[0].codigoBarra']").value("El código de barra no puede tener más de 100 caracteres"));
+                .andExpect(jsonPath("$.['codigos[0].codigoBarra']")
+                        .value("El código de barra no puede tener más de 100 caracteres"));
     }
 
     @Test
     @DisplayName("Crear producto con tipo de código vacío devuelve 400")
     void crearProductoConTipoCodigoVacio() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                List.of(new CodigoACrear("1234567890123", "", true))
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIVIRALES,
+                List.of(new CodigoACrear( "1234567890123", "", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -711,23 +878,24 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['codigos[0].tipoCodigo']").value("El tipo de código no puede estar vacío"));
+                .andExpect(jsonPath("$.['codigos[0].tipoCodigo']")
+                        .value("El tipo de código no puede estar vacío"));
     }
 
     @Test
     @DisplayName("Crear producto con tipo de código demasiado largo devuelve 400")
     void crearProductoConTipoCodigoMuyLargo() throws Exception {
-        var tipoLargo = "a".repeat(51);
+        String tipoLargo = "a".repeat(51);
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
+                "Nombre Comercial",
+                "Nombre Genérico",
+                "Caja 10",
+                "10mg",
+                "mg",
+                10,
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
                 List.of(new CodigoACrear("1234567890123", tipoLargo, true))
         );
 
@@ -736,13 +904,14 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['codigos[0].tipoCodigo']").value("El tipo de código no puede tener más de 50 caracteres"));
+                .andExpect(jsonPath("$.['codigos[0].tipoCodigo']")
+                        .value("El tipo de código no puede tener más de 50 caracteres"));
     }
 
     @Test
     @DisplayName("Actualizar producto con stock máximo menor que stock mínimo devuelve 400")
     void actualizarProductoStockMaxMenorQueStockMin() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -753,7 +922,7 @@ public class ControladorProductoTest {
                 50,
                 10,
                 true,
-                null,
+                CategoriaProducto.ANTIVIRALES,
                 List.of(new CodigoAModificar("C001", "1234567890123", "EAN", true))
         );
 
@@ -762,13 +931,14 @@ public class ControladorProductoTest {
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.['stockValido']").value("El stock máximo debe ser mayor o igual al stock mínimo"));
+                .andExpect(jsonPath("$.['stockValido']")
+                        .value("El stock máximo debe ser mayor o igual al stock mínimo"));
     }
 
     @Test
     @DisplayName("Actualizar producto con stock mínimo negativo devuelve 400")
     void actualizarProductoConStockMinimoNegativo() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -794,7 +964,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con stock máximo negativo devuelve 400")
     void actualizarProductoConStockMaximoNegativo() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -820,8 +990,8 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con nombre comercial demasiado largo devuelve 400")
     void actualizarProductoNombreComercialMuyLargo() throws Exception {
-        var idProducto = "P001";
-        var nombreLargo = "a".repeat(201);
+        String idProducto = "P001";
+        String nombreLargo = "a".repeat(201);
 
         var dto = new ProductoAModificar(
                 nombreLargo,
@@ -846,9 +1016,9 @@ public class ControladorProductoTest {
 
     @Test
     @DisplayName("Actualizar producto con nombre genérico demasiado largo devuelve 400")
-    void actualizarProductoNombreGenericolMuyLargo() throws Exception {
-        var idProducto = "P001";
-        var nombreLargo = "a".repeat(201);
+    void actualizarProductoNombreGenericoMuyLargo() throws Exception {
+        String idProducto = "P001";
+        String nombreLargo = "a".repeat(201);
 
         var dto = new ProductoAModificar(
                 null,
@@ -874,8 +1044,8 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con presentación demasiado larga devuelve 400")
     void actualizarProductoPresentacionMuyLarga() throws Exception {
-        var idProducto = "P001";
-        var presentacionLarga = "a".repeat(501);
+        String idProducto = "P001";
+        String presentacionLarga = "a".repeat(501);
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -901,8 +1071,8 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con dosificación demasiado larga devuelve 400")
     void actualizarProductoDosificacionMuyLarga() throws Exception {
-        var idProducto = "P001";
-        var dosificacionLarga = "a".repeat(101);
+        String idProducto = "P001";
+        String dosificacionLarga = "a".repeat(101);
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -928,8 +1098,8 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con unidad de medida demasiado larga devuelve 400")
     void actualizarProductoUnidadMedidaMuyLarga() throws Exception {
-        var idProducto = "P001";
-        var unidadLarga = "a".repeat(51);
+        String idProducto = "P001";
+        String unidadLarga = "a".repeat(51);
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -955,7 +1125,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con estado activo nulo devuelve 400")
     void actualizarProductoActivoNulo() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -981,7 +1151,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar producto con código que no pertenece al producto devuelve 404")
     void actualizarProductoCodigoNoPertenece() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var dto = new ProductoAModificar(
                 "Nombre Nuevo",
@@ -996,9 +1166,6 @@ public class ControladorProductoTest {
                 List.of(new CodigoAModificar("C999", "0000000000000", "EAN", true))
         );
 
-        when(servicioAppProducto.actualizarProducto(Mockito.eq(idProducto), any(ProductoAModificar.class)))
-                .thenThrow(new CodigoNoPerteneceProductoException("C999", idProducto));
-
         mockMvc.perform(patch("/productos/{id}", idProducto)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
@@ -1009,14 +1176,9 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar código con id vacío devuelve 400")
     void actualizarCodigoIdVacio() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
-        var dto = new CodigoAModificar(
-                "",
-                "1234567890123",
-                "EAN",
-                true
-        );
+        var dto = new CodigoAModificar("", "1234567890123", "EAN", true);
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
@@ -1035,15 +1197,10 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar código con código de barra demasiado largo devuelve 400")
     void actualizarCodigoCodigoBarraMuyLargo() throws Exception {
-        var idProducto = "P001";
-        var codigoBarraLargo = "a".repeat(101);
+        String idProducto = "P001";
+        String codigoBarraLargo = "1".repeat(101);
 
-        var dto = new CodigoAModificar(
-                "C001",
-                codigoBarraLargo,
-                "EAN",
-                true
-        );
+        var dto = new CodigoAModificar("C001", codigoBarraLargo, "EAN", true);
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
@@ -1062,15 +1219,10 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar código con tipo de código demasiado largo devuelve 400")
     void actualizarCodigoTipoCodigoMuyLargo() throws Exception {
-        var idProducto = "P001";
-        var tipoCodigoLargo = "a".repeat(51);
+        String idProducto = "P001";
+        String tipoCodigoLargo = "a".repeat(51);
 
-        var dto = new CodigoAModificar(
-                "C001",
-                "1234567890123",
-                tipoCodigoLargo,
-                true
-        );
+        var dto = new CodigoAModificar("C001", "1234567890123", tipoCodigoLargo, true);
 
         var productoDto = new ProductoAModificar(
                 null, null, null, null, null,
@@ -1089,7 +1241,7 @@ public class ControladorProductoTest {
     @Test
     @DisplayName("Actualizar códigos con IDs duplicados devuelve 400")
     void actualizarCodigosDuplicadosDevuelve400() throws Exception {
-        var idProducto = "P001";
+        String idProducto = "P001";
 
         var codigo1 = new CodigoAModificar("C001", null, null, null);
         var codigo2 = new CodigoAModificar("C002", null, null, null);
@@ -1113,20 +1265,21 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock mínimo máximo permitido devuelve 400 si supera el límite")
     void crearProductoConStockMinimoExcedido() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
+                "Producto Test",
+                "Genérico Test",
+                "Caja 10",
+                "10mg",
+                "mg",
                 100_000_001,
-                productoValido.stockMaximo(),
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                50,
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890123", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.stockMinimo").value("El stock mínimo no puede superar 100.000.000"));
@@ -1136,24 +1289,26 @@ public class ControladorProductoTest {
     @DisplayName("Crear producto con stock máximo excedido devuelve 400")
     void crearProductoConStockMaximoExcedido() throws Exception {
         var dto = new ProductoACrear(
-                productoValido.nombreComercial(),
-                productoValido.nombreGenerico(),
-                productoValido.presentacion(),
-                productoValido.dosificacion(),
-                productoValido.unidadMedida(),
-                productoValido.stockMinimo(),
+                "Producto Test 2",
+                "Genérico Test 2",
+                "Caja 20",
+                "20mg",
+                "mg",
+                10,
                 100_000_001,
-                productoValido.activo(),
-                productoValido.categoria(),
-                productoValido.codigos()
+                true,
+                CategoriaProducto.ANTIBIOTICOS,
+                List.of(new CodigoACrear("1234567890456", "EAN", true))
         );
 
         mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.stockMaximo").value("El stock máximo no puede superar 100.000.000"));
     }
+
 
     @Test
     @DisplayName("Actualizar producto con stock mínimo excedido devuelve 400")
@@ -1206,7 +1361,7 @@ public class ControladorProductoTest {
     void crearProductoConTodosLosCamposEnBlanco() throws Exception {
         var codigo = new CodigoACrear("   ", "   ", true);
 
-        var dto = new ProductoACrear(
+        ProductoACrear dto = new ProductoACrear(
                 "   ",
                 "   ",
                 "   ",
@@ -1230,134 +1385,102 @@ public class ControladorProductoTest {
     }
 
     @Test
-    @DisplayName("Buscar productos sin filtros devuelve todos los productos con urlFoto")
+    @DisplayName("Buscar productos sin filtros devuelve todos los productos")
     void buscarProductosSinFiltros() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, null, null, 0))
-                .thenReturn(new PageImpl<>(productosFiltrados, PageRequest.of(0, 4), productosFiltrados.size()));
-
         mockMvc.perform(get("/productos/buscar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(productosFiltrados.size()))
-                .andExpect(jsonPath("$.content[0].idProducto").value("P001"))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(3))
+
+                .andExpect(jsonPath("$.content[0].nombreComercial").value("Paracetamol"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"))
-                .andExpect(jsonPath("$.content[1].idProducto").value("P002"))
+
+                .andExpect(jsonPath("$.content[1].nombreComercial").value("Advil"))
                 .andExpect(jsonPath("$.content[1].stockTotal").value(100))
                 .andExpect(jsonPath("$.content[1].disponible").value(true))
-                .andExpect(jsonPath("$.content[1].urlFoto").value("productos/P002.jpg"))
-                .andExpect(jsonPath("$.content[2].idProducto").value("P003"))
+
+                .andExpect(jsonPath("$.content[2].nombreComercial").value("Amoxil"))
                 .andExpect(jsonPath("$.content[2].stockTotal").value(20))
-                .andExpect(jsonPath("$.content[2].disponible").value(false))
-                .andExpect(jsonPath("$.content[2].urlFoto").value("productos/P003.jpg"));
+                .andExpect(jsonPath("$.content[2].disponible").value(false));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
     void buscarProductosPorNombreComercial() throws Exception {
-        var filtrados = productosFiltrados.stream()
-                .filter(p -> p.nombreComercial().equalsIgnoreCase("Advil"))
-                .toList();
-
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados("Advil", null, null, null, 0))
-                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
-
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "Advil"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].nombreComercial").value("Advil"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(100))
-                .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P002.jpg"));
+                .andExpect(jsonPath("$.content[0].disponible").value(true));
     }
 
     @Test
     @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
     void buscarProductosPorNombreGenerico() throws Exception {
-        var filtrados = productosFiltrados.stream()
-                .filter(p -> p.nombreGenerico().equalsIgnoreCase("Paracetamol"))
-                .toList();
-
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, "Paracetamol", null, null, 0))
-                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
-
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreGenerico", "Paracetamol"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].nombreGenerico").value("Paracetamol"))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
-                .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"));
+                .andExpect(jsonPath("$.content[0].disponible").value(true));
     }
 
     @Test
     @DisplayName("Buscar productos por categoría devuelve coincidencias")
     void buscarProductosPorCategoria() throws Exception {
-        var categoria = CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible();
-
-        var filtrados = productosFiltrados.stream()
-                .filter(p -> p.categoria().equalsIgnoreCase(categoria))
-                .toList();
-
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(
-                null,
-                null,
-                null,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                0
-        )).thenReturn(new PageImpl<>(
-                filtrados,
-                PageRequest.of(0, 4),
-                filtrados.size()
-        ));
-
         mockMvc.perform(get("/productos/buscar")
                         .param("categoria", CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.name()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(filtrados.size()))
-                .andExpect(jsonPath("$.content[0].categoria").value(categoria));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+
+                .andExpect(jsonPath("$.content[0].categoria")
+                        .value(CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible()))
+                .andExpect(jsonPath("$.content[0].stockTotal").value(300))
+                .andExpect(jsonPath("$.content[0].disponible").value(true))
+
+                .andExpect(jsonPath("$.content[1].categoria")
+                        .value(CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS.getNombreLegible()))
+                .andExpect(jsonPath("$.content[1].stockTotal").value(100))
+                .andExpect(jsonPath("$.content[1].disponible").value(true));
     }
 
     @Test
     @DisplayName("Buscar productos por activo devuelve coincidencias")
     void buscarProductosPorActivo() throws Exception {
-        var filtrados = productosFiltrados.stream()
-                .filter(ProductoFiltrado::activo)
-                .toList();
-
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados(null, null, true, null, 0))
-                .thenReturn(new PageImpl<>(filtrados, PageRequest.of(0, 4), filtrados.size()));
-
         mockMvc.perform(get("/productos/buscar")
                         .param("activo", "true"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(2))
+
                 .andExpect(jsonPath("$.content[0].activo").value(true))
                 .andExpect(jsonPath("$.content[0].stockTotal").value(300))
                 .andExpect(jsonPath("$.content[0].disponible").value(true))
-                .andExpect(jsonPath("$.content[0].urlFoto").value("productos/P001.jpg"))
+
                 .andExpect(jsonPath("$.content[1].activo").value(true))
                 .andExpect(jsonPath("$.content[1].stockTotal").value(100))
-                .andExpect(jsonPath("$.content[1].disponible").value(true))
-                .andExpect(jsonPath("$.content[1].urlFoto").value("productos/P002.jpg"));
+                .andExpect(jsonPath("$.content[1].disponible").value(true));
     }
 
     @Test
     @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
     void buscarProductosSinCoincidencias() throws Exception {
-        Mockito.when(servicioAppProducto.buscarProductosFiltrados("NoExiste", null, null, null, 0))
-                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 4), 0));
-
         mockMvc.perform(get("/productos/buscar")
                         .param("nombreComercial", "NoExiste"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(0));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
-    @DisplayName("Crear producto (JSON) y luego subir imagen funciona (200)")
+    @DisplayName("Crear producto (JSON) y luego subir imagen funciona (200) [integración]")
     void crearProductoYLuegoSubirImagen() throws Exception {
         var dto = new ProductoACrear(
                 "Prueba Producto", "Genérico Prueba",
@@ -1367,24 +1490,18 @@ public class ControladorProductoTest {
                 List.of(new CodigoACrear("0001112223334", "EAN", true))
         );
 
-        var creado = new ProductoCreado(
-                "P020",
-                dto.nombreComercial(),
-                true,
-                null,
-                List.of(new CodigoCreado("C020", "0001112223334"))
-        );
-
-        when(servicioAppProducto.crearProducto(any(ProductoACrear.class)))
-                .thenReturn(creado);
-
-        mockMvc.perform(post("/productos")
+        var resultadoCreacion = mockMvc.perform(post("/productos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.idProducto").value("P020"))
-                .andExpect(jsonPath("$.urlFoto").doesNotExist());
+                .andExpect(jsonPath("$.idProducto").exists())
+                .andExpect(jsonPath("$.urlFoto").doesNotExist())
+                .andReturn();
+
+        var idProducto = JsonPath.read(
+                resultadoCreacion.getResponse().getContentAsString(), "$.idProducto"
+        ).toString();
 
         var foto = new MockMultipartFile(
                 "foto",
@@ -1393,36 +1510,38 @@ public class ControladorProductoTest {
                 "contenido-de-prueba".getBytes()
         );
 
-        doNothing().when(servicioAppProducto).actualizarFoto(eq("P020"), any(MultipartFile.class));
-
-        mockMvc.perform(multipart("/productos/{id}/foto", "P020")
+        mockMvc.perform(multipart("/productos/{id}/foto", idProducto)
                         .file(foto)
                         .with(csrf()))
                 .andExpect(status().isOk());
+
+        var producto = repositorioProducto.findById(idProducto).orElseThrow();
+        assertThat(producto.getUrlFoto()).isNotNull();
     }
 
     @Test
-    @DisplayName("Actualizar imagen del producto llama a servicio y devuelve 200")
-    void actualizarImagenDelProducto() throws Exception {
+    @DisplayName("Actualizar imagen del producto devuelve 200 (integración)")
+    void actualizarImagenDelProductoIntegracion() throws Exception {
+        String idProducto = idsProductos.getFirst();
+
         var foto = new MockMultipartFile(
                 "foto",
                 "ok.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
-                "bytes".getBytes()
+                "contenido-de-prueba".getBytes()
         );
 
-        doNothing().when(servicioAppProducto).actualizarFoto("P001", foto);
-
-        mockMvc.perform(multipart("/productos/{id}/foto", "P001")
+        mockMvc.perform(multipart("/productos/{id}/foto", idProducto)
                         .file(foto)
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(servicioAppProducto).actualizarFoto(eq("P001"), any(MultipartFile.class));
+        var producto = repositorioProducto.findById(idProducto).orElseThrow();
+        assertThat(producto.getUrlFoto()).isNotNull();
     }
 
     @Test
-    @DisplayName("Actualizar imagen con formato no permitido devuelve 400 y mensaje")
+    @DisplayName("Actualizar imagen con formato no permitido devuelve 400 (integración)")
     void actualizarImagenFormatoNoPermitido() throws Exception {
         var foto = new MockMultipartFile(
                 "foto",
@@ -1435,15 +1554,16 @@ public class ControladorProductoTest {
                         .file(foto)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.foto").value("El archivo debe ser una imagen PNG o JPG"));
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo debe ser una imagen PNG o JPG"));
     }
 
     @Test
-    @DisplayName("Actualizar imagen con nombre vacío devuelve 400 y mensaje")
+    @DisplayName("Actualizar imagen con nombre vacío devuelve 400 (integración)")
     void actualizarImagenNombreVacio() throws Exception {
         var foto = new MockMultipartFile(
                 "foto",
-                "  ",
+                "   ",
                 MediaType.IMAGE_JPEG_VALUE,
                 "bytes".getBytes()
         );
@@ -1452,40 +1572,41 @@ public class ControladorProductoTest {
                         .file(foto)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.foto").value("El archivo debe tener un nombre válido"));
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo debe tener un nombre válido"));
     }
 
     @Test
-    @DisplayName("Error del servicio al guardar la imagen devuelve 500 o el código configurado")
-    void actualizarImagenErrorInterno() throws Exception {
+    @DisplayName("Actualizar imagen muy grande devuelve 400 por validación")
+    void actualizarImagenMuyGrande() throws Exception {
+        var gigante = new byte[20_000_000];
+
         var foto = new MockMultipartFile(
                 "foto",
                 "ok.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
-                "bytes".getBytes()
+                gigante
         );
-
-        doThrow(new ImagenAlmacenadaException())
-                .when(servicioAppProducto)
-                .actualizarFoto(eq("P001"), any(MultipartFile.class));
 
         mockMvc.perform(multipart("/productos/{id}/foto", "P001")
                         .file(foto)
                         .with(csrf()))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.foto").value("El archivo no puede superar los 10 MB"));
     }
 
     @Test
-    @DisplayName("Actualizar imagen sin enviar archivo devuelve 400 y mensaje")
+    @DisplayName("Actualizar imagen sin enviar archivo devuelve 400 (integración)")
     void actualizarImagenSinArchivo() throws Exception {
         mockMvc.perform(multipart("/productos/{id}/foto", "P001")
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.foto").value("El archivo no puede estar vacío"));
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo no puede estar vacío"));
     }
 
     @Test
-    @DisplayName("Actualizar imagen con archivo vacío devuelve 400 y mensaje")
+    @DisplayName("Actualizar imagen con archivo vacío devuelve 400 (integración)")
     void actualizarImagenArchivoVacio() throws Exception {
         var foto = new MockMultipartFile(
                 "foto",
@@ -1498,46 +1619,8 @@ public class ControladorProductoTest {
                         .file(foto)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.foto").value("El archivo no puede estar vacío"));
-    }
-
-    @Test
-    @DisplayName("Obtener producto por ID devuelve 200 y el producto esperado")
-    void obtenerProductoPorId() throws Exception {
-        var codigos = List.of(new CodigoBuscado("C001", "1234567890123"));
-        var productoBuscado = new ProductoBuscado(
-                "P001",
-                "Producto Test",
-                "Genérico Test",
-                "Caja",
-                "50mg",
-                "mg",
-                true,
-                10,
-                null,
-                codigos
-        );
-
-        when(servicioAppProducto.obtenerProductoPorId("P001")).thenReturn(productoBuscado);
-
-        mockMvc.perform(get("/productos/{id}", "P001")
-                        .with(csrf()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idProducto").value("P001"))
-                .andExpect(jsonPath("$.nombreComercial").value("Producto Test"))
-                .andExpect(jsonPath("$.stockTotal").value(10))
-                .andExpect(jsonPath("$.codigos[0].idCodigo").value("C001"));
-    }
-
-    @Test
-    @DisplayName("Obtener producto por ID inexistente devuelve 404")
-    void obtenerProductoPorIdNoExistente() throws Exception {
-        when(servicioAppProducto.obtenerProductoPorId("P999"))
-                .thenThrow(new ProductoNoEncontradoException("P999"));
-
-        mockMvc.perform(get("/productos/{id}", "P999").with(csrf()))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("No se encontró producto con id = P999"));
+                .andExpect(jsonPath("$.foto")
+                        .value("El archivo no puede estar vacío"));
     }
 
     @Test

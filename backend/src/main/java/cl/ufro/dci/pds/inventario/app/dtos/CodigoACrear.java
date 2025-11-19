@@ -4,11 +4,9 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.UniqueElements;
 
 public record CodigoACrear(
-        @NotBlank(message = "El id del código no puede estar vacío")
-        String idCodigo,
-
         @NotBlank(message = "El código de barra no puede estar vacío")
         @Size(max = 100, message = "El código de barra no puede tener más de 100 caracteres")
         String codigoBarra,
@@ -19,11 +17,10 @@ public record CodigoACrear(
 
         boolean activo
 
-) implements CodigoConId{
+) implements CodigoConCodigoBarra{
     public Codigo aEntidad(Producto producto) {
         Codigo c = new Codigo();
         c.setProducto(producto);
-        c.setIdCodigo(idCodigo);
         c.setCodigoBarra(codigoBarra);
         c.setTipoCodigo(tipoCodigo);
         c.setActivo(activo);

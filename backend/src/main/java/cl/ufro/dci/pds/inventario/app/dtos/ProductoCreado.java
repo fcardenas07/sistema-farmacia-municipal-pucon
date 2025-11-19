@@ -9,13 +9,15 @@ public record ProductoCreado(
         String idProducto,
         String nombreComercial,
         boolean activo,
+        String urlFoto,
         List<CodigoCreado> codigos
 ) {
     public static ProductoCreado desde(Producto producto, List<Codigo> codigos) {
         return new ProductoCreado(
                 producto.getIdProducto(),
                 producto.getNombreComercial(),
-                producto.getActivo(),
+                producto.isActivo(),
+                producto.getUrlFoto(),
                 codigos.stream().map(CodigoCreado::desde).toList()
         );
     }
