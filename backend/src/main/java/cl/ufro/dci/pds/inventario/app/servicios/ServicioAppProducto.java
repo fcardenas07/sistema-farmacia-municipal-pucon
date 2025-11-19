@@ -79,7 +79,7 @@ public class ServicioAppProducto {
             CategoriaProducto categoria,
             int numeroPagina
     ) {
-        Page<Producto> productosPage = servicioProducto.buscarPorCampos(
+        var productosPage = servicioProducto.buscarPorCampos(
                 nombreComercial, nombreGenerico, activo, categoria, numeroPagina
         );
 
@@ -91,7 +91,7 @@ public class ServicioAppProducto {
         var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
         var stockPorProducto = agruparStockPorProducto(lotes, codigosPorProducto);
 
-        List<ProductoFiltrado> filtrados = productosPage.getContent().stream()
+        var filtrados = productosPage.getContent().stream()
                 .map(p -> {
                     int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
                     return ProductoFiltrado.desde(p, stockTotal);
