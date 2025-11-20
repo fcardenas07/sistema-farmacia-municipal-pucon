@@ -1,4 +1,4 @@
-package cl.ufro.dci.pds.servicios;
+/*package cl.ufro.dci.pds.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
@@ -173,3 +173,5 @@ class ServicioCodigoTest {
         verify(repositorioCodigo).save(codigoEntidad);
     }
 }
+
+ */

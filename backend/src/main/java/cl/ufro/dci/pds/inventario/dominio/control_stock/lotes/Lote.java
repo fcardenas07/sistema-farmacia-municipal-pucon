@@ -22,11 +22,20 @@ public class Lote {
     @Column(name = "fecha_vencimiento", nullable = false)
     private LocalDate fechaVencimiento;
 
-    @Column(name = "numero_lote", nullable = false, unique = true)
+    @Column(name = "numero_lote", nullable = false)
     private String numeroLote;
 
     @Column(name = "estado", nullable = false)
     private String estado;
+
+    @Column(name = "precio_unitario", nullable = false)
+    private Integer precioUnitario;
+
+    @Column(name = "limite_merma")
+    private Integer limiteMerma;
+
+    @Column(name = "porcentaje_oferta")
+    private Float porcentajeOferta;
 
     @ManyToOne
     @JoinColumn(name = "id_codigo", nullable = false)
@@ -78,12 +87,28 @@ public class Lote {
         this.estado = estado;
     }
 
-    public Stock getStock() {
-        return stock;
+    public Integer getPrecioUnitario() {
+        return precioUnitario;
     }
 
-    public void setStock(Stock stock) {
-        this.stock = stock;
+    public void setPrecioUnitario(Integer precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public Integer getLimiteMerma() {
+        return limiteMerma;
+    }
+
+    public void setLimiteMerma(Integer limiteMerma) {
+        this.limiteMerma = limiteMerma;
+    }
+
+    public Float getPorcentajeOferta() {
+        return porcentajeOferta;
+    }
+
+    public void setPorcentajeOferta(Float porcentajeOferta) {
+        this.porcentajeOferta = porcentajeOferta;
     }
 
     public Codigo getCodigo() {
@@ -94,12 +119,20 @@ public class Lote {
         this.codigo = codigo;
     }
 
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
     public GuiaIngreso getGuiaIngreso() {
         return guiaIngreso;
     }
 
-    public void setGuiaIngreso(GuiaIngreso guiaingreso) {
-        this.guiaIngreso = guiaingreso;
+    public void setGuiaIngreso(GuiaIngreso guiaIngreso) {
+        this.guiaIngreso = guiaIngreso;
     }
 
     @Override

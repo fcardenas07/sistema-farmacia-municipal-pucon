@@ -19,12 +19,12 @@ class ServicioLoteTest {
     private RepositorioLote repo;
     private ServicioLote servicio;
 
+
     @BeforeEach
     void setUp() {
         repo = mock(RepositorioLote.class);
-        RepositorioProducto repoProducto = mock(RepositorioProducto.class);
         EntradaInventarioMapper entradaInventarioMapper = mock(EntradaInventarioMapper.class);
-        servicio = new ServicioLote(repo, repoProducto, entradaInventarioMapper);
+        servicio = new ServicioLote(repo, entradaInventarioMapper);
     }
 
     @Test

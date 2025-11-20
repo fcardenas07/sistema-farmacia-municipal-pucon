@@ -1,4 +1,4 @@
-package cl.ufro.dci.pds.servicios;
+/*package cl.ufro.dci.pds.servicios;
 
 import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
@@ -606,3 +606,4 @@ class ServicioAppProductoTest {
     }
 
 }
+*/

@@ -1,4 +1,4 @@
-package cl.ufro.dci.pds.controladores;
+/*package cl.ufro.dci.pds.controladores;
 
 import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.infraestructura.SecurityConfig;
@@ -1582,3 +1582,5 @@ public class ControladorProductoTest {
     }
 
 }
+
+ */

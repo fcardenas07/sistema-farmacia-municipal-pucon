@@ -19,9 +19,6 @@ public class Stock {
     @Column(name = "cantidad_actual", nullable = false)
     private int cantidadActual;
 
-    @Column(name = "precio", nullable = false)
-    private double precio;
-
     @OneToOne
     @JoinColumn(name = "id_lote", nullable = false, unique = true)
     private Lote lote;
@@ -48,13 +45,6 @@ public class Stock {
         this.cantidadActual = cantidadActual;
     }
 
-    public double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
 
     public Lote getLote() {
         return lote;
@@ -81,7 +71,6 @@ public class Stock {
                 "idStock='" + idStock + '\'' +
                 ", cantidadInicial=" + cantidadInicial +
                 ", cantidadActual=" + cantidadActual +
-                ", precio=" + precio +
                 ", lote=" + (lote != null ? lote.getNumeroLote() : null) +
                 '}';
     }
