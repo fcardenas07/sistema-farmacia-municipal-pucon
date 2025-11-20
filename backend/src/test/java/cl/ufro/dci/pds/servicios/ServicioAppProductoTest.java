@@ -7,6 +7,8 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,8 @@ class ServicioAppProductoTest {
     private ServicioCodigo servicioCodigo;
     private ServicioAppProducto servicioAppProducto;
     private ServicioLote servicioLote;
+    private ServicioStock servicioStock;
+    private ServicioMovimiento servicioMovimiento;
 
     private Producto productoEntidad;
     private Codigo codigoEntidad;
@@ -39,7 +43,9 @@ class ServicioAppProductoTest {
         servicioProducto = mock(ServicioProducto.class);
         servicioCodigo = mock(ServicioCodigo.class);
         servicioLote = mock(ServicioLote.class);
-        servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo, servicioLote);
+        servicioStock = mock(ServicioStock.class);
+        servicioMovimiento = mock(ServicioMovimiento.class);
+        servicioAppProducto = new ServicioAppProducto(servicioProducto, servicioCodigo, servicioLote, servicioStock, servicioMovimiento);
 
         var productoParacetamol = new Producto(
                 "Paracetamol", "Paracetamol", "Tabletas", "500", "mg", 10, 100,
@@ -549,4 +555,54 @@ class ServicioAppProductoTest {
         assertThrows(ProductoNoEncontradoException.class,
                 () -> servicioAppProducto.obtenerProductoPorId("P999"));
     }
+
+    @Test
+    @DisplayName("Dar de baja un producto llama a todos los servicios correspondientes")
+    void darBajaProducto() {
+        String idProducto = "P001";
+
+        var codigo1 = mock(Codigo.class);
+        when(codigo1.getIdCodigo()).thenReturn("C001");
+        when(codigo1.getProducto()).thenReturn(productoEntidad);
+
+        var codigo2 = mock(Codigo.class);
+        when(codigo2.getIdCodigo()).thenReturn("C002");
+        when(codigo2.getProducto()).thenReturn(productoEntidad);
+
+        when(servicioCodigo.obtenerCodigosConIdProducto(idProducto))
+                .thenReturn(List.of(codigo1, codigo2));
+
+        var lote1 = mock(Lote.class);
+        when(lote1.getCodigo()).thenReturn(codigo1);
+        var stock1 = mock(Stock.class);
+        when(lote1.getStock()).thenReturn(stock1);
+        when(stock1.getCantidadActual()).thenReturn(10);
+        when(servicioStock.darBaja(stock1)).thenReturn(10);
+
+        var lote2 = mock(Lote.class);
+        when(lote2.getCodigo()).thenReturn(codigo2);
+        var stock2 = mock(Stock.class);
+        when(lote2.getStock()).thenReturn(stock2);
+        when(stock2.getCantidadActual()).thenReturn(5);
+        when(servicioStock.darBaja(stock2)).thenReturn(5);
+
+        when(servicioLote.obtenerLotesDeCodigos(List.of("C001", "C002")))
+                .thenReturn(List.of(lote1, lote2));
+
+        servicioAppProducto.darBajaProducto(idProducto);
+
+        verify(servicioProducto).darBaja(idProducto);
+        verify(servicioCodigo).darBaja(codigo1);
+        verify(servicioCodigo).darBaja(codigo2);
+
+        verify(servicioStock).darBaja(stock1);
+        verify(servicioStock).darBaja(stock2);
+
+        verify(servicioLote).darBaja(lote1);
+        verify(servicioLote).darBaja(lote2);
+
+        verify(servicioMovimiento).registrarMovimientoPorBajaProducto(productoEntidad, lote1, 10);
+        verify(servicioMovimiento).registrarMovimientoPorBajaProducto(productoEntidad, lote2, 5);
+    }
+
 }

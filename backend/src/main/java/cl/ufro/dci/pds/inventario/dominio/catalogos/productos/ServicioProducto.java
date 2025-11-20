@@ -61,9 +61,7 @@ public class ServicioProducto {
     }
 
     public void darBaja(String id) {
-        var producto = repositorioProducto.findById(id)
-                .orElseThrow(() -> new ProductoNoEncontradoException(id));
-
+        var producto = obtenerPorId(id);
         producto.setActivo(false);
         repositorioProducto.save(producto);
     }

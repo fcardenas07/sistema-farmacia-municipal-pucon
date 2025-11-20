@@ -8,6 +8,9 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.RepositorioMovimiento;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.RepositorioStock;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -33,6 +36,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -54,6 +59,12 @@ class ControladorProductoIntegradoTest {
     private RepositorioLote repositorioLote;
 
     @Autowired
+    private RepositorioStock repositorioStock;
+
+    @Autowired
+    private RepositorioMovimiento repositorioMovimiento;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private List<String> idsProductos;
@@ -61,6 +72,8 @@ class ControladorProductoIntegradoTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        repositorioMovimiento.deleteAll();
+        repositorioStock.deleteAll();
         repositorioLote.deleteAll();
         repositorioCodigo.deleteAll();
         repositorioProducto.deleteAll();
@@ -216,7 +229,7 @@ class ControladorProductoIntegradoTest {
     @DisplayName("Crear producto con un json vacío devuelve 400")
     void crearProductoConBodyVacioJSON() throws Exception {
         ProductoACrear dtoVacio = new ProductoACrear(
-                 null, null, null, null, null,
+                null, null, null, null, null,
                 null, null, false, null, List.of()
         );
 
@@ -870,7 +883,7 @@ class ControladorProductoIntegradoTest {
                 50,
                 true,
                 CategoriaProducto.ANTIVIRALES,
-                List.of(new CodigoACrear( "1234567890123", "", true))
+                List.of(new CodigoACrear("1234567890123", "", true))
         );
 
         mockMvc.perform(post("/productos")
@@ -1648,5 +1661,35 @@ class ControladorProductoIntegradoTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigosBarraUnicos").value("No puede haber códigos de barra duplicados"));
+    }
+
+    @Test
+    @DisplayName("dar de baja un producto: actualiza estado, códigos, lotes, stocks y genera movimiento")
+    void darBajaProductoIntegradoCompleto() throws Exception {
+        var idProducto = idsProductos.getFirst();
+
+        mockMvc.perform(
+                patch("/productos/dar-de-baja/{id}", idProducto)
+        ).andExpect(status().isOk());
+
+        var producto = repositorioProducto.findById(idProducto).orElseThrow();
+        assertFalse(producto.isActivo(), "El producto debe quedar inactivo");
+
+        var codigos = repositorioCodigo.findAllByProducto_IdProducto(idProducto);
+        assertTrue(codigos.stream().noneMatch(Codigo::isActivo), "Todos los códigos deben quedar inactivos");
+
+        var idsCodigos = codigos.stream().map(Codigo::getIdCodigo).toList();
+        var lotes = repositorioLote.findByCodigo_IdCodigoIn(idsCodigos);
+        assertTrue(lotes.stream().allMatch(l -> "INACTIVO".equals(l.getEstado())),
+                "Todos los lotes deben quedar marcados como INACTIVO");
+
+        var stocks = lotes.stream().map(Lote::getStock).toList();
+        assertTrue(stocks.stream().allMatch(s -> s.getCantidadActual() == 0),
+                "Todos los stocks deben quedar en 0");
+
+        var movimientos = repositorioMovimiento.findAll();
+        assertFalse(movimientos.isEmpty(), "Debe generarse al menos un movimiento de baja");
+        assertTrue(movimientos.stream().allMatch(m -> m.getTipoMovimiento().equals(TipoMovimiento.BAJA)),
+                "Todos los movimientos deben ser tipo BAJA");
     }
 }

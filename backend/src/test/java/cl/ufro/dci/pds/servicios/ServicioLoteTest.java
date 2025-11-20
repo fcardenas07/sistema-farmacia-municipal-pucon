@@ -59,4 +59,18 @@ class ServicioLoteTest {
         assertTrue(resultado.isEmpty());
         verify(repo, never()).findByCodigo_IdCodigoIn(any());
     }
+
+    @Test
+    @DisplayName("dar de baja marca el lote como INACTIVO y lo guarda")
+    void darBajaLote() {
+        var lote = new Lote();
+        lote.setEstado("ACTIVO");
+
+        when(repo.save(any(Lote.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        servicio.darBaja(lote);
+
+        assertEquals("INACTIVO", lote.getEstado(), "El lote debe quedar inactivo");
+        verify(repo).save(lote);
+    }
 }

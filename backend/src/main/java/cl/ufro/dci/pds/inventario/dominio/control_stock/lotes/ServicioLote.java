@@ -19,13 +19,8 @@ public class ServicioLote {
         return repositorioLote.findByCodigo_IdCodigoIn(idsCodigo);
     }
 
-    public void darBaja(String idLote) {
-        var lote = repositorioLote.findById(idLote)
-                .orElseThrow(() -> new RuntimeException("Lote no encontrado: " + idLote));
+    public void darBaja(Lote lote) {
         lote.setEstado("INACTIVO");
-        if (lote.getStock() != null) {
-            lote.getStock().setCantidadActual(0);
-        }
         repositorioLote.save(lote);
     }
 }
