@@ -159,4 +159,17 @@ class ServicioCodigoTest {
 
         verify(repositorioCodigo).findAllByProducto_IdProductoIn(List.of("P001", "P002"));
     }
+
+    @Test
+    @DisplayName("dar de baja marca el código como inactivo y lo guarda")
+    void darBajaCodigo() {
+        codigoEntidad.setActivo(true);
+
+        when(repositorioCodigo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        servicioCodigo.darBaja(codigoEntidad);
+
+        assertFalse(codigoEntidad.isActivo(), "El código debe quedar inactivo");
+        verify(repositorioCodigo).save(codigoEntidad);
+    }
 }

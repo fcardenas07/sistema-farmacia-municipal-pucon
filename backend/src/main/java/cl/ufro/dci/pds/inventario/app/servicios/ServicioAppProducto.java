@@ -8,6 +8,8 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,13 +26,19 @@ public class ServicioAppProducto {
     private final ServicioProducto servicioProducto;
     private final ServicioCodigo servicioCodigo;
     private final ServicioLote servicioLote;
+    private final ServicioStock servicioStock;
+    private final ServicioMovimiento servicioMovimiento;
 
     public ServicioAppProducto(ServicioProducto servicioProducto,
                                ServicioCodigo servicioCodigo,
-                               ServicioLote servicioLote) {
+                               ServicioLote servicioLote,
+                               ServicioStock servicioStock,
+                               ServicioMovimiento servicioMovimiento) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
+        this.servicioStock = servicioStock;
+        this.servicioMovimiento = servicioMovimiento;
     }
 
     @Transactional
@@ -99,6 +107,37 @@ public class ServicioAppProducto {
                 .toList();
 
         return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
+    }
+
+    @Transactional
+    public void darBajaProducto(String idProducto) {
+        servicioProducto.darBaja(idProducto);
+
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(idProducto);
+        codigos.forEach(servicioCodigo::darBaja);
+
+        var idsCodigos = codigos.stream().map(Codigo::getIdCodigo).toList();
+        var lotes = servicioLote.obtenerLotesDeCodigos(idsCodigos);
+
+        darBajaLotesYStocks(lotes);
+    }
+
+    private void darBajaLotesYStocks(List<Lote> lotes) {
+        for (var lote : lotes) {
+            var stock = lote.getStock();
+            var cantidadBajada = 0;
+
+            if (stock != null) {
+                cantidadBajada = servicioStock.darBaja(stock);
+            }
+            servicioLote.darBaja(lote);
+
+            servicioMovimiento.registrarMovimientoPorBajaProducto(
+                    lote.getCodigo().getProducto(),
+                    lote,
+                    cantidadBajada
+            );
+        }
     }
 
     private Map<String, Producto> mapearCodigosPorProducto(List<String> idsProducto) {

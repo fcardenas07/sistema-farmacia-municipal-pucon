@@ -60,4 +60,9 @@ public class ServicioProducto {
         return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
     }
 
+    public void darBaja(String id) {
+        var producto = obtenerPorId(id);
+        producto.setActivo(false);
+        repositorioProducto.save(producto);
+    }
 }

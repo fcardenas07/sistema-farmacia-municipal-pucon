@@ -388,4 +388,19 @@ class ServicioProductoTest {
 
         verify(repositorioProducto).findById("P999");
     }
+
+    @Test
+    @DisplayName("dar de baja marca el producto como inactivo y lo guarda")
+    void darBajaProducto() {
+        productoEntidad.setActivo(true);
+
+        when(repositorioProducto.findById("P001")).thenReturn(Optional.of(productoEntidad));
+        when(repositorioProducto.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        servicioProducto.darBaja("P001");
+
+        assertFalse(productoEntidad.isActivo(), "El producto debe quedar inactivo");
+        verify(repositorioProducto).findById("P001");
+        verify(repositorioProducto).save(productoEntidad);
+    }
 }
