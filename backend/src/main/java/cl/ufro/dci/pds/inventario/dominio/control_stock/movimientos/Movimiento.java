@@ -16,10 +16,12 @@ public class Movimiento {
 
     @Id
     @Column(name = "id_movimiento")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String idMovimiento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimiento")
-    private String tipoMovimiento;
+    private TipoMovimiento tipoMovimiento;
 
     @Column(name = "cantidad")
     private Integer cantidad;
@@ -61,11 +63,11 @@ public class Movimiento {
         this.idMovimiento = idMovimiento;
     }
 
-    public String getTipoMovimiento() {
+    public TipoMovimiento getTipoMovimiento() {
         return tipoMovimiento;
     }
 
-    public void setTipoMovimiento(String tipoMovimiento) {
+    public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
         this.tipoMovimiento = tipoMovimiento;
     }
 

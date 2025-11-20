@@ -1566,4 +1566,19 @@ public class ControladorProductoTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.codigosBarraUnicos").value("No puede haber códigos de barra duplicados"));
     }
+
+    @Test
+    @DisplayName("dar de baja un producto devuelve 200 OK")
+    void darBajaProductoEndpoint() throws Exception {
+        String idProducto = "P001";
+
+        doNothing().when(servicioAppProducto).darBajaProducto(idProducto);
+
+        mockMvc.perform(
+                patch("/productos/dar-de-baja/{id}", idProducto)
+        ).andExpect(status().isOk());
+
+        verify(servicioAppProducto, times(1)).darBajaProducto(idProducto);
+    }
+
 }

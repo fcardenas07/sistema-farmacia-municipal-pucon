@@ -43,4 +43,9 @@ public class ServicioLote {
         }
         return repositorioLote.findByCodigo_IdCodigoIn(idsCodigo);
     }
+
+    public void darBaja(Lote lote) {
+        lote.setEstado("INACTIVO");
+        repositorioLote.save(lote);
+    }
 }
