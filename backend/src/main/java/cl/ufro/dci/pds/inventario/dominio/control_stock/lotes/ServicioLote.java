@@ -23,6 +23,7 @@ public class ServicioLote {
     }
 
 
+
     public Lote crear(EntradaInventario entrada) {
 
         var existente = repositorioLote.findById(entrada.idLote());

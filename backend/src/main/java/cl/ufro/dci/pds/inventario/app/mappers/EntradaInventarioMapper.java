@@ -10,12 +10,10 @@ public class EntradaInventarioMapper {
 
     public Lote toLote(EntradaInventario dto, Producto producto) {
         Lote lote = new Lote();
-        lote.setIdLote(dto.idLote());
         lote.setNumeroLote(dto.numeroLote());
         lote.setFechaElaboracion(dto.fechaElaboracion());
         lote.setFechaVencimiento(dto.fechaVencimiento());
         lote.setEstado("ACTIVO");
-        lote.setProducto(producto);
         return lote;
     }
 }

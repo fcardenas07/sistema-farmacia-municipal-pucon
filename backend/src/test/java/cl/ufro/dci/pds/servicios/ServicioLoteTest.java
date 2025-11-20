@@ -1,5 +1,7 @@
 package cl.ufro.dci.pds.servicios;
 
+import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
@@ -20,7 +22,9 @@ class ServicioLoteTest {
     @BeforeEach
     void setUp() {
         repo = mock(RepositorioLote.class);
-        servicio = new ServicioLote(repo);
+        RepositorioProducto repoProducto = mock(RepositorioProducto.class);
+        EntradaInventarioMapper entradaInventarioMapper = mock(EntradaInventarioMapper.class);
+        servicio = new ServicioLote(repo, repoProducto, entradaInventarioMapper);
     }
 
     @Test

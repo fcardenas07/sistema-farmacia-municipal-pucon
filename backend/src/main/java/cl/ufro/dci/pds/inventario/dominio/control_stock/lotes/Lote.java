@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
+import cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso.GuiaIngreso;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import jakarta.persistence.*;
@@ -33,6 +34,10 @@ public class Lote {
 
     @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL)
     private Stock stock;
+
+    @ManyToOne
+    @JoinColumn(name = "id_guia_ingreso", nullable = true) //por ahora que no está implementado guiaingreso
+    private GuiaIngreso  guiaIngreso;
 
     public Lote() {
     }
@@ -89,6 +94,14 @@ public class Lote {
         this.codigo = codigo;
     }
 
+    public GuiaIngreso getGuiaIngreso() {
+        return guiaIngreso;
+    }
+
+    public void setGuiaIngreso(GuiaIngreso guiaingreso) {
+        this.guiaIngreso = guiaingreso;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Lote lote)) return false;
@@ -108,8 +121,9 @@ public class Lote {
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
-                ", codigo=" + codigo + '\'' +
-                ", stock=" + stock + '\'' +
+                ", codigo=" + codigo +
+                ", stock=" + stock +
+                ", guiaIngreso=" + guiaIngreso +
                 '}';
     }
 }
