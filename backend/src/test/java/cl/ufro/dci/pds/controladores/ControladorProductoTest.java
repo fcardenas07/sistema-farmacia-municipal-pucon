@@ -1,4 +1,4 @@
-/*package cl.ufro.dci.pds.controladores;
+package cl.ufro.dci.pds.controladores;
 
 import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.infraestructura.SecurityConfig;
@@ -36,11 +36,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/*
 
 @WebMvcTest(ControladorProducto.class)
 @Import(SecurityConfig.class)
 public class ControladorProductoTest {
+
+    /*
 
     @Autowired
     private MockMvc mockMvc;
@@ -1583,6 +1584,6 @@ public class ControladorProductoTest {
         verify(servicioAppProducto, times(1)).darBajaProducto(idProducto);
     }
 
+     */
 }
 
- */

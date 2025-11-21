@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes;
 
 import cl.ufro.dci.pds.inventario.dominio.DatosContacto;
 import jakarta.persistence.*;

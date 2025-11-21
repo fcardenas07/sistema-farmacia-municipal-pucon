@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes;
+package cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes;
 
 public class FabricanteNoEncontradoException extends RuntimeException {
   public FabricanteNoEncontradoException(String id) {

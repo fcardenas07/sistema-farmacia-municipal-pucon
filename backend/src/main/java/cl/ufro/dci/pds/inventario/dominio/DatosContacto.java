@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio;
+package cl.ufro.dci.pds.inventario.dominio;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;

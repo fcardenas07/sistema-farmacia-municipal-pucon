@@ -83,10 +83,9 @@ public class ControladorProducto {
 
     @GetMapping("/buscar-para-codigo")
     public ResponseEntity<List<ProductoParaCodigo>> buscarProductosParaCodigo(
-            @RequestParam(required = false) String nombreComercial,
-            @RequestParam(defaultValue = "0") int pagina
+            @RequestParam(required = false) String nombreComercial
     ) {
-        var productos = servicioAppProducto.buscarProductosParaCodigo(nombreComercial, pagina);
+        var productos = servicioAppProducto.buscarProductosParaCodigo(nombreComercial);
         return ResponseEntity.ok(productos);
     }
 

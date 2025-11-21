@@ -81,12 +81,12 @@ public class ServicioAppProducto {
     }
 
     @Transactional
-    public List<ProductoParaCodigo> buscarProductosParaCodigo(String nombreComercial, int numeroPagina) {
-        var productosPage = servicioProducto.buscarPorCampos(
-                nombreComercial, null, null, null, numeroPagina
+    public List<ProductoParaCodigo> buscarProductosParaCodigo(String nombreComercial) {
+        var productos = servicioProducto.buscarPorCampos(
+                nombreComercial, null, null, null
         );
 
-        return productosPage.getContent().stream()
+        return productos.stream()
                 .map(ProductoParaCodigo::desde)
                 .toList();
     }
