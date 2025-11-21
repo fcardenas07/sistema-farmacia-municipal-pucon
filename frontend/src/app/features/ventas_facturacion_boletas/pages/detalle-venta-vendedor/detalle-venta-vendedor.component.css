@@ -1,0 +1,54 @@
+/* Contenedor general */
+.venta-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #d7d6d6;
+  padding: 0;
+  margin: 0;
+}
+
+/* Barra blanca superior */
+.title-box {
+  width: 100%;
+  background: white;
+  padding: 1vh 3vw;        /* altura y margen horizontal */
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;      /* alinea verticalmente */
+}
+
+/* Texto del título */
+.title {
+  margin-left: 1%;
+  font-size: 2.4rem;
+  font-weight: 800;         /* más grueso como la imagen */
+  color: #1e1e1e;
+}
+
+
+/* Zona de contenido gris */
+.venta-content {
+  display: flex;
+  gap: 4vw;
+  width: 100%;
+  padding: 4vh 4vw;        /* espacio interno */
+  box-sizing: border-box;
+}
+
+/* Columna izquierda (productos) */
+.col-left {
+  width: 55%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Columna derecha (totales + métodos) */
+.col-right {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  gap: 4vh;
+  margin-left: auto ;
+  margin-top: 4.3%;
+}
