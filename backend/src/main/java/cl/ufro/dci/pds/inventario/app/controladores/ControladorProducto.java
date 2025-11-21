@@ -1,22 +1,22 @@
 package cl.ufro.dci.pds.inventario.app.controladores;
 
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoCreado;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoModificado;
+import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoPerteneceProductoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoDuplicadoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.net.URI;
 import java.util.Map;
@@ -50,7 +50,43 @@ public class ControladorProducto {
         return ResponseEntity.ok(actualizado);
     }
 
-    @ExceptionHandler({CodigoDuplicadoException.class, ProductoDuplicadoException.class})
+    @PostMapping("/{id}/foto")
+    public ResponseEntity<?> subirFoto(
+            @PathVariable String id,
+            @Valid @ModelAttribute FotoProductoASubir dto
+    ) {
+        servicioAppProducto.actualizarFoto(id, dto.foto());
+        return ResponseEntity.ok(Map.of("mensaje", "Foto subida correctamente"));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoBuscado> obtenerProducto(@PathVariable String id) {
+        var resultado = servicioAppProducto.obtenerProductoPorId(id);
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<Page<ProductoFiltrado>> buscarProductos(
+            @RequestParam(required = false) String nombreComercial,
+            @RequestParam(required = false) String nombreGenerico,
+            @RequestParam(required = false) Boolean activo,
+            @RequestParam(required = false) CategoriaProducto categoria,
+            @RequestParam(defaultValue = "0") int pagina
+    ) {
+        var productos = servicioAppProducto.buscarProductosFiltrados(
+                nombreComercial, nombreGenerico, activo, categoria, pagina
+        );
+
+        return ResponseEntity.ok(productos);
+    }
+
+    @PatchMapping("dar-de-baja/{id}")
+    public ResponseEntity<Void> darBaja(@PathVariable String id) {
+        servicioAppProducto.darBajaProducto(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler({CodigoDuplicadoException.class})
     public ResponseEntity<String> manejarConflicto(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
@@ -75,6 +111,15 @@ public class ControladorProducto {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> manejarBodyFaltante(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body("Body de la solicitud requerido");
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<?> manejarParteFaltante(MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest().body(
+                Map.of("errors", Map.of(
+                        ex.getRequestPartName(), "El archivo no puede estar vacío"
+                ))
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

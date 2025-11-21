@@ -3,6 +3,8 @@ package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +19,17 @@ public class ServicioCodigo {
     }
 
     public Codigo crear(Producto producto, CodigoACrear nuevoCodigo) {
-        if (repositorioCodigo.existsById(nuevoCodigo.idCodigo())) {
-            throw new CodigoDuplicadoException(nuevoCodigo.idCodigo());
-        }
-
         var codigo = nuevoCodigo.aEntidad(producto);
         return repositorioCodigo.save(codigo);
+    }
+
+    public Codigo obtenerOCrear(Producto producto, CodigoACrear nuevoCodigo) {
+
+        return repositorioCodigo.findByCodigoBarra(nuevoCodigo.codigoBarra())
+                .orElseGet(() -> {
+                    Codigo nuevo = nuevoCodigo.aEntidad(producto);
+                    return repositorioCodigo.save(nuevo);
+                });
     }
 
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {
@@ -39,5 +46,17 @@ public class ServicioCodigo {
 
     public List<Codigo> obtenerCodigosConIdProducto(String idProducto) {
         return repositorioCodigo.findAllByProducto_IdProducto(idProducto);
+    }
+
+    public List<Codigo> obtenerCodigosConIdProductoEn(List<String> idsProducto) {
+        if (idsProducto == null || idsProducto.isEmpty()) {
+            return List.of();
+        }
+        return repositorioCodigo.findAllByProducto_IdProductoIn(idsProducto);
+    }
+
+    public void darBaja(Codigo codigo) {
+        codigo.setActivo(false);
+        repositorioCodigo.save(codigo);
     }
 }

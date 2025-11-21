@@ -1,6 +1,7 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso.GuiaIngreso;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.Objects;
 public class Lote {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_lote")
     private String idLote;
 
@@ -20,25 +22,37 @@ public class Lote {
     @Column(name = "fecha_vencimiento", nullable = false)
     private LocalDate fechaVencimiento;
 
-    @Column(name = "numero_lote", nullable = false, unique = true)
+    @Column(name = "numero_lote", nullable = false)
     private String numeroLote;
 
     @Column(name = "estado", nullable = false)
     private String estado;
 
+    @Column(name = "precio_unitario", nullable = false)
+    private Integer precioUnitario;
+
+    @Column(name = "limite_merma")
+    private Integer limiteMerma;
+
+    @Column(name = "porcentaje_oferta")
+    private Float porcentajeOferta;
+
     @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
-    private Producto producto;
+    @JoinColumn(name = "id_codigo", nullable = false)
+    private Codigo codigo;
+
+    @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL)
+    private Stock stock;
+
+    @ManyToOne
+    @JoinColumn(name = "id_guia_ingreso", nullable = true) //por ahora que no está implementado guiaingreso
+    private GuiaIngreso  guiaIngreso;
 
     public Lote() {
     }
 
     public String getIdLote() {
         return idLote;
-    }
-
-    public void setIdLote(String idLote) {
-        this.idLote = idLote;
     }
 
     public LocalDate getFechaElaboracion() {
@@ -73,12 +87,52 @@ public class Lote {
         this.estado = estado;
     }
 
-    public Producto getProducto() {
-        return producto;
+    public Integer getPrecioUnitario() {
+        return precioUnitario;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+    public void setPrecioUnitario(Integer precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
+    public Integer getLimiteMerma() {
+        return limiteMerma;
+    }
+
+    public void setLimiteMerma(Integer limiteMerma) {
+        this.limiteMerma = limiteMerma;
+    }
+
+    public Float getPorcentajeOferta() {
+        return porcentajeOferta;
+    }
+
+    public void setPorcentajeOferta(Float porcentajeOferta) {
+        this.porcentajeOferta = porcentajeOferta;
+    }
+
+    public Codigo getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(Codigo codigo) {
+        this.codigo = codigo;
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public GuiaIngreso getGuiaIngreso() {
+        return guiaIngreso;
+    }
+
+    public void setGuiaIngreso(GuiaIngreso guiaIngreso) {
+        this.guiaIngreso = guiaIngreso;
     }
 
     @Override
@@ -100,7 +154,9 @@ public class Lote {
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
-                ", producto=" + producto + '\'' +
+                ", codigo=" + codigo +
+                ", stock=" + stock +
+                ", guiaIngreso=" + guiaIngreso +
                 '}';
     }
 }

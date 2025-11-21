@@ -1,14 +1,18 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
+import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosBarraUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+
 import java.util.List;
 
-@StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
-@CodigosUnicos(message =  "No se pueden repetir los IDs de los códigos")
+@StockValido
+@CodigosUnicos
+@CodigosBarraUnicos
 public record ProductoAModificar(
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
@@ -36,6 +40,8 @@ public record ProductoAModificar(
         @NotNull(message = "El estado activo no puede ser nulo")
         Boolean activo,
 
+        CategoriaProducto categoria,
+
         @Valid
         List<CodigoAModificar> codigos
 ) implements ProductoConStock, ProductoConCodigos {
@@ -48,5 +54,6 @@ public record ProductoAModificar(
         if (stockMinimo != null) p.setStockMinimo(stockMinimo);
         if (stockMaximo != null) p.setStockMaximo(stockMaximo);
         if (activo != null) p.setActivo(activo);
+        if (categoria != null) p.setCategoria(categoria);
     }
 }

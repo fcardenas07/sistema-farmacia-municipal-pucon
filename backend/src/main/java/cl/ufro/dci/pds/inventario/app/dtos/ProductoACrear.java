@@ -1,18 +1,17 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
-import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosUnicos;
+import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosBarraUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+
 import java.util.List;
 
-@StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
-@CodigosUnicos(message =  "No se pueden repetir los IDs de los códigos")
+@StockValido
+@CodigosBarraUnicos
 public record ProductoACrear(
-        @NotBlank(message = "El id del producto no puede estar vacío")
-        String idProducto,
-
         @NotBlank(message = "El nombre comercial no puede estar vacío")
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
@@ -40,14 +39,15 @@ public record ProductoACrear(
 
         boolean activo,
 
+        @NotNull(message = "La categoría es obligatoria")
+        CategoriaProducto categoria,
+
         @Valid
-        @NotEmpty(message = "El producto debe tener al menos un código")
         List<CodigoACrear> codigos
 
 ) implements ProductoConStock, ProductoConCodigos {
     public Producto aEntidad() {
         Producto p = new Producto();
-        p.setIdProducto(idProducto);
         p.setNombreComercial(nombreComercial);
         p.setNombreGenerico(nombreGenerico);
         p.setPresentacion(presentacion);
@@ -56,6 +56,8 @@ public record ProductoACrear(
         p.setStockMinimo(stockMinimo);
         p.setStockMaximo(stockMaximo);
         p.setActivo(activo);
+        p.setCategoria(categoria);
+
         return p;
     }
 }

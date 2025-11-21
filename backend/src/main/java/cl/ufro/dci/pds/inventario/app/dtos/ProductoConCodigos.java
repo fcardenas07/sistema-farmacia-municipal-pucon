@@ -3,5 +3,5 @@ package cl.ufro.dci.pds.inventario.app.dtos;
 import java.util.List;
 
 public interface ProductoConCodigos {
-    List<? extends CodigoConId> codigos();
+    List<? extends CodigoConCodigoBarra> codigos();
 }

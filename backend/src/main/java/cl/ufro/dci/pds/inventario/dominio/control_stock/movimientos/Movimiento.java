@@ -1,6 +1,5 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos;
 
-import cl.ufro.dci.pds.inventario.dominio.abastecimiento.pedidos.Pedido;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.fraccionamientos.Fraccionamiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.Merma;
@@ -17,10 +16,12 @@ public class Movimiento {
 
     @Id
     @Column(name = "id_movimiento")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String idMovimiento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimiento")
-    private String tipoMovimiento;
+    private TipoMovimiento tipoMovimiento;
 
     @Column(name = "cantidad")
     private Integer cantidad;
@@ -44,10 +45,6 @@ public class Movimiento {
     private Devolucion devolucion;
 
     @ManyToOne
-    @JoinColumn(name = "id_pedido")
-    private Pedido pedido;
-
-    @ManyToOne
     @JoinColumn(name = "id_fraccionamiento")
     private Fraccionamiento fraccionamiento;
 
@@ -66,11 +63,11 @@ public class Movimiento {
         this.idMovimiento = idMovimiento;
     }
 
-    public String getTipoMovimiento() {
+    public TipoMovimiento getTipoMovimiento() {
         return tipoMovimiento;
     }
 
-    public void setTipoMovimiento(String tipoMovimiento) {
+    public void setTipoMovimiento(TipoMovimiento tipoMovimiento) {
         this.tipoMovimiento = tipoMovimiento;
     }
 
@@ -122,14 +119,6 @@ public class Movimiento {
         this.devolucion = devolucion;
     }
 
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
     public Fraccionamiento getFraccionamiento() {
         return fraccionamiento;
     }
@@ -168,7 +157,6 @@ public class Movimiento {
                 ", lote=" + lote +
                 ", venta=" + venta +
                 ", devolucion=" + devolucion +
-                ", pedido=" + pedido +
                 ", fraccionamiento=" + fraccionamiento +
                 ", merma=" + merma +
                 '}';
