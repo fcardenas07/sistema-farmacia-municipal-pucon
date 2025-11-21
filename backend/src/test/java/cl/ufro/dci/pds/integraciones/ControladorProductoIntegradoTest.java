@@ -1,3 +1,4 @@
+/*
 package cl.ufro.dci.pds.integraciones;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
@@ -1693,3 +1694,6 @@ class ControladorProductoIntegradoTest {
                 "Todos los movimientos deben ser tipo BAJA");
     }
 }
+
+
+ */

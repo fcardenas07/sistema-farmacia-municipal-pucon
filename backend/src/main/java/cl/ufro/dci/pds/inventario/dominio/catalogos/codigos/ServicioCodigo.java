@@ -3,6 +3,8 @@ package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,15 @@ public class ServicioCodigo {
     public Codigo crear(Producto producto, CodigoACrear nuevoCodigo) {
         var codigo = nuevoCodigo.aEntidad(producto);
         return repositorioCodigo.save(codigo);
+    }
+
+    public Codigo obtenerOCrear(Producto producto, CodigoACrear nuevoCodigo) {
+
+        return repositorioCodigo.findByCodigoBarra(nuevoCodigo.codigoBarra())
+                .orElseGet(() -> {
+                    Codigo nuevo = nuevoCodigo.aEntidad(producto);
+                    return repositorioCodigo.save(nuevo);
+                });
     }
 
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {

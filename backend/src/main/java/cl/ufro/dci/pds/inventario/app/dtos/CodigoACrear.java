@@ -15,7 +15,10 @@ public record CodigoACrear(
         @Size(max = 50, message = "El tipo de código no puede tener más de 50 caracteres")
         String tipoCodigo,
 
-        boolean activo
+        boolean activo,
+
+        @NotBlank(message = "La id del producto no puede estar vacía")
+        String idProducto
 
 ) implements CodigoConCodigoBarra{
     public Codigo aEntidad(Producto producto) {

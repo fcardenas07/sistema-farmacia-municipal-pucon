@@ -15,6 +15,16 @@ public class ServicioMovimiento {
         this.repositorioMovimiento = repositorioMovimiento;
     }
 
+    public Movimiento registarMovimientoPorEntradaInventario(Lote lote, int cantidad, String nombreComercial) {
+        var movimiento = new Movimiento();
+        movimiento.setLote(lote);
+        movimiento.setFechaMovimiento(LocalDate.now());
+        movimiento.setCantidad(cantidad);
+        movimiento.setTipoMovimiento(TipoMovimiento.INGRESO);
+        movimiento.setDetalle("Ingreso de " + cantidad + " unidades del lote: " + lote.getNumeroLote() + " del producto: " + nombreComercial);
+        return repositorioMovimiento.save(movimiento);
+    }
+
     public Movimiento registrarMovimientoPorBajaProducto(Producto producto, Lote lote, int cantidad) {
         var movimiento = new Movimiento();
         movimiento.setLote(lote);

@@ -1,6 +1,5 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos;
 
-import cl.ufro.dci.pds.inventario.dominio.abastecimiento.pedidos.Pedido;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.fraccionamientos.Fraccionamiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.Merma;
@@ -44,10 +43,6 @@ public class Movimiento {
     @ManyToOne
     @JoinColumn(name = "id_devolucion")
     private Devolucion devolucion;
-
-    @ManyToOne
-    @JoinColumn(name = "id_pedido")
-    private Pedido pedido;
 
     @ManyToOne
     @JoinColumn(name = "id_fraccionamiento")
@@ -124,14 +119,6 @@ public class Movimiento {
         this.devolucion = devolucion;
     }
 
-    public Pedido getPedido() {
-        return pedido;
-    }
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }
-
     public Fraccionamiento getFraccionamiento() {
         return fraccionamiento;
     }
@@ -170,7 +157,6 @@ public class Movimiento {
                 ", lote=" + lote +
                 ", venta=" + venta +
                 ", devolucion=" + devolucion +
-                ", pedido=" + pedido +
                 ", fraccionamiento=" + fraccionamiento +
                 ", merma=" + merma +
                 '}';
