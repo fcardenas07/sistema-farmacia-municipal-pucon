@@ -6,6 +6,7 @@ import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -17,16 +18,18 @@ public class ServicioAppInventario {
     private final ServicioStock servicioStock;
     private final ServicioCodigo  servicioCodigo;
     private final ServicioProducto  servicioProducto;
+    private final ServicioMovimiento servicioMovimiento;
     private final EntradaInventarioMapper mapper;
 
     public ServicioAppInventario(ServicioLote servicioLote,
                                  ServicioStock servicioStock,
                                  ServicioCodigo servicioCodigo,
-                                 ServicioProducto servicioProducto, EntradaInventarioMapper mapper) {
+                                 ServicioProducto servicioProducto, ServicioMovimiento servicioMovimiento, EntradaInventarioMapper mapper) {
         this.servicioLote = servicioLote;
         this.servicioStock = servicioStock;
         this.servicioCodigo = servicioCodigo;
         this.servicioProducto = servicioProducto;
+        this.servicioMovimiento = servicioMovimiento;
         this.mapper = mapper;
     }
 
@@ -36,6 +39,7 @@ public class ServicioAppInventario {
         var codigo = servicioCodigo.obtenerOCrear(producto, dto.codigo());
         var lote = servicioLote.crear(dto, codigo);
         var stock = servicioStock.crear(lote, dto.cantidad());
+        servicioMovimiento.registarMovimientoPorEntradaInventario(lote, dto.cantidad(), producto.getNombreComercial());
         return mapper.toEntradaIngresada(lote, producto, codigo, stock, null);
     }
 }
