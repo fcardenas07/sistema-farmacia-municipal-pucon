@@ -1,29 +1,70 @@
 <div class="scan-container">
-  
+
+  <!-- PANEL IZQUIERDO -->
   <div class="left-panel">
-    <form [formGroup]="scanForm">
-      
+
+    <form [formGroup]="loteForm">
+
+      <label class="header-text">Datos del lote</label>
+
       <div class="form-group">
-        <label class="header-text">Escanee el código de los productos</label>
-        <input type="text" formControlName="code" placeholder="Código" class="input-box">
+        <label>Número de lote</label>
+        <input type="text" class="input-box" formControlName="numeroLote">
       </div>
 
       <div class="form-group">
-        <label class="header-text">Ingrese cantidad de unidades del producto</label>
-        <input type="number" formControlName="quantity" class="input-box">
+        <label>Fecha de elaboración</label>
+        <input type="date" class="input-box" formControlName="fechaElaboracion">
       </div>
+
+      <div class="form-group">
+        <label>Fecha de vencimiento</label>
+        <input type="date" class="input-box" formControlName="fechaVencimiento">
+      </div>
+
+      <div class="form-group">
+        <label>Cantidad</label>
+        <input type="number" class="input-box" formControlName="cantidad">
+      </div>
+
+      <div class="form-group">
+        <label>Límite merma</label>
+        <input type="number" class="input-box" formControlName="limiteMerma">
+      </div>
+
+      <label class="header-text">Código del producto</label>
+
+      <div class="form-group">
+        <input type="text" class="input-box" placeholder="Código de barra" formControlName="codigoBarra">
+      </div>
+
+      <button type="button" class="btn-search" (click)="buscarProducto()">Buscar Producto</button>
 
       <button type="button" class="btn-add-batch" (click)="addBatch()">
-        Añadir otro lote 
-        <span class="plus-icon">+</span>
+        Añadir otro lote <span class="plus-icon">+</span>
       </button>
 
     </form>
+
+    <!-- LISTADO DE LOTES AÑADIDOS -->
+    <div class="batch-list" *ngIf="batches.length > 0">
+      <h3 class="header-text">Lotes añadidos</h3>
+
+      @for (b of batches; track b.numeroLote) {
+        <div class="batch-item">
+          <p><strong>Lote:</strong> {{ b.numeroLote }}</p>
+          <p><strong>Producto:</strong> {{ b.product?.name }}</p>
+          <p><strong>Unidades:</strong> {{ b.cantidad }}</p>
+        </div>
+      }
+    </div>
+
   </div>
 
+  <!-- PANEL DERECHO -->
   <div class="right-panel">
     <h2 class="header-text">Producto</h2>
-    
+
     @if (scannedProduct) {
       <div class="product-card">
         <div class="card-image">
@@ -37,7 +78,7 @@
       </div>
     }
   </div>
-  
+
   <div class="footer-action">
     <button class="btn-finalize" (click)="finalize()">Finalizar</button>
   </div>
