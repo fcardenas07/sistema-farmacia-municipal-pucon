@@ -7,50 +7,76 @@
 
       <label class="header-text">Datos del lote</label>
 
+      <!-- Número de lote -->
       <div class="form-group">
         <label>Número de lote</label>
         <input type="text" class="input-box" formControlName="numeroLote">
       </div>
 
+      <!-- Fecha elaboración -->
       <div class="form-group">
         <label>Fecha de elaboración</label>
         <input type="date" class="input-box" formControlName="fechaElaboracion">
       </div>
 
+      <!-- Fecha vencimiento -->
       <div class="form-group">
         <label>Fecha de vencimiento</label>
         <input type="date" class="input-box" formControlName="fechaVencimiento">
       </div>
 
+      <!-- Cantidad -->
       <div class="form-group">
         <label>Cantidad</label>
         <input type="number" class="input-box" formControlName="cantidad">
       </div>
 
+      <!-- Límite merma -->
       <div class="form-group">
         <label>Límite merma</label>
         <input type="number" class="input-box" formControlName="limiteMerma">
       </div>
 
-      <label class="header-text">Código del producto</label>
+      <!-- DROPDOWN DE PRODUCTOS -->
+      <label class="header-text">Producto</label>
 
       <div class="form-group">
+        <input
+          type="text"
+          placeholder="Buscar producto..."
+          class="input-box"
+          [(ngModel)]="productoSearch"
+          (input)="buscarProductoPorNombre()"
+          [ngModelOptions]="{standalone: true}"
+        >
+      </div>
+
+      <div class="dropdown-list" *ngIf="productosFiltrados.length > 0">
+        @for (p of productosFiltrados; track p.idProducto) {
+          <div class="dropdown-item" (click)="seleccionarProducto(p)">
+            <strong>{{ p.nombreComercial }}</strong>
+            <br>
+            <span>{{ p.nombreGenerico }}</span> · 
+            <span>{{ p.categoria }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Código de barra -->
+      <div class="form-group">
+        <label>Código de barra (opcional)</label>
         <input type="text" class="input-box" placeholder="Código de barra" formControlName="codigoBarra">
       </div>
 
-      <!-- BOTÓN BUSCAR PRODUCTO -->
-      <button type="button" class="btn-search" (click)="buscarProducto()">Buscar Producto</button>
-
-      <!-- BOTÓN AÑADIR LOTE -->
+      <!-- AÑADIR LOTE -->
       <button type="button" class="btn-add-batch" (click)="addBatch()">
-        Añadir otro lote <span class="plus-icon">+</span>
+        Añadir lote <span class="plus-icon">+</span>
       </button>
 
     </form>
 
-    <!-- LISTA DE LOTES AÑADIDOS (TARJETAS) -->
+    <!-- LISTA DE LOTES EN TARJETAS -->
     <div class="batch-list" *ngIf="batches.length > 0">
-
       <h3 class="header-text">Lotes añadidos</h3>
 
       @for (b of batches; track b.numeroLote) {
@@ -61,48 +87,22 @@
             <p><strong>Elaboración:</strong> {{ b.fechaElaboracion }}</p>
             <p><strong>Vencimiento:</strong> {{ b.fechaVencimiento }}</p>
             <p><strong>Cantidad:</strong> {{ b.cantidad }}</p>
-            <p><strong>Límite Merma:</strong> {{ b.limiteMerma }}</p>
-            <p><strong>Código Barra:</strong> {{ b.codigoBarra }}</p>
+            <p><strong>Merma:</strong> {{ b.limiteMerma }}</p>
+            <p><strong>Código Barra:</strong> {{ b.codigoBarra || 'Sin código' }}</p>
           </div>
 
-          <div class="right-info" *ngIf="b.product">
-            <div class="product-mini-card">
-              <img [src]="b.product.imageUrl" alt="Producto">
-
-              <div>
-                <h4>{{ b.product.name }}</h4>
-                <p class="subtitle">{{ b.product.genericName }}</p>
-                <p class="meta">{{ b.product.details }}</p>
-              </div>
-            </div>
+          <div class="right-info">
+            <p><strong>Producto:</strong> {{ b.product.nombreComercial }}</p>
+            <p>{{ b.product.nombreGenerico }}</p>
+            <p>{{ b.product.categoria }}</p>
           </div>
 
         </div>
       }
-
     </div>
 
   </div>
 
-  <!-- PANEL DERECHO – PRODUCTO SCANEADO -->
-  <div class="right-panel">
-
-    <h2 class="header-text">Producto</h2>
-
-    @if (scannedProduct) {
-      <div class="product-card">
-        <div class="card-image">
-          <img [src]="scannedProduct.imageUrl" alt="Producto">
-        </div>
-        <div class="card-details">
-          <h3>{{ scannedProduct.name }}</h3>
-          <p class="subtitle">{{ scannedProduct.genericName }}</p>
-          <p class="meta">{{ scannedProduct.details }}</p>
-        </div>
-      </div>
-    }
-
-  </div>
 
   <!-- BOTÓN FINALIZAR -->
   <div class="footer-action">

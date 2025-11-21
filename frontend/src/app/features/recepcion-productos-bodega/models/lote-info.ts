@@ -7,8 +7,7 @@ export interface LoteInfo {
   cantidad: number;
   limiteMerma: number;
   codigoBarra: string;
-
-  product: ProductInfo;
+  product: ProductInfo;  // Siempre tendrá un producto
 }
 
 export interface LoteBackendPayload {

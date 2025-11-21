@@ -1,3 +1,4 @@
+/* CONTENEDOR PRINCIPAL */
 .scan-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -9,13 +10,14 @@
   align-items: start;
 }
 
-/* Panels */
-.left-panel, .right-panel {
+/* PANEL IZQUIERDO / DERECHO */
+.left-panel,
+.right-panel {
   display: flex;
   flex-direction: column;
 }
 
-/* Titles */
+/* TITULOS */
 .header-text {
   font-size: 1.6rem;
   font-weight: 700;
@@ -23,7 +25,7 @@
   margin-bottom: 1rem;
 }
 
-/* Inputs */
+/* FORM GROUP */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -36,7 +38,40 @@
   border-radius: 6px;
 }
 
-/* Buscar */
+/* INPUT AUTOCOMPLETE / DROPDOWN */
+.product-search-box {
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  border: 1px solid #888;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.dropdown-list {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.dropdown-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* BOTÓN BUSCAR */
 .btn-search {
   background-color: #2e7d32;
   color: white;
@@ -45,13 +80,15 @@
   border-radius: 8px;
   cursor: pointer;
   margin-bottom: 20px;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .btn-search:hover {
   background-color: #1b5e20;
 }
 
-/* Añadir lote */
+/* BOTÓN AÑADIR LOTE */
 .btn-add-batch {
   display: flex;
   align-items: center;
@@ -77,35 +114,72 @@
   justify-content: center;
 }
 
-/* Batch List */
+/* LISTA DE LOTES AGREGADOS */
 .batch-list {
   margin-top: 2rem;
 }
 
-.batch-item {
+.batch-card {
   background: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
   border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-/* Producto */
+.left-info p,
+.right-info p {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+
+.product-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-mini-card img {
+  width: 60px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.product-mini-card h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0;
+  color: #666;
+}
+
+.meta {
+  margin: 0;
+  color: #444;
+  font-weight: 600;
+}
+
+/* PANEL DERECHO (PRODUCTO BUSCADO) */
 .product-card {
   border: 1px solid #e0e0e0;
   border-radius: 16px;
   padding: 2rem;
-  display: flex;
-  gap: 2rem;
   background: white;
 }
 
-.product-card img {
-  width: 120px;
-  height: auto;
+.product-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
 }
 
-/* Finalizar */
+/* FINALIZAR */
 .footer-action {
   grid-column: 2;
   display: flex;
@@ -122,4 +196,8 @@
   font-weight: 700;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.btn-finalize:hover {
+  background-color: #5343d6;
 }
