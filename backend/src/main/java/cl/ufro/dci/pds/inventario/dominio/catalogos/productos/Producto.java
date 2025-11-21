@@ -1,7 +1,9 @@
 package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -23,7 +25,7 @@ public class Producto {
     private String presentacion;
 
     @Column(name = "dosificacion")
-    private String dosificacion;
+    private int dosificacion;
 
     @Column(name = "unidad_medida")
     private String unidadMedida;
@@ -44,11 +46,15 @@ public class Producto {
     @Column(name = "url_foto")
     private String urlFoto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_fabricante")
+    private Fabricante fabricante;
+
     public Producto() {
     }
 
     public Producto(String nombreComercial, String nombreGenerico, String presentacion,
-                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
+                    int dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
                     boolean activo, CategoriaProducto categoria, String urlFoto) {
         this.nombreComercial = nombreComercial;
         this.nombreGenerico = nombreGenerico;
@@ -90,11 +96,11 @@ public class Producto {
         this.presentacion = presentacion;
     }
 
-    public String getDosificacion() {
+    public int getDosificacion() {
         return dosificacion;
     }
 
-    public void setDosificacion(String dosificacion) {
+    public void setDosificacion(int dosificacion) {
         this.dosificacion = dosificacion;
     }
 
@@ -150,6 +156,14 @@ public class Producto {
         this.urlFoto = urlFoto;
     }
 
+    public Fabricante getFabricante() {
+        return fabricante;
+    }
+
+    public void setFabricante(Fabricante fabricante) {
+        this.fabricante = fabricante;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Producto producto)) return false;
@@ -173,6 +187,7 @@ public class Producto {
                 ", stockMaximo=" + stockMaximo + '\'' +
                 ", activo='" + activo + '\'' +
                 ", categoría='" + categoria + '\'' +
-                ", url foto=" + urlFoto + '}';
+                ", url foto=" + urlFoto + '\'' +
+                ", fabricante=" + fabricante + '}';
     }
 }

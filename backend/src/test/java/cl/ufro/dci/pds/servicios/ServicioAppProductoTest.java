@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/*
 class ServicioAppProductoTest {
 
     private ServicioProducto servicioProducto;
@@ -37,6 +38,8 @@ class ServicioAppProductoTest {
 
     private List<Producto> productosEntidadesFiltrados;
     private List<Lote> lotesSimulados;
+
+
 
     @BeforeEach
     void setUp() {

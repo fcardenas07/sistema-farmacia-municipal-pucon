@@ -1,7 +1,6 @@
 package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 import cl.ufro.dci.pds.infraestructura.ServicioAlmacenamientoImagen;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +21,20 @@ public class ServicioProducto {
         this.servicioAlmacenamientoImagen = servicioAlmacenamientoImagen;
     }
 
-    public Producto crear(ProductoACrear dto) {
-        var producto = dto.aEntidad();
+    public Producto validarYGuardar(Producto producto) {
+        var existe = repositorioProducto.existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                producto.getFabricante().getIdFabricante()
+        );
+
+        if (existe) {
+            throw new ProductoDuplicadoException();
+        }
+
         return repositorioProducto.save(producto);
     }
 
