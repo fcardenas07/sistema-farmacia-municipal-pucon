@@ -5,21 +5,43 @@
   font-family: Arial, sans-serif;
 }
 
+/* 🔍 BARRA DE FILTROS */
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.filter-input {
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #1e212d;
+  box-shadow: 0 0 4px rgba(30,33,45,0.3);
+}
+
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+}
 
-  h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-    flex-grow: 1;
-    text-align: center;
-    padding-left: 80px;
-  }
+.header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+  padding-left: 80px;
 }
 
 .nav-controls {
@@ -27,101 +49,112 @@
   border-radius: 8px;
   display: flex;
   overflow: hidden;
-  
-  .nav-btn {
-    background: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    color: #666;
-    
-    &:hover {
-      background-color: #f0f0f0;
-    }
-    &:first-child {
-      border-right: 1px solid #eee;
-    }
-  }
 }
 
+.nav-btn {
+  background: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.nav-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.nav-btn:first-child {
+  border-right: 1px solid #eee;
+}
+
+/* LISTA */
 .cards-list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* TARJETAS */
 .product-card {
   background: white;
   border-radius: 16px;
   padding: 1.5rem 2rem;
   display: grid;
-  grid-template-columns: 100px 1.5fr 1.5fr 1fr auto; 
+  grid-template-columns: 100px 1.5fr 1.5fr 1fr auto;
   align-items: center;
   gap: 2rem;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
+/* IMAGEN */
 .img-section img {
   width: 100%;
   height: auto;
   object-fit: contain;
 }
 
+/* INFORMACIÓN */
 .info-section {
   display: flex;
   flex-direction: column;
-  
-  h3 {
-    font-size: 1.2rem;
-    font-weight: 800;
-    margin: 0 0 4px 0;
-  }
-  .generic {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #999;
-    margin-bottom: 4px;
-  }
-  .details {
-    font-size: 0.9rem;
-    color: #333;
-  }
 }
 
+.info-section h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.info-section .generic {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.info-section .details,
+.info-section .manufacturer,
+.info-section .dosage {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* TAGS */
 .tags-section {
   display: flex;
   gap: 10px;
-  
-  .tag {
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: white;
-    text-align: center;
-    min-width: 100px;
-  }
-
-  .tag-dark {
-    background-color: #1e212d;
-  }
-
-  .tag-medium {
-    background-color: #c0ca33;
-  }
-
-  .tag-low {
-    background-color: #b71c1c;
-  }
 }
 
+.tag {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+  min-width: 100px;
+}
+
+.tag-dark {
+  background-color: #1e212d;
+}
+
+.tag-medium {
+  background-color: #c0ca33;
+}
+
+.tag-low {
+  background-color: #b71c1c;
+}
+
+/* UNIDADES */
 .units-section {
   font-weight: 600;
   font-size: 1.1rem;
   color: #1a1a1a;
 }
 
+/* BOTÓN */
 .btn-update {
   background-color: #1e212d;
   color: white;
@@ -133,8 +166,59 @@
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 1px;
-
-  &:hover {
-    background-color: #333;
-  }
 }
+
+.btn-update:hover {
+  background-color: #333;
+}
+
+.stock-container {
+  background-color: #dcdcdc;
+  padding: 40px;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* FILTROS */
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.filter-select {
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 0.95rem;
+}
+
+.search-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.btn-search {
+  background-color: #1e212d;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-clear {
+  background-color: white;
+  color: #1e212d;
+  padding: 12px 25px;
+  border: 1px solid #1e212d;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* TARJETAS (igual que antes) */

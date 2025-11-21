@@ -12,6 +12,6 @@ export class HeaderStockComponent {
 
   // 3. Creamos la función de navegación
   irAlStock() {
-    this.router.navigate(['/stock']);
+    this.router.navigate(['/stock-total']);
   }
 }

@@ -1,17 +1,73 @@
 <div class="stock-container">
-  
+
+  <!-- FILTROS -->
+  <div class="filters-container">
+
+    <select [(ngModel)]="filters.name" class="filter-select">
+      <option value="">Nombre comercial</option>
+      @for (n of names; track n) {
+        <option [value]="n">{{ n }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.generic" class="filter-select">
+      <option value="">Nombre genérico</option>
+      @for (g of generics; track g) {
+        <option [value]="g">{{ g }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.details" class="filter-select">
+      <option value="">Presentación</option>
+      @for (d of details; track d) {
+        <option [value]="d">{{ d }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.category" class="filter-select">
+      <option value="">Categoría</option>
+      @for (c of categories; track c) {
+        <option [value]="c">{{ c }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.dosage" class="filter-select">
+      <option value="">Dosificación</option>
+      @for (doz of dosages; track doz) {
+        <option [value]="doz">{{ doz }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.manufacturer" class="filter-select">
+      <option value="">Fabricante</option>
+      @for (f of manufacturers; track f) {
+        <option [value]="f">{{ f }}</option>
+      }
+    </select>
+
+  </div>
+
+  <!-- BOTONES -->
+  <div class="search-buttons">
+    <button class="btn-search" (click)="buscarProductos()">Buscar</button>
+    <button class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+
+  <!-- HEADER -->
   <div class="header">
     <h2>Stock Total</h2>
+
     <div class="nav-controls">
       <button class="nav-btn">◀</button>
       <button class="nav-btn">▶</button>
     </div>
   </div>
 
+  <!-- TARJETAS -->
   <div class="cards-list">
-    @for (product of products; track product.id) {
+    @for (product of filteredList; track product.id) {
       <div class="product-card">
-        
+
         <div class="img-section">
           <img [src]="product.imageUrl" alt="Producto">
         </div>
@@ -20,6 +76,8 @@
           <h3>{{ product.name }}</h3>
           <span class="generic">{{ product.generic }}</span>
           <span class="details">{{ product.details }}</span>
+          <span class="manufacturer">Fabricante: {{ product.manufacturer }}</span>
+          <span class="dosage">Dosificación: {{ product.dosage }}</span>
         </div>
 
         <div class="tags-section">
@@ -34,10 +92,11 @@
         </div>
 
         <div class="action-section">
-          
-          </div> 
+          <!-- Podrías poner botón editar más adelante -->
+        </div>
 
       </div>
     }
   </div>
+
 </div>
