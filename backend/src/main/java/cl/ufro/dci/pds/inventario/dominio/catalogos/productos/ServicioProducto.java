@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 public class ServicioProducto {
 
@@ -69,6 +71,15 @@ public class ServicioProducto {
     ) {
         var pageable = PageRequest.of(numeroPagina, 4);
         return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
+    }
+
+    public List<Producto> buscarPorCampos(
+            String nombreComercial,
+            String nombreGenerico,
+            Boolean activo,
+            CategoriaProducto categoria
+    ) {
+        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria);
     }
 
     public void darBaja(String id) {
