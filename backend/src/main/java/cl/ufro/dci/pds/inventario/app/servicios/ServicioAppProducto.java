@@ -3,6 +3,7 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.ServicioFabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
@@ -28,29 +29,29 @@ public class ServicioAppProducto {
     private final ServicioLote servicioLote;
     private final ServicioStock servicioStock;
     private final ServicioMovimiento servicioMovimiento;
+    private final ServicioFabricante servicioFabricante;
 
     public ServicioAppProducto(ServicioProducto servicioProducto,
                                ServicioCodigo servicioCodigo,
                                ServicioLote servicioLote,
                                ServicioStock servicioStock,
-                               ServicioMovimiento servicioMovimiento) {
+                               ServicioMovimiento servicioMovimiento,
+                               ServicioFabricante servicioFabricante) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
         this.servicioStock = servicioStock;
         this.servicioMovimiento = servicioMovimiento;
+        this.servicioFabricante = servicioFabricante;
     }
 
     @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
-        var creado = servicioProducto.crear(dto);
-
-        if (dto.codigos() != null) {
-            dto.codigos().forEach(c -> servicioCodigo.crear(creado, c));
-        }
-
-        var codigos = servicioCodigo.obtenerCodigosConIdProducto(creado.getIdProducto());
-        return ProductoCreado.desde(creado, codigos);
+        var fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
+        var producto = dto.aEntidad();
+        producto.setFabricante(fabricante);
+        var creado = servicioProducto.validarYGuardar(producto);
+        return ProductoCreado.desde(creado);
     }
 
     @Transactional
@@ -77,6 +78,17 @@ public class ServicioAppProducto {
         int stockTotal = calcularStockTotal(codigos);
 
         return ProductoBuscado.desde(producto, codigos, stockTotal);
+    }
+
+    @Transactional
+    public List<ProductoParaCodigo> buscarProductosParaCodigo(String nombreComercial, int numeroPagina) {
+        var productosPage = servicioProducto.buscarPorCampos(
+                nombreComercial, null, null, null, numeroPagina
+        );
+
+        return productosPage.getContent().stream()
+                .map(ProductoParaCodigo::desde)
+                .toList();
     }
 
     @Transactional

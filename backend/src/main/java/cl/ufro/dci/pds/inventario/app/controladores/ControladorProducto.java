@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,13 +81,22 @@ public class ControladorProducto {
         return ResponseEntity.ok(productos);
     }
 
+    @GetMapping("/buscar-para-codigo")
+    public ResponseEntity<List<ProductoParaCodigo>> buscarProductosParaCodigo(
+            @RequestParam(required = false) String nombreComercial,
+            @RequestParam(defaultValue = "0") int pagina
+    ) {
+        var productos = servicioAppProducto.buscarProductosParaCodigo(nombreComercial, pagina);
+        return ResponseEntity.ok(productos);
+    }
+
     @PatchMapping("dar-de-baja/{id}")
     public ResponseEntity<Void> darBaja(@PathVariable String id) {
         servicioAppProducto.darBajaProducto(id);
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({CodigoDuplicadoException.class})
+    @ExceptionHandler({CodigoDuplicadoException.class, ProductoDuplicadoException.class})
     public ResponseEntity<String> manejarConflicto(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }

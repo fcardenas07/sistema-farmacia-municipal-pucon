@@ -11,17 +11,36 @@ import org.springframework.stereotype.Repository;
 public interface RepositorioProducto extends JpaRepository<Producto, String> {
 
     @Query("""
-    SELECT p FROM Producto p
-    WHERE (:nombreComercial IS NULL OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :nombreComercial, '%')))
-      AND (:nombreGenerico IS NULL OR LOWER(p.nombreGenerico) LIKE LOWER(CONCAT('%', :nombreGenerico, '%')))
-      AND (:activo IS NULL OR p.activo = :activo)
-      AND (:categoria IS NULL OR p.categoria = :categoria)
-""")
+                SELECT p FROM Producto p
+                WHERE (:nombreComercial IS NULL OR LOWER(p.nombreComercial) LIKE LOWER(CONCAT('%', :nombreComercial, '%')))
+                  AND (:nombreGenerico IS NULL OR LOWER(p.nombreGenerico) LIKE LOWER(CONCAT('%', :nombreGenerico, '%')))
+                  AND (:activo IS NULL OR p.activo = :activo)
+                  AND (:categoria IS NULL OR p.categoria = :categoria)
+            """)
     Page<Producto> buscarPorCampos(
             @Param("nombreComercial") String nombreComercial,
             @Param("nombreGenerico") String nombreGenerico,
             @Param("activo") Boolean activo,
             @Param("categoria") CategoriaProducto categoria,
             Pageable pageable
+    );
+
+    @Query("""
+                SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END
+                FROM Producto p
+                WHERE p.nombreComercial = :nombreComercial
+                  AND p.nombreGenerico = :nombreGenerico
+                  AND ((p.presentacion IS NULL AND :presentacion IS NULL) OR p.presentacion = :presentacion)
+                  AND p.dosificacion = :dosificacion
+                  AND ((p.unidadMedida IS NULL AND :unidadMedida IS NULL) OR p.unidadMedida = :unidadMedida)
+                  AND p.idFabricante = :idFabricante
+            """)
+    boolean existsByClaveUnica(
+            @Param("nombreComercial") String nombreComercial,
+            @Param("nombreGenerico") String nombreGenerico,
+            @Param("presentacion") String presentacion,
+            @Param("dosificacion") int dosificacion,
+            @Param("unidadMedida") String unidadMedida,
+            @Param("idFabricante") String idFabricante
     );
 }
