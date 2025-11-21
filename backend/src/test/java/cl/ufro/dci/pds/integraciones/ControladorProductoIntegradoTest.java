@@ -1,4 +1,4 @@
-/*
+
 package cl.ufro.dci.pds.integraciones;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
@@ -43,10 +43,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/*
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class ControladorProductoIntegradoTest {
+
+    /*
 
     @Autowired
     private MockMvc mockMvc;
@@ -1694,6 +1696,6 @@ class ControladorProductoIntegradoTest {
         assertTrue(movimientos.stream().allMatch(m -> m.getTipoMovimiento().equals(TipoMovimiento.BAJA)),
                 "Todos los movimientos deben ser tipo BAJA");
     }
-}
 
  */
+}

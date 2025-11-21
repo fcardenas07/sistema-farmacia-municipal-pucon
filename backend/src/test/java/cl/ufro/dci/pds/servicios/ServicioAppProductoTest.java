@@ -1,4 +1,4 @@
-/*package cl.ufro.dci.pds.servicios;
+package cl.ufro.dci.pds.servicios;
 
 import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
@@ -23,9 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/*
+
 class ServicioAppProductoTest {
 
+    /*
     private ServicioProducto servicioProducto;
     private ServicioCodigo servicioCodigo;
     private ServicioAppProducto servicioAppProducto;
@@ -607,6 +608,5 @@ class ServicioAppProductoTest {
         verify(servicioMovimiento).registrarMovimientoPorBajaProducto(productoEntidad, lote1, 10);
         verify(servicioMovimiento).registrarMovimientoPorBajaProducto(productoEntidad, lote2, 5);
     }
-
-}
 */
+}

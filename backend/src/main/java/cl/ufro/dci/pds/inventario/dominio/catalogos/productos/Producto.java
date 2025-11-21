@@ -3,7 +3,6 @@ package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -25,7 +24,7 @@ public class Producto {
     private String presentacion;
 
     @Column(name = "dosificacion")
-    private int dosificacion;
+    private Integer dosificacion;
 
     @Column(name = "unidad_medida")
     private String unidadMedida;
@@ -54,7 +53,7 @@ public class Producto {
     }
 
     public Producto(String nombreComercial, String nombreGenerico, String presentacion,
-                    int dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
+                    Integer dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
                     boolean activo, CategoriaProducto categoria, String urlFoto) {
         this.nombreComercial = nombreComercial;
         this.nombreGenerico = nombreGenerico;
@@ -96,11 +95,11 @@ public class Producto {
         this.presentacion = presentacion;
     }
 
-    public int getDosificacion() {
+    public Integer getDosificacion() {
         return dosificacion;
     }
 
-    public void setDosificacion(int dosificacion) {
+    public void setDosificacion(Integer dosificacion) {
         this.dosificacion = dosificacion;
     }
 
