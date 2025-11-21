@@ -38,31 +38,55 @@
         <input type="text" class="input-box" placeholder="Código de barra" formControlName="codigoBarra">
       </div>
 
+      <!-- BOTÓN BUSCAR PRODUCTO -->
       <button type="button" class="btn-search" (click)="buscarProducto()">Buscar Producto</button>
 
+      <!-- BOTÓN AÑADIR LOTE -->
       <button type="button" class="btn-add-batch" (click)="addBatch()">
         Añadir otro lote <span class="plus-icon">+</span>
       </button>
 
     </form>
 
-    <!-- LISTADO DE LOTES AÑADIDOS -->
+    <!-- LISTA DE LOTES AÑADIDOS (TARJETAS) -->
     <div class="batch-list" *ngIf="batches.length > 0">
+
       <h3 class="header-text">Lotes añadidos</h3>
 
       @for (b of batches; track b.numeroLote) {
-        <div class="batch-item">
-          <p><strong>Lote:</strong> {{ b.numeroLote }}</p>
-          <p><strong>Producto:</strong> {{ b.product?.name }}</p>
-          <p><strong>Unidades:</strong> {{ b.cantidad }}</p>
+        <div class="batch-card">
+
+          <div class="left-info">
+            <p><strong>Lote:</strong> {{ b.numeroLote }}</p>
+            <p><strong>Elaboración:</strong> {{ b.fechaElaboracion }}</p>
+            <p><strong>Vencimiento:</strong> {{ b.fechaVencimiento }}</p>
+            <p><strong>Cantidad:</strong> {{ b.cantidad }}</p>
+            <p><strong>Límite Merma:</strong> {{ b.limiteMerma }}</p>
+            <p><strong>Código Barra:</strong> {{ b.codigoBarra }}</p>
+          </div>
+
+          <div class="right-info" *ngIf="b.product">
+            <div class="product-mini-card">
+              <img [src]="b.product.imageUrl" alt="Producto">
+
+              <div>
+                <h4>{{ b.product.name }}</h4>
+                <p class="subtitle">{{ b.product.genericName }}</p>
+                <p class="meta">{{ b.product.details }}</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       }
+
     </div>
 
   </div>
 
-  <!-- PANEL DERECHO -->
+  <!-- PANEL DERECHO – PRODUCTO SCANEADO -->
   <div class="right-panel">
+
     <h2 class="header-text">Producto</h2>
 
     @if (scannedProduct) {
@@ -77,8 +101,10 @@
         </div>
       </div>
     }
+
   </div>
 
+  <!-- BOTÓN FINALIZAR -->
   <div class="footer-action">
     <button class="btn-finalize" (click)="finalize()">Finalizar</button>
   </div>

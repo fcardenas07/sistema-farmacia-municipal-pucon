@@ -2,22 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
-interface ProductInfo {
-  name: string;
-  genericName: string;
-  details: string;
-  imageUrl: string;
-}
-
-interface LoteInfo {
-  numeroLote: string;
-  fechaElaboracion: string;
-  fechaVencimiento: string;
-  cantidad: number;
-  limiteMerma: number;
-  codigoBarra: string;
-  product?: ProductInfo; 
-}
+import { ProductInfo } from '../../models/product-info';
+import { LoteInfo, LoteBackendPayload } from '../../models/lote-info';
 
 @Component({
   selector: 'app-escaneo-productos',
@@ -28,30 +14,33 @@ interface LoteInfo {
 })
 export class EscaneoProductosComponent {
 
-  // Array de lotes
+  // Lista de lotes añadidos
   batches: LoteInfo[] = [];
 
-  // Formulario principal de un lote
-  loteForm!: FormGroup;
-
-  // Producto escaneado
+  // Producto escaneado actual
   scannedProduct: ProductInfo | null = null;
 
-  // Medicamentos de prueba simulando un backend
+  // Formulario del lote actual
+  loteForm!: FormGroup;
+
+  // Mock de productos simulando backend
   mockProducts: Record<string, ProductInfo> = {
     "123456789": {
+      idProducto: null,
       name: "Lipitor 20mg",
       genericName: "Atorvastatina",
       details: "30 Comprimidos",
-      imageUrl: "https://via.placeholder.com/150"
+      imageUrl: "https://via.placeholder.com/150",
     },
     "555888999": {
+      idProducto: null,
       name: "Paracetamol 500mg",
       genericName: "Acetaminofén",
       details: "100 Comprimidos",
       imageUrl: "https://via.placeholder.com/150"
     },
     "987654321": {
+      idProducto: null,
       name: "Losartán 50mg",
       genericName: "Losartán",
       details: "30 Comprimidos",
@@ -70,6 +59,7 @@ export class EscaneoProductosComponent {
     });
   }
 
+  // Buscar producto por código
   buscarProducto() {
     const code = this.loteForm.value.codigoBarra;
 
@@ -81,28 +71,62 @@ export class EscaneoProductosComponent {
     }
   }
 
+  // Añadir lote
   addBatch() {
     if (this.loteForm.invalid) {
       alert("Completa todos los datos del lote.");
       return;
     }
 
+    if (!this.scannedProduct) {
+      alert("Debes buscar un producto primero.");
+      return;
+    }
+
     const lote: LoteInfo = {
-      ...this.loteForm.value,
-      product: this.scannedProduct!
+      numeroLote: this.loteForm.value.numeroLote,
+      fechaElaboracion: this.loteForm.value.fechaElaboracion,
+      fechaVencimiento: this.loteForm.value.fechaVencimiento,
+      cantidad: this.loteForm.value.cantidad,
+      limiteMerma: this.loteForm.value.limiteMerma,
+      codigoBarra: this.loteForm.value.codigoBarra,
+      product: this.scannedProduct
     };
 
     this.batches.push(lote);
 
-    console.log("Lotes actuales:", this.batches);
+    console.log("Lotes actualmente:", this.batches);
 
-    // Reset para añadir otro lote
+    // Reset para ingresar otro lote
     this.loteForm.reset();
     this.scannedProduct = null;
   }
 
+  // * GENERAR PAYLOAD EXACTO PARA EL BACKEND
+  getBackendPayload(): LoteBackendPayload[] {
+    return this.batches.map(b => ({
+      fechaElaboracion: b.fechaElaboracion,
+      fechaVencimiento: b.fechaVencimiento,
+      estado: null,
+      numeroLote: b.numeroLote,
+      cantidad: b.cantidad,
+      limiteMerma: b.limiteMerma,
+      porcentajeOferta: null,
+      precioUnitario: null,
+      idGuiaIngreso: null,
+
+      codigo: {
+        idProducto: null,
+        codigoBarra: b.codigoBarra,
+        tipoCodigo: null,
+        activo: null
+      }
+    }));
+  }
+
   finalize() {
-    console.log("Lotes enviados al backend:", this.batches);
-    alert("Proceso finalizado. Revisar consola.");
+    const payload = this.getBackendPayload();
+    console.log("Payload final listo para backend (POST):", payload);
+    alert("Revisar consola para ver el payload final.");
   }
 }
