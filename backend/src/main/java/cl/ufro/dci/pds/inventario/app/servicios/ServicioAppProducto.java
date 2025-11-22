@@ -3,6 +3,7 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.ServicioFabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
@@ -47,9 +48,16 @@ public class ServicioAppProducto {
 
     @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
-        //var fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
+        Fabricante fabricante = null;
+        if (dto.idFabricante() != null) {
+            fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
+        }
+
         var producto = dto.aEntidad();
-        //producto.setFabricante(fabricante);
+
+        if (fabricante != null) {
+            producto.setFabricante(fabricante);
+        }
         var creado = servicioProducto.validarYGuardar(producto);
         return ProductoCreado.desde(creado);
     }

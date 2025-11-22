@@ -13,6 +13,6 @@ public class ServicioFabricante {
 
     public Fabricante obtenerPorId(String idFabricante) {
         return repositorioFabricante.findById(idFabricante)
-                .orElseThrow(() -> new FabricanteNoEncontradoException(idFabricante));
+                .orElse(null);
     }
 }
