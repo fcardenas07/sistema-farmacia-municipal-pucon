@@ -24,13 +24,15 @@ public class ServicioProducto {
     }
 
     public Producto validarYGuardar(Producto producto) {
+        var idFabricante = producto.getFabricante() != null ? producto.getFabricante().getIdFabricante() : null;
+
         var existe = repositorioProducto.existsByClaveUnica(
                 producto.getNombreComercial(),
                 producto.getNombreGenerico(),
                 producto.getPresentacion(),
                 producto.getDosificacion(),
                 producto.getUnidadMedida(),
-                producto.getFabricante().getIdFabricante()
+                idFabricante
         );
 
         if (existe) {
