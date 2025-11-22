@@ -105,7 +105,8 @@ public class ServicioAppProducto {
             String nombreGenerico,
             Boolean activo,
             CategoriaProducto categoria,
-            int numeroPagina
+            int numeroPagina,
+            String tipoFiltro
     ) {
         var productosPage = servicioProducto.buscarPorCampos(
                 nombreComercial, nombreGenerico, activo, categoria, numeroPagina
@@ -124,9 +125,16 @@ public class ServicioAppProducto {
                     int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
                     return ProductoFiltrado.desde(p, stockTotal);
                 })
+                .filter(p -> {
+                    if ("normal".equalsIgnoreCase(tipoFiltro)) {
+                        return p.nivelStock().equals("Normal");
+                    } else {
+                        return !p.nivelStock().equals("Normal");
+                    }
+                })
                 .toList();
 
-        return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
+        return new PageImpl<>(filtrados, productosPage.getPageable(), filtrados.size());
     }
 
     @Transactional
