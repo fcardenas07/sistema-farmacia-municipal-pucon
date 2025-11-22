@@ -36,12 +36,12 @@ public record ProductoACrear(
         @NotNull(message = "La categoría es obligatoria")
         CategoriaProducto categoria,
 
-        @NotBlank(message = "El fabricante es obligatorio")
+        //@NotBlank(message = "El fabricante es obligatorio")
         String idFabricante
 
 ) implements ProductoConStock {
     public Producto aEntidad() {
-        Producto p = new Producto();
+        var p = new Producto();
         p.setNombreComercial(nombreComercial);
         p.setNombreGenerico(nombreGenerico);
         p.setPresentacion(presentacion);

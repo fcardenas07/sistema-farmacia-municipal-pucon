@@ -47,9 +47,9 @@ public class ServicioAppProducto {
 
     @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
-        var fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
+        //var fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
         var producto = dto.aEntidad();
-        producto.setFabricante(fabricante);
+        //producto.setFabricante(fabricante);
         var creado = servicioProducto.validarYGuardar(producto);
         return ProductoCreado.desde(creado);
     }
