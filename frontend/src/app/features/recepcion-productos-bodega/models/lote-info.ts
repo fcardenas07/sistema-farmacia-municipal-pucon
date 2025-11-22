@@ -1,4 +1,5 @@
-import { ProductInfo } from './product-info';
+import { ProductInfo } from "./product-info";
+
 
 export interface LoteInfo {
   numeroLote: string;
@@ -6,25 +7,9 @@ export interface LoteInfo {
   fechaVencimiento: string;
   cantidad: number;
   limiteMerma: number;
+  precioUnitario: number;
   codigoBarra: string;
-  product: ProductInfo;  // Siempre tendrá un producto
+  product: ProductInfo;  // Producto seleccionado con Opción A
 }
 
-export interface LoteBackendPayload {
-  fechaElaboracion: string;
-  fechaVencimiento: string;
-  estado: string | null;
-  numeroLote: string;
-  cantidad: number;
-  limiteMerma: number;
-  porcentajeOferta: number | null;
-  precioUnitario: number | null;
-  idGuiaIngreso: string | null;
 
-  codigo: {
-    idProducto: string | null;
-    codigoBarra: string;
-    tipoCodigo: string | null;
-    activo: boolean | null;
-  };
-}

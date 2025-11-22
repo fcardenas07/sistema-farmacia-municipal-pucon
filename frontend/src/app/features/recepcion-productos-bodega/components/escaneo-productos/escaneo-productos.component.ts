@@ -1,9 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 
-import { ProductInfo } from '../../models/product-info';
-import { LoteInfo, LoteBackendPayload } from '../../models/lote-info';
+import { ProductosBodegaService } from '../../services/productos-bodega.service';
+import { ProductoBackend } from '../../models/producto-backend';
+import { LoteInfo } from '../../models/lote-info';
+import { Router } from '@angular/router';
+import { LotesService } from '../../services/lotes.service';
 
 @Component({
   selector: 'app-escaneo-productos',
@@ -14,97 +23,56 @@ import { LoteInfo, LoteBackendPayload } from '../../models/lote-info';
 })
 export class EscaneoProductosComponent {
 
-  // Lista de lotes añadidos
-  batches: LoteInfo[] = [];
-
-  // Formulario del lote
   loteForm!: FormGroup;
 
-  // Producto seleccionado desde el dropdown
-  selectedProduct: ProductInfo | null = null;
+  productoSearch: string = '';
+  productosFiltrados: ProductoBackend[] = [];
+  selectedProduct: ProductoBackend | null = null;
 
-  // --- CAMPOS NECESARIOS PARA EL DROPDOWN ---
-  productoSearch: string = ''; // texto ingresado
-  productosFiltrados: ProductInfo[] = []; // lista filtrada con coincidencias
+  batches: LoteInfo[] = [];
 
-  // Mock: lo que realmente devuelve el backend
-  mockBackendProducts: ProductInfo[] = [
-    {
-      idProducto: "642eaf0f-74a3-4de3-8fc3-146736a389f0",
-      nombreComercial: "Paracetamol 500mg",
-      nombreGenerico: "Paracetamol",
-      categoria: "Analgésicos y Antiinflamatorios",
-      imageUrl: null
-    },
-    {
-      idProducto: "b77fbcfa-2abc-42cd-9182-98fa09171f51",
-      nombreComercial: "Amoxicilina 500mg",
-      nombreGenerico: "Amoxicilina",
-      categoria: "Antibiótico",
-      imageUrl: null
-    },
-    {
-      idProducto: "c7cbb2fa-11cc-4444-8bb2-39aaf1f0b221",
-      nombreComercial: "Losartán 50mg",
-      nombreGenerico: "Losartán",
-      categoria: "Cardiovascular",
-      imageUrl: null
-    }
-  ];
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private productosService: ProductosBodegaService,
+    private lotesService: LotesService,
+    private router: Router
+  ) {
     this.loteForm = this.fb.group({
       numeroLote: ['', Validators.required],
       fechaElaboracion: ['', Validators.required],
       fechaVencimiento: ['', Validators.required],
       cantidad: [0, [Validators.required, Validators.min(1)]],
-      limiteMerma: [0, [Validators.required, Validators.min(0)]],
+      limiteMerma: [0, Validators.required],
+      precioUnitario: [null, Validators.required],
       codigoBarra: ['', Validators.required],
-      idProducto: [null] // <-- se llena al seleccionar producto
+      idProducto: [null, Validators.required]
+    });
+
+    this.batches = this.lotesService.getLotes();
+  }
+
+  buscarProductosBackend() {
+    const texto = this.productoSearch.trim();
+    if (!texto) return;
+
+    this.productosService.buscarProductos(texto).subscribe({
+      next: (resp) => {
+        this.productosFiltrados = resp.content;
+      },
+      error: (err) => console.error(err)
     });
   }
 
-  //------------------------------
-  //  BUSCAR PRODUCTO POR NOMBRE
-  //------------------------------
-  buscarProductoPorNombre() {
-    const texto = this.productoSearch.toLowerCase().trim();
-
-    if (texto.length === 0) {
-      this.productosFiltrados = [];
-      return;
-    }
-
-    this.productosFiltrados = this.mockBackendProducts.filter(p =>
-      p.nombreComercial.toLowerCase().includes(texto)
-    );
-  }
-
-  //-----------------------------------
-  //  SELECCIONAR PRODUCTO DESDE LISTA
-  //-----------------------------------
-  seleccionarProducto(p: ProductInfo) {
+  seleccionarProducto(p: ProductoBackend) {
     this.selectedProduct = p;
     this.productoSearch = p.nombreComercial;
     this.productosFiltrados = [];
-
-    // insertamos idProducto al lote
-    this.loteForm.patchValue({
-      idProducto: p.idProducto
-    });
+    this.loteForm.patchValue({ idProducto: p.idProducto });
   }
 
-  //-----------------------------------
-  //  AÑADIR LOTE COMPLETO
-  //-----------------------------------
   addBatch() {
-    if (this.loteForm.invalid) {
-      alert("Completa todos los datos del lote.");
-      return;
-    }
-
-    if (!this.selectedProduct) {
-      alert("Debes seleccionar un producto.");
+    if (this.loteForm.invalid || !this.selectedProduct) {
+      alert('Completa todos los campos');
       return;
     }
 
@@ -114,49 +82,26 @@ export class EscaneoProductosComponent {
       fechaVencimiento: this.loteForm.value.fechaVencimiento,
       cantidad: this.loteForm.value.cantidad,
       limiteMerma: this.loteForm.value.limiteMerma,
+      precioUnitario: this.loteForm.value.precioUnitario,
       codigoBarra: this.loteForm.value.codigoBarra,
       product: this.selectedProduct
     };
 
     this.batches.push(lote);
-
-    console.log("LOTE AÑADIDO:", lote);
+    this.lotesService.setLotes(this.batches);
 
     this.loteForm.reset();
     this.productoSearch = '';
     this.selectedProduct = null;
   }
 
-  //-----------------------------------
-  //  GENERAR PAYLOAD EXACTO PARA POST
-  //-----------------------------------
-  getBackendPayload(): LoteBackendPayload[] {
-    return this.batches.map(b => ({
-      fechaElaboracion: b.fechaElaboracion,
-      fechaVencimiento: b.fechaVencimiento,
-      estado: "ACTIVO",
-      numeroLote: b.numeroLote,
-      cantidad: b.cantidad,
-      limiteMerma: b.limiteMerma,
-      porcentajeOferta: null,
-      precioUnitario: null,
-      idGuiaIngreso: null,
-
-      codigo: {
-        idProducto: b.product.idProducto ?? null,
-        codigoBarra: b.codigoBarra,
-        tipoCodigo: "EAN",
-        activo: true
-      }
-    }));
+  eliminarLote(index: number) {
+    this.batches.splice(index, 1);
+    this.lotesService.setLotes(this.batches);
   }
 
-  //-----------------------------------
-  //  FINALIZAR SIMULANDO POST
-  //-----------------------------------
   finalize() {
-    const payload = this.getBackendPayload();
-    console.log("PAYLOAD FINAL:", payload);
-    alert("Revisa consola.");
+    this.lotesService.setLotes(this.batches);
+    this.router.navigate(['/resumen-pedido']);
   }
 }

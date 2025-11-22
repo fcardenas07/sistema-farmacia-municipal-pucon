@@ -1,57 +1,54 @@
-/* CONTENEDOR PRINCIPAL */
+/* GRID PRINCIPAL — 2 COLUMNAS */
 .scan-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 150px;
+  grid-template-columns: 1fr 0.45fr; /* Formulario izquierda, lotes derecha */
+  gap: 40px;
   padding: 40px;
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
-  align-items: start;
 }
 
-/* PANEL IZQUIERDO / DERECHO */
-.left-panel,
-.right-panel {
+/* PANEL IZQUIERDO */
+.left-panel {
   display: flex;
   flex-direction: column;
 }
 
 /* TITULOS */
 .header-text {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-/* FORM GROUP */
+/* INPUTS */
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .input-box {
   width: 100%;
-  padding: 15px;
-  font-size: 1rem;
-  border: 1px solid #888;
+  padding: 14px;
+  border: 1px solid #aaa;
   border-radius: 6px;
 }
 
-/* INPUT AUTOCOMPLETE / DROPDOWN */
-.product-search-box {
-  width: 100%;
-  padding: 15px;
-  font-size: 1rem;
-  border: 1px solid #888;
+/* BOTÓN BUSCAR PRODUCTOS */
+.btn-search {
+  width: fit-content;
+  background: #2e7d32;
+  color: white;
+  padding: 10px 26px;
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 15px;
+  cursor: pointer;
 }
 
+/* DROPDOWN */
 .dropdown-list {
-  background: white;
   border: 1px solid #ccc;
   border-radius: 6px;
+  background: white;
   max-height: 200px;
   overflow-y: auto;
   margin-bottom: 20px;
@@ -59,145 +56,87 @@
 
 .dropdown-item {
   padding: 12px;
-  cursor: pointer;
   border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
 .dropdown-item:hover {
-  background-color: #f0f0f0;
-}
-
-.dropdown-item:last-child {
-  border-bottom: none;
-}
-
-/* BOTÓN BUSCAR */
-.btn-search {
-  background-color: #2e7d32;
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.btn-search:hover {
-  background-color: #1b5e20;
+  background: #f5f5f5;
 }
 
 /* BOTÓN AÑADIR LOTE */
 .btn-add-batch {
+  margin-top: 10px;
+  background: #6B5BF2;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  background-color: #6B5BF2;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-radius: 8px;
+  gap: 10px;
   cursor: pointer;
-  width: fit-content;
 }
 
 .plus-icon {
   border: 2px solid white;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  padding: 4px 8px;
+}
+
+/* PANEL DERECHO — LOTES */
+.right-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-/* LISTA DE LOTES AGREGADOS */
+/* LISTA DE LOTES */
 .batch-list {
-  margin-top: 2rem;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
+/* TARJETAS DE LOTES */
 .batch-card {
+  padding: 20px;
+  border-radius: 10px;
   background: white;
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 15px;
   border: 1px solid #ddd;
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-}
-
-.left-info p,
-.right-info p {
-  margin: 4px 0;
-  font-size: 1rem;
-}
-
-.product-mini-card {
-  display: flex;
   align-items: center;
-  gap: 12px;
 }
 
-.product-mini-card img {
-  width: 60px;
-  height: auto;
-  border-radius: 6px;
-}
-
-.product-mini-card h4 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.subtitle {
-  margin: 0;
-  color: #666;
-}
-
-.meta {
-  margin: 0;
-  color: #444;
-  font-weight: 600;
-}
-
-/* PANEL DERECHO (PRODUCTO BUSCADO) */
-.product-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 16px;
-  padding: 2rem;
-  background: white;
-}
-
-.product-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-}
-
-/* FINALIZAR */
-.footer-action {
-  grid-column: 2;
+.batch-info {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.95rem;
 }
 
-.btn-finalize {
-  background-color: #6B5BF2;
-  color: white;
+/* BOTÓN ELIMINAR LOTE */
+.delete-batch-btn {
+  font-size: 20px;
+  background: none;
   border: none;
-  padding: 15px 80px;
+  cursor: pointer;
+  color: #d32f2f;
+}
+
+/* BOTÓN FINALIZAR – ABAJO A LA DERECHA */
+.btn-finalize {
+  width: 100%;
+  padding: 15px;
+  background: #6B5BF2;
+  color: white;
   font-size: 1.3rem;
-  font-weight: 700;
   border-radius: 10px;
+  margin-top: 20px;
   cursor: pointer;
 }
 
 .btn-finalize:hover {
-  background-color: #5343d6;
+  background: #5343d6;
 }

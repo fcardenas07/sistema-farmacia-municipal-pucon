@@ -1,37 +1,47 @@
 <div class="resumen-container">
-  <h1 class="summary-header">Resumen de su pedido</h1>
+
+  <h1 class="summary-header">Resumen del pedido</h1>
+
+  <!-- BOTÓN VOLVER -->
+  <button class="btn-back" (click)="volver()">← Volver</button>
 
   <div class="order-list">
-    @for (item of pedidoItems; track item.id) {
+
+    @if (lotes.length === 0) {
+      <p class="empty-message">No hay lotes agregados.</p>
+    }
+
+    @for (lote of lotes; track lote.numeroLote; let i = $index) {
+
       <div class="order-item">
+
         <div class="product-info-card">
-          <div class="card-image">
-            <img [src]="item.imageUrl" [alt]="item.productName">
-          </div>
           <div class="card-details">
-            <h3>{{ item.productName }}</h3>
-            <p class="subtitle">{{ item.genericName }}</p>
-            <p class="meta">{{ item.details }}</p>
+            <h3>{{ lote.product.nombreComercial }}</h3>
+            <p class="subtitle">{{ lote.product.nombreGenerico }}</p>
+            <p class="meta">{{ lote.product.categoria }}</p>
           </div>
-        </div>
-        
-        <div class="item-details">
-          <p class="detail-text">Lote: <span>{{ item.batch }}</span></p>
-          <p class="detail-text">Stock: <span>{{ item.stock }} unidades</span></p>
         </div>
 
-        <button class="delete-button" (click)="removeItem(item.id)">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="delete-icon">
-            <path d="M5 4h14c.55 0 1 .45 1 1s-.45 1-1 1H5c-.55 0-1-.45-1-1s.45-1 1-1zm14 3H5v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7zm-8 4v7c0 .55-.45 1-1 1s-1-.45-1-1v-7c0-.55.45-1 1-1s1 .45 1 1zm4 0v7c0 .55-.45 1-1 1s-1-.45-1-1v-7c0-.55.45-1 1-1s1 .45 1 1z"/>
-          </svg>
+        <div class="item-details">
+          <p class="detail-text">Lote: <span>{{ lote.numeroLote }}</span></p>
+          <p class="detail-text">Elaboración: <span>{{ lote.fechaElaboracion }}</span></p>
+          <p class="detail-text">Vencimiento: <span>{{ lote.fechaVencimiento }}</span></p>
+          <p class="detail-text">Cantidad: <span>{{ lote.cantidad }}</span></p>
+          <p class="detail-text">Código Barra: <span>{{ lote.codigoBarra }}</span></p>
+        </div>
+
+        <button class="delete-button" (click)="eliminar(i)">
+          🗑️
         </button>
+
       </div>
-    } @empty {
-      <p class="empty-message">No hay productos en el pedido.</p>
     }
+
   </div>
 
   <div class="footer-action">
-    <button class="btn-completed" (click)="completeOrder()">Completado</button>
+    <button class="btn-completed" (click)="finalizarPedido()">Finalizar Pedido</button>
   </div>
+
 </div>
