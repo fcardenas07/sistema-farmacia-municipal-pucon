@@ -57,8 +57,9 @@ export class EscaneoProductosComponent {
 
     this.productosService.buscarProductos(texto).subscribe({
       next: (resp) => {
-        this.productosFiltrados = resp.content;
-      },
+      this.productosFiltrados = resp;   
+  },
+
       error: (err) => console.error(err)
     });
   }
