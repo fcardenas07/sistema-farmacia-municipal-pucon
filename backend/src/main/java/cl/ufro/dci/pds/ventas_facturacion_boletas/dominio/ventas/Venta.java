@@ -5,6 +5,8 @@ import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -28,6 +30,10 @@ public class Venta {
     @ManyToOne
     @JoinColumn(name = "id_vendedor", nullable = false)
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleVenta> detallesVenta = new ArrayList<>();
+
 
     public Venta() {
     }

@@ -17,6 +17,6 @@ export class OpcionesBodegaHomeComponent {
   }
 
   irAStock() {
-    this.router.navigate(['/stock-critico']);
+    this.router.navigate(['/stock-critico-bodega']);
   }
 }

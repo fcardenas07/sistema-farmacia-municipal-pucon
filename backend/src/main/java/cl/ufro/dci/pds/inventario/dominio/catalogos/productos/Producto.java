@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -9,6 +10,7 @@ import java.util.Objects;
 public class Producto {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_producto")
     private String idProducto;
 
@@ -22,7 +24,7 @@ public class Producto {
     private String presentacion;
 
     @Column(name = "dosificacion")
-    private String dosificacion;
+    private Integer dosificacion;
 
     @Column(name = "unidad_medida")
     private String unidadMedida;
@@ -36,12 +38,23 @@ public class Producto {
     @Column(name = "activo")
     private boolean activo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria")
+    private CategoriaProducto categoria;
+
+    @Column(name = "url_foto")
+    private String urlFoto;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_fabricante")
+    private Fabricante fabricante;
+
     public Producto() {
     }
 
-    public Producto(String idProducto, String nombreComercial, String nombreGenerico, String presentacion,
-                    String dosificacion, String unidadMedida, int stockMinimo, int stockMaximo, boolean activo) {
-        this.idProducto = idProducto;
+    public Producto(String nombreComercial, String nombreGenerico, String presentacion,
+                    Integer dosificacion, String unidadMedida, int stockMinimo, int stockMaximo,
+                    boolean activo, CategoriaProducto categoria, String urlFoto) {
         this.nombreComercial = nombreComercial;
         this.nombreGenerico = nombreGenerico;
         this.presentacion = presentacion;
@@ -50,14 +63,12 @@ public class Producto {
         this.stockMinimo = stockMinimo;
         this.stockMaximo = stockMaximo;
         this.activo = activo;
+        this.categoria = categoria;
+        this.urlFoto = urlFoto;
     }
 
     public String getIdProducto() {
         return idProducto;
-    }
-
-    public void setIdProducto(String idProducto) {
-        this.idProducto = idProducto;
     }
 
     public String getNombreComercial() {
@@ -84,11 +95,11 @@ public class Producto {
         this.presentacion = presentacion;
     }
 
-    public String getDosificacion() {
+    public Integer getDosificacion() {
         return dosificacion;
     }
 
-    public void setDosificacion(String dosificacion) {
+    public void setDosificacion(Integer dosificacion) {
         this.dosificacion = dosificacion;
     }
 
@@ -116,12 +127,40 @@ public class Producto {
         this.stockMaximo = stockMaximo;
     }
 
-    public boolean getActivo() {
+    public boolean isActivo() {
         return activo;
     }
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getCategoria() {
+        return categoria.getNombreLegible();
+    }
+
+    public CategoriaProducto getCategoriaProducto() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaProducto categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
+    }
+
+    public Fabricante getFabricante() {
+        return fabricante;
+    }
+
+    public void setFabricante(Fabricante fabricante) {
+        this.fabricante = fabricante;
     }
 
     @Override
@@ -137,6 +176,17 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto{" + "idProducto='" + idProducto + '\'' + ", nombreComercial='" + nombreComercial + '\'' + ", nombreGenerico='" + nombreGenerico + '\'' + ", presentacion='" + presentacion + '\'' + ", dosificacion='" + dosificacion + '\'' + ", unidadMedida='" + unidadMedida + '\'' + ", stockMinimo=" + stockMinimo + ", stockMaximo=" + stockMaximo + ", activo='" + activo + '}';
+        return "Producto{" + "idProducto='" + idProducto + '\'' +
+                ", nombreComercial='" + nombreComercial + '\'' +
+                ", nombreGenerico='" + nombreGenerico + '\'' +
+                ", presentacion='" + presentacion + '\'' +
+                ", dosificacion='" + dosificacion + '\'' +
+                ", unidadMedida='" + unidadMedida + '\'' +
+                ", stockMinimo=" + stockMinimo + '\'' +
+                ", stockMaximo=" + stockMaximo + '\'' +
+                ", activo='" + activo + '\'' +
+                ", categoría='" + categoria + '\'' +
+                ", url foto=" + urlFoto + '\'' +
+                ", fabricante=" + fabricante + '}';
     }
 }

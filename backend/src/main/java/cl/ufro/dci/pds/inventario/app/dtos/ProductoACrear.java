@@ -1,18 +1,12 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
-import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.CodigosUnicos;
 import cl.ufro.dci.pds.inventario.app.dtos.anotaciones.StockValido;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import java.util.List;
 
-@StockValido(message = "El stock máximo debe ser mayor o igual al stock mínimo")
-@CodigosUnicos(message =  "No se pueden repetir los IDs de los códigos")
+@StockValido
 public record ProductoACrear(
-        @NotBlank(message = "El id del producto no puede estar vacío")
-        String idProducto,
-
         @NotBlank(message = "El nombre comercial no puede estar vacío")
         @Size(max = 200, message = "El nombre comercial no puede tener más de 200 caracteres")
         String nombreComercial,
@@ -24,8 +18,9 @@ public record ProductoACrear(
         @Size(max = 500, message = "La presentación no puede tener más de 500 caracteres")
         String presentacion,
 
-        @Size(max = 100, message = "La dosificación no puede tener más de 100 caracteres")
-        String dosificacion,
+        @Min(value = 1, message = "La dosificación debe ser mayor a 0")
+        @Max(value = 10_000, message = "La dosificación no debe ser mayor a 10000")
+        int dosificacion,
 
         @Size(max = 50, message = "La unidad de medida no puede tener más de 50 caracteres")
         String unidadMedida,
@@ -38,16 +33,15 @@ public record ProductoACrear(
         @Max(value = 100_000_000, message = "El stock máximo no puede superar 100.000.000")
         Integer stockMaximo,
 
-        boolean activo,
+        @NotNull(message = "La categoría es obligatoria")
+        CategoriaProducto categoria,
 
-        @Valid
-        @NotEmpty(message = "El producto debe tener al menos un código")
-        List<CodigoACrear> codigos
+        //@NotBlank(message = "El fabricante es obligatorio")
+        String idFabricante
 
-) implements ProductoConStock, ProductoConCodigos {
+) implements ProductoConStock {
     public Producto aEntidad() {
-        Producto p = new Producto();
-        p.setIdProducto(idProducto);
+        var p = new Producto();
         p.setNombreComercial(nombreComercial);
         p.setNombreGenerico(nombreGenerico);
         p.setPresentacion(presentacion);
@@ -55,7 +49,8 @@ public record ProductoACrear(
         p.setUnidadMedida(unidadMedida);
         p.setStockMinimo(stockMinimo);
         p.setStockMaximo(stockMaximo);
-        p.setActivo(activo);
+        p.setActivo(true);
+        p.setCategoria(categoria);
         return p;
     }
 }

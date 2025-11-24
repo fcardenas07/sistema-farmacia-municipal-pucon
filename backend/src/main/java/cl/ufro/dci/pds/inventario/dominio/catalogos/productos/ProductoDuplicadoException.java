@@ -4,4 +4,8 @@ public class ProductoDuplicadoException extends RuntimeException {
     public ProductoDuplicadoException(String id) {
         super("Ya existe un producto con id = " + id);
     }
+
+    public ProductoDuplicadoException() {
+        super("Ya existe un producto con los mismos datos");
+    }
 }
