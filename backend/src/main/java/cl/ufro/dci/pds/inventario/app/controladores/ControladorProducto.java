@@ -66,33 +66,18 @@ public class ControladorProducto {
         return ResponseEntity.ok(resultado);
     }
 
-    @GetMapping("/buscar-stock-normal")
-    public ResponseEntity<Page<ProductoFiltrado>> buscarProductosStockNormal(
+    @GetMapping("/buscar-stock")
+    public ResponseEntity<Page<ProductoFiltrado>> buscarProductosPorStock(
             @RequestParam(required = false) String nombreComercial,
             @RequestParam(required = false) String nombreGenerico,
             @RequestParam(required = false) Boolean activo,
             @RequestParam(required = false) CategoriaProducto categoria,
-            @RequestParam(defaultValue = "0") int pagina
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam ProductoFiltrado.FiltroStock tipoStock
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
-                nombreComercial, nombreGenerico, activo, categoria, pagina, "critico"
+                nombreComercial, nombreGenerico, activo, categoria, pagina, tipoStock
         );
-
-        return ResponseEntity.ok(productos);
-    }
-
-    @GetMapping("/buscar-stock-critico")
-    public ResponseEntity<Page<ProductoFiltrado>> buscarProductosStockCritico(
-            @RequestParam(required = false) String nombreComercial,
-            @RequestParam(required = false) String nombreGenerico,
-            @RequestParam(required = false) Boolean activo,
-            @RequestParam(required = false) CategoriaProducto categoria,
-            @RequestParam(defaultValue = "0") int pagina
-    ) {
-        var productos = servicioAppProducto.buscarProductosFiltrados(
-                nombreComercial, nombreGenerico, activo, categoria, pagina, "normal"
-        );
-
         return ResponseEntity.ok(productos);
     }
 
