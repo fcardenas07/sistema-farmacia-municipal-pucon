@@ -23,8 +23,9 @@ public record ProductoAModificar(
         @Size(max = 500, message = "La presentación no puede tener más de 500 caracteres")
         String presentacion,
 
-        @Size(max = 100, message = "La dosificación no puede tener más de 100 caracteres")
-        String dosificacion,
+        @Min(value = 1, message = "La dosificación debe ser mayor a 0")
+        @Max(value = 10_000, message = "La dosificación no debe ser mayor a 10000")
+        Integer dosificacion,
 
         @Size(max = 50, message = "La unidad de medida no puede tener más de 50 caracteres")
         String unidadMedida,
@@ -37,14 +38,11 @@ public record ProductoAModificar(
         @Max(value = 100_000_000, message = "El stock máximo no puede superar 100.000.000")
         Integer stockMaximo,
 
-        @NotNull(message = "El estado activo no puede ser nulo")
-        Boolean activo,
-
         CategoriaProducto categoria,
 
         @Valid
         List<CodigoAModificar> codigos
-) implements ProductoConStock, ProductoConCodigos {
+) implements ProductoConStock {
     public void aplicarCambios(Producto p) {
         if (nombreComercial != null) p.setNombreComercial(nombreComercial);
         if (nombreGenerico != null) p.setNombreGenerico(nombreGenerico);
@@ -53,7 +51,6 @@ public record ProductoAModificar(
         if (unidadMedida != null) p.setUnidadMedida(unidadMedida);
         if (stockMinimo != null) p.setStockMinimo(stockMinimo);
         if (stockMaximo != null) p.setStockMaximo(stockMaximo);
-        if (activo != null) p.setActivo(activo);
         if (categoria != null) p.setCategoria(categoria);
     }
 }

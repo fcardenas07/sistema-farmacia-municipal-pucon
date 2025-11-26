@@ -1,4 +1,4 @@
-/*package cl.ufro.dci.pds.servicios;
+package cl.ufro.dci.pds.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.CodigoAModificar;
@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 
 class ServicioCodigoTest {
 
+    /*
     private RepositorioCodigo repositorioCodigo;
     private ServicioCodigo servicioCodigo;
 
@@ -33,7 +34,7 @@ class ServicioCodigoTest {
                 "Paracetamol",
                 "Paracetamol",
                 "30 Comprimidos",
-                "500",
+                500,
                 "mg",
                 10,
                 100,
@@ -134,7 +135,7 @@ class ServicioCodigoTest {
                 "Ibuprofeno",
                 "Ibuprofeno Genérico",
                 "20 Comprimidos",
-                "400",
+                400,
                 "mg",
                 5,
                 50,
@@ -172,6 +173,6 @@ class ServicioCodigoTest {
         assertFalse(codigoEntidad.isActivo(), "El código debe quedar inactivo");
         verify(repositorioCodigo).save(codigoEntidad);
     }
+     */
 }
 
- */

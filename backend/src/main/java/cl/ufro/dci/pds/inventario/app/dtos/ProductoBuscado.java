@@ -10,7 +10,7 @@ public record ProductoBuscado(
         String nombreComercial,
         String nombreGenerico,
         String presentacion,
-        String dosificacion,
+        int dosificacion,
         String unidadMedida,
         boolean activo,
         int stockTotal,

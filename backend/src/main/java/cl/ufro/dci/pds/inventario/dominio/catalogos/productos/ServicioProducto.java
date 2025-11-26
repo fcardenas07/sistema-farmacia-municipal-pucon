@@ -1,12 +1,13 @@
 package cl.ufro.dci.pds.inventario.dominio.catalogos.productos;
 
 import cl.ufro.dci.pds.infraestructura.ServicioAlmacenamientoImagen;
-import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 public class ServicioProducto {
@@ -22,8 +23,22 @@ public class ServicioProducto {
         this.servicioAlmacenamientoImagen = servicioAlmacenamientoImagen;
     }
 
-    public Producto crear(ProductoACrear dto) {
-        var producto = dto.aEntidad();
+    public Producto validarYGuardar(Producto producto) {
+        var idFabricante = producto.getFabricante() != null ? producto.getFabricante().getIdFabricante() : null;
+
+        var existe = repositorioProducto.existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                idFabricante
+        );
+
+        if (existe) {
+            throw new ProductoDuplicadoException();
+        }
+
         return repositorioProducto.save(producto);
     }
 
@@ -56,8 +71,17 @@ public class ServicioProducto {
             CategoriaProducto categoria,
             int numeroPagina
     ) {
-        var pageable = PageRequest.of(numeroPagina, 4);
+        var pageable = PageRequest.of(numeroPagina, 15);
         return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
+    }
+
+    public List<Producto> buscarPorCampos(
+            String nombreComercial,
+            String nombreGenerico,
+            Boolean activo,
+            CategoriaProducto categoria
+    ) {
+        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria);
     }
 
     public void darBaja(String id) {

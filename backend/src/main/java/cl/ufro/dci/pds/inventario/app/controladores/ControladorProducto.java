@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,18 +66,26 @@ public class ControladorProducto {
         return ResponseEntity.ok(resultado);
     }
 
-    @GetMapping("/buscar")
-    public ResponseEntity<Page<ProductoFiltrado>> buscarProductos(
+    @GetMapping("/buscar-stock")
+    public ResponseEntity<Page<ProductoFiltrado>> buscarProductosPorStock(
             @RequestParam(required = false) String nombreComercial,
             @RequestParam(required = false) String nombreGenerico,
             @RequestParam(required = false) Boolean activo,
             @RequestParam(required = false) CategoriaProducto categoria,
-            @RequestParam(defaultValue = "0") int pagina
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam ProductoFiltrado.FiltroStock tipoStock
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
-                nombreComercial, nombreGenerico, activo, categoria, pagina
+                nombreComercial, nombreGenerico, activo, categoria, pagina, tipoStock
         );
+        return ResponseEntity.ok(productos);
+    }
 
+    @GetMapping("/buscar-para-codigo")
+    public ResponseEntity<List<ProductoParaCodigo>> buscarProductosParaCodigo(
+            @RequestParam(required = false) String nombreComercial
+    ) {
+        var productos = servicioAppProducto.buscarProductosParaCodigo(nombreComercial);
         return ResponseEntity.ok(productos);
     }
 
@@ -86,7 +95,7 @@ public class ControladorProducto {
         return ResponseEntity.ok().build();
     }
 
-    @ExceptionHandler({CodigoDuplicadoException.class})
+    @ExceptionHandler({CodigoDuplicadoException.class, ProductoDuplicadoException.class})
     public ResponseEntity<String> manejarConflicto(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }

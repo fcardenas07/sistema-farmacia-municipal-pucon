@@ -26,15 +26,15 @@ class RepositorioProductoTest {
 
         repositorioProducto.saveAll(List.of(
                 new Producto("Paracetamol", "Paracetamol",
-                        "Tabletas", "500", "mg",
+                        "Tabletas", 500, "mg",
                         10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                         "productos/P001.jpg"),
                 new Producto("Advil", "Ibuprofeno",
-                        "Tabletas", "400", "mg",
+                        "Tabletas", 400, "mg",
                         5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                         "productos/P002.jpg"),
                 new Producto("Amoxil", "Amoxicilina",
-                        "Caja 12 cápsulas", "500", "mg",
+                        "Caja 12 cápsulas", 500, "mg",
                         20, 200, false, CategoriaProducto.ANTIBIOTICOS,
                         "productos/P003.jpg")
         ));
@@ -108,5 +108,37 @@ class RepositorioProductoTest {
         var pageable = PageRequest.of(0, 4);
         var resultado = repositorioProducto.buscarPorCampos("NoExiste", null, null, null, pageable);
         assertThat(resultado.getContent()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("existsByClaveUnica devuelve true si existe un producto con la misma clave")
+    void existsByClaveUnicaDevuelveTrue() {
+        var p = repositorioProducto.findAll().getFirst();
+
+        boolean existe = repositorioProducto.existsByClaveUnica(
+                p.getNombreComercial(),
+                p.getNombreGenerico(),
+                p.getPresentacion(),
+                p.getDosificacion(),
+                p.getUnidadMedida(),
+                p.getFabricante().getIdFabricante()
+        );
+
+        assertThat(existe).isTrue();
+    }
+
+    @Test
+    @DisplayName("existsByClaveUnica devuelve false si no existe un producto con la misma clave")
+    void existsByClaveUnicaDevuelveFalse() {
+        boolean existe = repositorioProducto.existsByClaveUnica(
+                "ProductoInexistente",
+                "GenéricoInexistente",
+                "Presentación",
+                123,
+                "Unidad",
+                "F999"
+        );
+
+        assertThat(existe).isFalse();
     }
 }

@@ -44,7 +44,7 @@ class RepositorioLoteTest {
 
         var productoParacetamol = new Producto(
                 "Paracetamol", "Paracetamol",
-                "Tabletas", "500", "mg",
+                "Tabletas", 500, "mg",
                 10, 100, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 "productos/P001.jpg"
@@ -54,7 +54,7 @@ class RepositorioLoteTest {
 
         var productoIbuprofeno = new Producto(
                 "Advil", "Ibuprofeno",
-                "Tabletas", "400", "mg",
+                "Tabletas", 400, "mg",
                 5, 50, true,
                 CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
                 "productos/P002.jpg"

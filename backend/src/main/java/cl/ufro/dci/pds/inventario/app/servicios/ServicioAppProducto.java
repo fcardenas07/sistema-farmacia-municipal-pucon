@@ -3,6 +3,8 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.ServicioFabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,29 +31,36 @@ public class ServicioAppProducto {
     private final ServicioLote servicioLote;
     private final ServicioStock servicioStock;
     private final ServicioMovimiento servicioMovimiento;
+    private final ServicioFabricante servicioFabricante;
 
     public ServicioAppProducto(ServicioProducto servicioProducto,
                                ServicioCodigo servicioCodigo,
                                ServicioLote servicioLote,
                                ServicioStock servicioStock,
-                               ServicioMovimiento servicioMovimiento) {
+                               ServicioMovimiento servicioMovimiento,
+                               ServicioFabricante servicioFabricante) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
         this.servicioStock = servicioStock;
         this.servicioMovimiento = servicioMovimiento;
+        this.servicioFabricante = servicioFabricante;
     }
 
     @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
-        var creado = servicioProducto.crear(dto);
-
-        if (dto.codigos() != null) {
-            dto.codigos().forEach(c -> servicioCodigo.crear(creado, c));
+        Fabricante fabricante = null;
+        if (dto.idFabricante() != null) {
+            fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
         }
 
-        var codigos = servicioCodigo.obtenerCodigosConIdProducto(creado.getIdProducto());
-        return ProductoCreado.desde(creado, codigos);
+        var producto = dto.aEntidad();
+
+        if (fabricante != null) {
+            producto.setFabricante(fabricante);
+        }
+        var creado = servicioProducto.validarYGuardar(producto);
+        return ProductoCreado.desde(creado);
     }
 
     @Transactional
@@ -80,33 +90,53 @@ public class ServicioAppProducto {
     }
 
     @Transactional
+    public List<ProductoParaCodigo> buscarProductosParaCodigo(String nombreComercial) {
+        var productos = servicioProducto.buscarPorCampos(
+                nombreComercial, null, null, null
+        );
+
+        return productos.stream()
+                .map(ProductoParaCodigo::desde)
+                .toList();
+    }
+
+    @Transactional
     public Page<ProductoFiltrado> buscarProductosFiltrados(
             String nombreComercial,
             String nombreGenerico,
             Boolean activo,
             CategoriaProducto categoria,
-            int numeroPagina
+            int numeroPagina,
+            ProductoFiltrado.FiltroStock filtroStock
     ) {
         var productosPage = servicioProducto.buscarPorCampos(
                 nombreComercial, nombreGenerico, activo, categoria, numeroPagina
         );
 
-        var idsProducto = productosPage.getContent().stream()
-                .map(Producto::getIdProducto)
-                .toList();
-
-        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
-        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
-        var stockPorProducto = agruparStockPorProducto(lotes, codigosPorProducto);
+        var stockPorProducto = calcularStockPorProducto(productosPage.getContent());
 
         var filtrados = productosPage.getContent().stream()
-                .map(p -> {
-                    int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
-                    return ProductoFiltrado.desde(p, stockTotal);
-                })
+                .map(p -> ProductoFiltrado.desde(p, stockPorProducto.getOrDefault(p.getIdProducto(), 0)))
+                .filter(p -> filtrarPorEstado(p, filtroStock))
+                .sorted(Comparator.comparingInt(p -> p.estadoStock().getPrioridad()))
                 .toList();
 
-        return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
+        return new PageImpl<>(filtrados, productosPage.getPageable(), filtrados.size());
+    }
+
+    private Map<String, Integer> calcularStockPorProducto(List<Producto> productos) {
+        var idsProducto = productos.stream()
+                .map(Producto::getIdProducto)
+                .toList();
+        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
+        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
+        return agruparStockPorProducto(lotes, codigosPorProducto);
+    }
+    
+    private boolean filtrarPorEstado(ProductoFiltrado producto, ProductoFiltrado.FiltroStock filtro) {
+        return filtro == ProductoFiltrado.FiltroStock.NORMAL
+                ? producto.estadoStock() == ProductoFiltrado.EstadoStock.NORMAL
+                : producto.estadoStock() != ProductoFiltrado.EstadoStock.NORMAL;
     }
 
     @Transactional

@@ -6,6 +6,7 @@ import cl.ufro.dci.pds.inventario.app.dtos.ProductoACrear;
 import cl.ufro.dci.pds.inventario.app.dtos.ProductoAModificar;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,7 @@ class ServicioProductoTest {
                 "Paracetamol",
                 "Paracetamol",
                 "Tabletas",
-                "500",
+                500,
                 "mg",
                 10,
                 100,
@@ -56,7 +57,7 @@ class ServicioProductoTest {
                 "Advil",
                 "Ibuprofeno",
                 "Tabletas",
-                "400",
+                400,
                 "mg",
                 5,
                 50,
@@ -70,7 +71,7 @@ class ServicioProductoTest {
                 "Amoxil",
                 "Amoxicilina",
                 "Caja 12 cápsulas",
-                "500",
+                500,
                 "mg",
                 20,
                 200,
@@ -85,38 +86,43 @@ class ServicioProductoTest {
 
 
     @Test
-    @DisplayName("Crear producto válido guarda y devuelve el producto")
-    void crearProductoValido() {
-        var dto = new ProductoACrear(
-                "Paracetamol",
-                "Paracetamol",
-                "Tabletas",
-                "500",
-                "mg",
-                10,
-                100,
-                true,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                null
+    @DisplayName("validarYGuardar guarda un producto si no existe duplicado")
+    void validarYGuardarProductoValido() {
+        var producto = productoEntidad;
+
+        var fabricante = new Fabricante();
+        ReflectionTestUtils.setField(fabricante, "idFabricante", "F001");
+        producto.setFabricante(fabricante);
+
+        when(repositorioProducto.existsByClaveUnica(
+                eq(producto.getNombreComercial()),
+                eq(producto.getNombreGenerico()),
+                eq(producto.getPresentacion()),
+                eq(producto.getDosificacion()),
+                eq(producto.getUnidadMedida()),
+                eq(producto.getFabricante().getIdFabricante())
+        )).thenReturn(false);
+
+        when(repositorioProducto.save(any())).thenAnswer(invocation -> {
+            var p = invocation.getArgument(0);
+            ReflectionTestUtils.setField(p, "idProducto", "P001");
+            return p;
+        });
+
+        var resultado = servicioProducto.validarYGuardar(producto);
+
+        assertNotNull(resultado);
+        assertEquals("P001", resultado.getIdProducto());
+
+        verify(repositorioProducto).existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                producto.getFabricante().getIdFabricante()
         );
-
-        when(repositorioProducto.save(any(Producto.class)))
-                .thenAnswer(invocation -> {
-                    Producto p = invocation.getArgument(0);
-                    ReflectionTestUtils.setField(p, "idProducto", "P001");
-                    return p;
-                });
-
-        var creado = servicioProducto.crear(dto);
-
-        assertNotNull(creado.getIdProducto());
-        assertEquals("Paracetamol", creado.getNombreComercial());
-        assertEquals("Paracetamol", creado.getNombreGenerico());
-        assertEquals("Tabletas", creado.getPresentacion());
-        assertEquals("500", creado.getDosificacion());
-        assertEquals("mg", creado.getUnidadMedida());
-
-        verify(repositorioProducto).save(any(Producto.class));
+        verify(repositorioProducto).save(producto);
     }
 
     @Test
@@ -130,7 +136,6 @@ class ServicioProductoTest {
                 null,
                 20,
                 200,
-                false,
                 null,
                 null
         );
@@ -159,7 +164,6 @@ class ServicioProductoTest {
                 null,
                 20,
                 200,
-                false,
                 null,
                 null
         );
