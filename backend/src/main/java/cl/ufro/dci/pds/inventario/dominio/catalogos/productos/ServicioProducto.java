@@ -71,7 +71,7 @@ public class ServicioProducto {
             CategoriaProducto categoria,
             int numeroPagina
     ) {
-        var pageable = PageRequest.of(numeroPagina, 4);
+        var pageable = PageRequest.of(numeroPagina, 15);
         return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
     }
 

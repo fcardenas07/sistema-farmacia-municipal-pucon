@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -105,28 +106,37 @@ public class ServicioAppProducto {
             String nombreGenerico,
             Boolean activo,
             CategoriaProducto categoria,
-            int numeroPagina
+            int numeroPagina,
+            ProductoFiltrado.FiltroStock filtroStock
     ) {
         var productosPage = servicioProducto.buscarPorCampos(
                 nombreComercial, nombreGenerico, activo, categoria, numeroPagina
         );
 
-        var idsProducto = productosPage.getContent().stream()
-                .map(Producto::getIdProducto)
-                .toList();
-
-        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
-        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
-        var stockPorProducto = agruparStockPorProducto(lotes, codigosPorProducto);
+        var stockPorProducto = calcularStockPorProducto(productosPage.getContent());
 
         var filtrados = productosPage.getContent().stream()
-                .map(p -> {
-                    int stockTotal = stockPorProducto.getOrDefault(p.getIdProducto(), 0);
-                    return ProductoFiltrado.desde(p, stockTotal);
-                })
+                .map(p -> ProductoFiltrado.desde(p, stockPorProducto.getOrDefault(p.getIdProducto(), 0)))
+                .filter(p -> filtrarPorEstado(p, filtroStock))
+                .sorted(Comparator.comparingInt(p -> p.estadoStock().getPrioridad()))
                 .toList();
 
-        return new PageImpl<>(filtrados, productosPage.getPageable(), productosPage.getTotalElements());
+        return new PageImpl<>(filtrados, productosPage.getPageable(), filtrados.size());
+    }
+
+    private Map<String, Integer> calcularStockPorProducto(List<Producto> productos) {
+        var idsProducto = productos.stream()
+                .map(Producto::getIdProducto)
+                .toList();
+        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
+        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
+        return agruparStockPorProducto(lotes, codigosPorProducto);
+    }
+    
+    private boolean filtrarPorEstado(ProductoFiltrado producto, ProductoFiltrado.FiltroStock filtro) {
+        return filtro == ProductoFiltrado.FiltroStock.NORMAL
+                ? producto.estadoStock() == ProductoFiltrado.EstadoStock.NORMAL
+                : producto.estadoStock() != ProductoFiltrado.EstadoStock.NORMAL;
     }
 
     @Transactional
