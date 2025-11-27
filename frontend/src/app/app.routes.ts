@@ -6,6 +6,8 @@ import { BodegaHomeComponent } from './features/home/pages/bodega-home/bodega-ho
 import { IngresoCodigoPedidoPageComponent } from './features/recepcion-productos-bodega/pages/ingreso-codigo-pedido-page/ingreso-codigo-pedido-page.component';
 import { AgregarStockPedidoPageComponent } from './features/recepcion-productos-bodega/pages/agregar-stock-pedido-page/agregar-stock-pedido-page.component';
 import { ResumenPedidoPageComponent } from './features/recepcion-productos-bodega/pages/resumen-pedido-page/resumen-pedido-page.component';
+import { CrearProductosPageComponent } from './features/crear_productos_QF/pages/crear-productos-page/crear-productos-page.component';
+import { ResumenCreacionProductoPageComponent } from './features/crear_productos_QF/pages/resumen-creacion-producto-page/resumen-creacion-producto-page.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
@@ -14,5 +16,7 @@ export const routes: Routes = [
     {path: 'ingreso-codigo-pedido',component: IngresoCodigoPedidoPageComponent},
     {path: 'agregar-stock-pedido',component: AgregarStockPedidoPageComponent},
     {path: 'resumen-pedido',component: ResumenPedidoPageComponent},
+    {path: 'crear-productos',component: CrearProductosPageComponent},
+    {path: 'resumen-creacion-producto',component: ResumenCreacionProductoPageComponent},
     {path: '**', redirectTo: 'login' }
 ];

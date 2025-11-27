@@ -1,0 +1,66 @@
+<div class="form-container">
+
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Nombre comercial</label>
+      <input type="text" [(ngModel)]="form.nombreComercial">
+    </div>
+
+    <div class="form-group">
+      <label>Nombre genérico</label>
+      <input type="text" [(ngModel)]="form.nombreGenerico">
+    </div>
+
+    <div class="form-group full">
+      <label>Presentación</label>
+      <input type="text" [(ngModel)]="form.presentacion">
+    </div>
+
+    <!-- DOSIFICACION -->
+    <div class="form-group full">
+      <label>Dosificación</label>
+      <div class="dosificacion-row">
+        <input 
+          type="number" 
+          [(ngModel)]="form.dosificacion"
+          placeholder="Cantidad"
+        />
+
+        <select [(ngModel)]="form.unidadMedida">
+          <option value="mg">mg</option>
+          <option value="ml">ml</option>
+          <option value="mcg">mcg</option>
+          <option value="g">g</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Stock mínimo</label>
+      <input type="number" [(ngModel)]="form.stockMinimo">
+    </div>
+
+    <div class="form-group">
+      <label>Stock máximo</label>
+      <input type="number" [(ngModel)]="form.stockMaximo">
+    </div>
+
+    <div class="form-group full">
+      <label>Categoría</label>
+      <select [(ngModel)]="form.categoria">
+        <option value="ANALGESICOS_ANTIINFLAMATORIOS">
+          Analgésicos / Antiinflamatorios
+        </option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- BOTONES -->
+  <div class="buttons">
+    <button class="clear-btn" (click)="vaciarFormulario()">Vaciar formulario</button>
+    <button class="continue-btn" (click)="continuar()">Continuar</button>
+  </div>
+
+</div>
