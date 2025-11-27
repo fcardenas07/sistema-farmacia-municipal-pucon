@@ -132,11 +132,14 @@ public class ServicioAppProducto {
         var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
         return agruparStockPorProducto(lotes, codigosPorProducto);
     }
-    
+
     private boolean filtrarPorEstado(ProductoFiltrado producto, ProductoFiltrado.FiltroStock filtro) {
-        return filtro == ProductoFiltrado.FiltroStock.NORMAL
-                ? producto.estadoStock() == ProductoFiltrado.EstadoStock.NORMAL
-                : producto.estadoStock() != ProductoFiltrado.EstadoStock.NORMAL;
+        var estado = producto.estadoStock();
+
+        return switch (filtro) {
+            case NORMAL -> estado == ProductoFiltrado.EstadoStock.NORMAL || estado == ProductoFiltrado.EstadoStock.MEDIO;
+            case CRITICO -> estado == ProductoFiltrado.EstadoStock.MUY_BAJO || estado == ProductoFiltrado.EstadoStock.BAJO;
+        };
     }
 
     @Transactional
