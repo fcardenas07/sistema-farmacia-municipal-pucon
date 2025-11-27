@@ -5,7 +5,10 @@
 
     <form [formGroup]="loteForm">
 
-      <label class="header-text">Datos del lote</label>
+      <!-- ============================ -->
+      <!--   1. DATOS DEL LOTE          -->
+      <!-- ============================ -->
+      <label class="header-text section-title">Datos del lote</label>
 
       <div class="form-group">
         <label>Número de lote</label>
@@ -22,19 +25,12 @@
         <input type="date" class="input-box" formControlName="fechaVencimiento">
       </div>
 
-      <div class="form-group">
-        <label>Cantidad</label>
-        <input type="number" class="input-box" formControlName="cantidad">
-      </div>
 
-      <div class="form-group">
-        <label>Límite merma</label>
-        <input type="number" class="input-box" formControlName="limiteMerma">
-      </div>
+      <!-- ============================ -->
+      <!--   2. BUSCAR PRODUCTO         -->
+      <!-- ============================ -->
+      <label class="header-text section-title">Producto</label>
 
-      <label class="header-text">Producto</label>
-
-      <!-- BUSCAR PRODUCTO -->
       <div class="form-group">
         <input
           type="text"
@@ -53,25 +49,58 @@
       <div class="dropdown-list" *ngIf="productosFiltrados.length > 0">
         @for (p of productosFiltrados; track p.idProducto) {
           <div class="dropdown-item" (click)="seleccionarProducto(p)">
+
+            @if (p.urlFoto) {
+              <img class="dropdown-photo" [src]="p.urlFoto" />
+            }
+
             <strong>{{ p.nombreComercial }}</strong><br>
-            <span>{{ p.nombreGenerico }}</span> · <span>{{ p.categoria }}</span>
+            <span>{{ p.nombreFabricante }}</span>
           </div>
         }
       </div>
 
-      <!-- CÓDIGO DE BARRA -->
+      <!-- MENSAJE SI NO SE SELECCIONA PRODUCTO -->
+      <p class="error-msg" *ngIf="productoError">
+        ❌ Debes seleccionar un producto antes de continuar.
+      </p>
+
+
+      <!-- ============================ -->
+      <!--   3. CONTENIDO DEL LOTE      -->
+      <!-- ============================ -->
+      <label class="header-text section-title">Contenido del lote</label>
+
       <div class="form-group">
-        <label>Código de barra</label>
+        <label>Cantidad de productos en el lote</label>
+        <input type="number" class="input-box" formControlName="cantidad">
+        <p class="error-msg" *ngIf="loteForm.controls['cantidad'].invalid && loteForm.controls['cantidad'].touched">
+          ❌ La cantidad debe ser mayor a 0.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label>Límite de merma del producto</label>
+        <input type="number" class="input-box" formControlName="limiteMerma">
+        <p class="error-msg" *ngIf="loteForm.controls['limiteMerma'].invalid && loteForm.controls['limiteMerma'].touched">
+          ❌ El límite de merma debe ser mayor a 0.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label>Precio unitario del producto</label>
+        <input type="number" class="input-box" formControlName="precioUnitario">
+        <p class="error-msg" *ngIf="loteForm.controls['precioUnitario'].invalid && loteForm.controls['precioUnitario'].touched">
+          ❌ El precio unitario debe ser mayor a 0.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label>Código de barras</label>
         <input type="text" class="input-box" formControlName="codigoBarra">
       </div>
 
-      <!-- PRECIO UNITARIO -->
-      <div class="form-group">
-        <label>Precio unitario</label>
-        <input type="number" class="input-box" formControlName="precioUnitario">
-      </div>
-
-      <!-- AÑADIR LOTE -->
+      <!-- BOTÓN AÑADIR LOTE -->
       <button type="button" class="btn-add-batch" (click)="addBatch()">
         Añadir lote <span class="plus-icon">+</span>
       </button>
@@ -80,10 +109,11 @@
 
   </div>
 
-  <!-- PANEL DERECHO LOTES + FINALIZAR -->
+
+
+  <!-- PANEL DERECHO -->
   <div class="right-panel">
 
-    <!-- LISTA DE LOTES -->
     <div class="batch-list" *ngIf="batches.length > 0">
       <h3 class="header-text">Lotes añadidos</h3>
 
@@ -94,16 +124,19 @@
             <p><strong>Lote:</strong> {{ b.numeroLote }}</p>
             <p><strong>Elaboración:</strong> {{ b.fechaElaboracion }}</p>
             <p><strong>Vencimiento:</strong> {{ b.fechaVencimiento }}</p>
-            <p><strong>Cantidad:</strong> {{ b.cantidad }}</p>
+            <p><strong>Cant. productos:</strong> {{ b.cantidad }}</p>
             <p><strong>Merma:</strong> {{ b.limiteMerma }}</p>
             <p><strong>Precio unitario:</strong> {{ b.precioUnitario }}</p>
-            <p><strong>Código Barra:</strong> {{ b.codigoBarra }}</p>
+            <p><strong>Código barras:</strong> {{ b.codigoBarra }}</p>
           </div>
 
           <div class="right-info">
             <p><strong>Producto:</strong> {{ b.product.nombreComercial }}</p>
-            <p>{{ b.product.nombreGenerico }}</p>
-            <p>{{ b.product.categoria }}</p>
+            <p>{{ b.product.nombreFabricante }}</p>
+
+            @if (b.product.urlFoto) {
+              <img class="product-photo" [src]="b.product.urlFoto" />
+            }
           </div>
 
           <button class="delete-batch-btn" (click)="eliminarLote(i)">🗑</button>
@@ -112,7 +145,6 @@
       }
     </div>
 
-    <!-- FINALIZAR -->
     <button class="btn-finalize" (click)="finalize()">Finalizar</button>
 
   </div>

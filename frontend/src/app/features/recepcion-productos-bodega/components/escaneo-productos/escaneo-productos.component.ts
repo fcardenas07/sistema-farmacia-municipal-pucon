@@ -8,16 +8,16 @@ import {
   Validators
 } from '@angular/forms';
 
-import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { ProductoBackend } from '../../models/producto-backend';
 import { LoteInfo } from '../../models/lote-info';
-import { Router } from '@angular/router';
+import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { LotesService } from '../../services/lotes.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-escaneo-productos',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './escaneo-productos.component.html',
   styleUrls: ['./escaneo-productos.component.css']
 })
@@ -31,6 +31,9 @@ export class EscaneoProductosComponent {
 
   batches: LoteInfo[] = [];
 
+  // Manejo de errores visuales
+  productoError = false;
+
   constructor(
     private fb: FormBuilder,
     private productosService: ProductosBodegaService,
@@ -38,41 +41,65 @@ export class EscaneoProductosComponent {
     private router: Router
   ) {
     this.loteForm = this.fb.group({
+      // 1. DATOS DEL LOTE
       numeroLote: ['', Validators.required],
       fechaElaboracion: ['', Validators.required],
       fechaVencimiento: ['', Validators.required],
-      cantidad: [0, [Validators.required, Validators.min(1)]],
-      limiteMerma: [0, Validators.required],
-      precioUnitario: [null, Validators.required],
+
+      // 3. CONTENIDO DEL LOTE
+      cantidad: [null, [Validators.required, Validators.min(1)]],
+      limiteMerma: [null, [Validators.required, Validators.min(1)]],
+      precioUnitario: [null, [Validators.required, Validators.min(1)]],
       codigoBarra: ['', Validators.required],
+
+      // ID PRODUCTO (LO LLENAMOS AUTOMÁTICAMENTE)
       idProducto: [null, Validators.required]
     });
 
     this.batches = this.lotesService.getLotes();
   }
 
+  // ===============================
+  // BUSCAR PRODUCTOS
+  // ===============================
   buscarProductosBackend() {
     const texto = this.productoSearch.trim();
     if (!texto) return;
 
     this.productosService.buscarProductos(texto).subscribe({
       next: (resp) => {
-        this.productosFiltrados = resp.content;
+        this.productosFiltrados = resp;
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error("❌ Error al buscar productos", err)
     });
   }
 
+  // ===============================
+  // SELECCIONAR PRODUCTO
+  // ===============================
   seleccionarProducto(p: ProductoBackend) {
     this.selectedProduct = p;
     this.productoSearch = p.nombreComercial;
     this.productosFiltrados = [];
     this.loteForm.patchValue({ idProducto: p.idProducto });
+    this.productoError = false; // quita mensaje de error si ya se seleccionó
   }
 
+  // ===============================
+  // AÑADIR LOTE
+  // ===============================
   addBatch() {
-    if (this.loteForm.invalid || !this.selectedProduct) {
-      alert('Completa todos los campos');
+    this.productoError = false;
+
+    // Validación 1: PRODUCTO DEBE ESTAR SELECCIONADO
+    if (!this.selectedProduct) {
+      this.productoError = true;
+      return;
+    }
+
+    // Validación 2: FORMULARIO COMPLETO
+    if (this.loteForm.invalid) {
+      this.loteForm.markAllAsTouched();
       return;
     }
 
@@ -90,18 +117,26 @@ export class EscaneoProductosComponent {
     this.batches.push(lote);
     this.lotesService.setLotes(this.batches);
 
+    // RESET
     this.loteForm.reset();
     this.productoSearch = '';
     this.selectedProduct = null;
   }
 
+  // ===============================
+  // ELIMINAR LOTE
+  // ===============================
   eliminarLote(index: number) {
     this.batches.splice(index, 1);
     this.lotesService.setLotes(this.batches);
   }
 
+  // ===============================
+  // FINALIZAR
+  // ===============================
   finalize() {
     this.lotesService.setLotes(this.batches);
     this.router.navigate(['/resumen-pedido']);
   }
+
 }

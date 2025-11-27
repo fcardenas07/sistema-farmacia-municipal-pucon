@@ -7,4 +7,5 @@ export interface ProductoCreacion {
   stockMinimo: number;
   stockMaximo: number;
   categoria: string;
+  idFabricante?: string | null; 
 }
