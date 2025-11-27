@@ -8,11 +8,13 @@ import { AgregarStockPedidoPageComponent } from './features/recepcion-productos-
 import { ResumenPedidoPageComponent } from './features/recepcion-productos-bodega/pages/resumen-pedido-page/resumen-pedido-page.component';
 import { CrearProductosPageComponent } from './features/crear_productos_QF/pages/crear-productos-page/crear-productos-page.component';
 import { ResumenCreacionProductoPageComponent } from './features/crear_productos_QF/pages/resumen-creacion-producto-page/resumen-creacion-producto-page.component';
+import {QfHomeComponent} from './features/home/pages/qf-home/qf-home.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
     {path: 'productos-vendedor', component: ProductosVendedorPageComponent},
     {path: 'home-bodega', component: BodegaHomeComponent},
+    {path: 'home-qf', component: QfHomeComponent},
     {path: 'ingreso-codigo-pedido',component: IngresoCodigoPedidoPageComponent},
     {path: 'agregar-stock-pedido',component: AgregarStockPedidoPageComponent},
     {path: 'resumen-pedido',component: ResumenPedidoPageComponent},
