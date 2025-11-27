@@ -15,22 +15,32 @@
 
       <div class="order-item">
 
+        <!-- INFORMACIÓN DEL PRODUCTO -->
         <div class="product-info-card">
           <div class="card-details">
             <h3>{{ lote.product.nombreComercial }}</h3>
-            <p class="subtitle">{{ lote.product.nombreGenerico }}</p>
-            <p class="meta">{{ lote.product.categoria }}</p>
+            <p class="subtitle">{{ lote.product.nombreFabricante }}</p>
+
+            <img
+              *ngIf="lote.product.urlFoto"
+              [src]="lote.product.urlFoto"
+              alt="foto"
+              class="product-photo"
+            />
           </div>
         </div>
 
+        <!-- DETALLES DEL LOTE -->
         <div class="item-details">
           <p class="detail-text">Lote: <span>{{ lote.numeroLote }}</span></p>
           <p class="detail-text">Elaboración: <span>{{ lote.fechaElaboracion }}</span></p>
           <p class="detail-text">Vencimiento: <span>{{ lote.fechaVencimiento }}</span></p>
           <p class="detail-text">Cantidad: <span>{{ lote.cantidad }}</span></p>
           <p class="detail-text">Código Barra: <span>{{ lote.codigoBarra }}</span></p>
+          <p class="detail-text">Precio Unitario: <span>${{ lote.precioUnitario }}</span></p>
         </div>
 
+        <!-- ELIMINAR LOTE -->
         <button class="delete-button" (click)="eliminar(i)">
           🗑️
         </button>
@@ -40,6 +50,7 @@
 
   </div>
 
+  <!-- FINALIZAR PEDIDO -->
   <div class="footer-action">
     <button class="btn-completed" (click)="finalizarPedido()">Finalizar Pedido</button>
   </div>
