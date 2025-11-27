@@ -142,4 +142,16 @@ export class ProductosStockCriticoComponent implements OnInit {
         return "tag-normal";
     }
   }
+  /* ============================================================
+   📌 LISTAS DINÁMICAS PARA LOS DROPDOWNS
+   ============================================================ */
+
+  get names(): string[] {
+    return [...new Set(this.filteredList.map(p => p.name))];
+  }
+
+  get generics(): string[] {
+    return [...new Set(this.filteredList.map(p => p.generic))];
+  }
+
 }

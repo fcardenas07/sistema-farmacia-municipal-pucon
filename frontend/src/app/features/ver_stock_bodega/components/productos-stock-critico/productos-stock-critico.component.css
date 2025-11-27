@@ -1,3 +1,4 @@
+/* CONTENEDOR PRINCIPAL */
 .stock-container {
   background-color: #f0f0f0;
   padding: 40px;
@@ -13,19 +14,22 @@
   margin-bottom: 20px;
 }
 
-.filter-input {
+.filter-select {
   padding: 12px 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  background: white;
   font-size: 0.95rem;
+  cursor: pointer;
 }
 
-.filter-input:focus {
+.filter-select:focus {
   outline: none;
   border-color: #111118;
   box-shadow: 0 0 4px rgba(0,0,0,0.3);
 }
 
+/* BOTONES */
 .search-buttons {
   display: flex;
   gap: 15px;
@@ -66,6 +70,7 @@
   margin: 0;
 }
 
+/* NAV */
 .nav-btn {
   background: white;
   border: 1px solid #ccc;
@@ -94,7 +99,7 @@
   margin-top: 20px;
 }
 
-/* TARJETAS */
+/* TARJETA */
 .product-card {
   background: white;
   border-radius: 16px;
@@ -158,15 +163,15 @@
 }
 
 .tag-medium {
-  background-color: #c0ca33; /* MEDIO */
+  background-color: #c0ca33;
 }
 
 .tag-low {
-  background-color: #b71c1c; /* BAJO / CRÍTICO */
+  background-color: #b71c1c;
 }
 
 .tag-normal {
-  background-color: #2e7d32; /* NORMAL */
+  background-color: #2e7d32;
 }
 
 /* Unidades */

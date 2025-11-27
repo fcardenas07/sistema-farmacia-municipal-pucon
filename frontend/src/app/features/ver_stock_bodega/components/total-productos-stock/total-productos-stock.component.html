@@ -3,45 +3,17 @@
   <!-- FILTROS -->
   <div class="filters-container">
 
-    <select [(ngModel)]="filters.name" class="filter-select">
+    <select [(ngModel)]="filters.nombreComercial" class="filter-select">
       <option value="">Nombre comercial</option>
-      @for (n of names; track n) {
+      @for (n of nombresComerciales; track n) {
         <option [value]="n">{{ n }}</option>
       }
     </select>
 
-    <select [(ngModel)]="filters.generic" class="filter-select">
+    <select [(ngModel)]="filters.nombreGenerico" class="filter-select">
       <option value="">Nombre genérico</option>
-      @for (g of generics; track g) {
+      @for (g of nombresGenericos; track g) {
         <option [value]="g">{{ g }}</option>
-      }
-    </select>
-
-    <select [(ngModel)]="filters.details" class="filter-select">
-      <option value="">Presentación</option>
-      @for (d of details; track d) {
-        <option [value]="d">{{ d }}</option>
-      }
-    </select>
-
-    <select [(ngModel)]="filters.category" class="filter-select">
-      <option value="">Categoría</option>
-      @for (c of categories; track c) {
-        <option [value]="c">{{ c }}</option>
-      }
-    </select>
-
-    <select [(ngModel)]="filters.dosage" class="filter-select">
-      <option value="">Dosificación</option>
-      @for (doz of dosages; track doz) {
-        <option [value]="doz">{{ doz }}</option>
-      }
-    </select>
-
-    <select [(ngModel)]="filters.manufacturer" class="filter-select">
-      <option value="">Fabricante</option>
-      @for (f of manufacturers; track f) {
-        <option [value]="f">{{ f }}</option>
       }
     </select>
 
@@ -58,44 +30,43 @@
     <h2>Stock Total</h2>
 
     <div class="nav-controls">
-      <button class="nav-btn">◀</button>
-      <button class="nav-btn">▶</button>
+      <button class="nav-btn" (click)="paginaAnterior()">◀</button>
+      <button class="nav-btn" (click)="paginaSiguiente()">▶</button>
     </div>
   </div>
 
   <!-- TARJETAS -->
   <div class="cards-list">
-    @for (product of filteredList; track product.id) {
+    @for (product of filteredList; track product.idProducto) {
+
       <div class="product-card">
 
         <div class="img-section">
-          <img [src]="product.imageUrl" alt="Producto">
+          <img [src]="product.urlFoto || 'https://via.placeholder.com/100'" alt="Producto">
         </div>
 
         <div class="info-section">
-          <h3>{{ product.name }}</h3>
-          <span class="generic">{{ product.generic }}</span>
-          <span class="details">{{ product.details }}</span>
-          <span class="manufacturer">Fabricante: {{ product.manufacturer }}</span>
-          <span class="dosage">Dosificación: {{ product.dosage }}</span>
+          <h3>{{ product.nombreComercial }}</h3>
+          <span class="generic">{{ product.nombreGenerico }}</span>
+          <span class="dosage">
+            {{ product.dosificacion }} {{ product.unidadMedida }}
+          </span>
+          <span class="manufacturer">Fabricante: {{ product.nombreFabricante || '—' }}</span>
         </div>
 
         <div class="tags-section">
-          <span class="tag tag-dark">{{ product.category }}</span>
-          <span class="tag" [ngClass]="getStatusClass(product.status)">
-            {{ product.status }}
+          <span class="tag tag-dark">Total stock</span>
+          <span class="tag" [ngClass]="getStatusClass(product.estadoStock)">
+            {{ product.estadoStockTitulo }}
           </span>
         </div>
 
         <div class="units-section">
-          <span>{{ product.units }} Unidades</span>
-        </div>
-
-        <div class="action-section">
-          <!-- Podrías poner botón editar más adelante -->
+          <span>{{ product.stockTotal }} Unidades</span>
         </div>
 
       </div>
+
     }
   </div>
 

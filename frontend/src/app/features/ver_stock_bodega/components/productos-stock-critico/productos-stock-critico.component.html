@@ -4,21 +4,26 @@
   <div class="filters-container">
 
     <!-- Nombre comercial -->
-    <input
-      class="filter-input"
-      type="text"
-      placeholder="Nombre comercial"
+    <select
+      class="filter-select"
       [(ngModel)]="filters.name"
-    />
+    >
+      <option value="">Nombre comercial</option>
+      @for (n of names; track n) {
+        <option [value]="n">{{ n }}</option>
+      }
+    </select>
 
     <!-- Nombre genérico -->
-    <input
-      class="filter-input"
-      type="text"
-      placeholder="Nombre genérico"
+    <select
+      class="filter-select"
       [(ngModel)]="filters.generic"
-    />
-
+    >
+      <option value="">Nombre genérico</option>
+      @for (g of generics; track g) {
+        <option [value]="g">{{ g }}</option>
+      }
+    </select>
 
   </div>
 
@@ -30,11 +35,13 @@
 
   <!-- HEADER -->
   <div class="header">
+
     <button class="nav-btn" (click)="prevPage()" [disabled]="currentPage === 0">◀</button>
 
     <h2>Stock Crítico (Página {{ currentPage + 1 }} de {{ totalPages }})</h2>
 
     <button class="nav-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">▶</button>
+
   </div>
 
   <!-- LISTA DE TARJETAS -->

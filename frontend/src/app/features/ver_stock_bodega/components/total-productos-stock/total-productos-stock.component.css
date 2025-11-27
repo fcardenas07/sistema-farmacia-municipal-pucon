@@ -9,7 +9,7 @@
 /* FILTROS */
 .filters-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 15px;
   margin-bottom: 15px;
 }
@@ -176,6 +176,10 @@
 
 .tag-low {
   background-color: #b71c1c;
+}
+
+.tag-medium {
+  background-color: #c0ca33;
 }
 
 /* UNIDADES */
