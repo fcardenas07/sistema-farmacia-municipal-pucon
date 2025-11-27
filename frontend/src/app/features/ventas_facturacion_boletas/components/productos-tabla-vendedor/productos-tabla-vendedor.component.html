@@ -1,0 +1,13 @@
+<div class="products-container">
+  <h1 class="main-title">Productos</h1>
+
+  <div class="product-list">
+    @for (producto of productos; track producto.nombre) {
+    <app-producto-card [producto]="producto"></app-producto-card>
+    } @empty {
+    <div class="empty-state">
+      <p>No se encontraron productos</p>
+    </div>
+    }
+  </div>
+</div>

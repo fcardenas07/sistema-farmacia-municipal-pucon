@@ -1,0 +1,35 @@
+/* Contenedor general */
+.total-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4vh;
+}
+
+/* Encabezado */
+.total-header {
+  background: #1b1c29;
+  color: white;
+  font-weight: 600;
+  font-size: 1.3rem;
+  padding: 1.5vh 2vw;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Caja del total */
+.total-box {
+  background: #ffffff;
+  padding: 3vh 2vw;
+  border-radius: 0 0 8px 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Texto del monto */
+.total-monto {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1b1c29;
+}

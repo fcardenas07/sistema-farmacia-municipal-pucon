@@ -1,0 +1,55 @@
+<div class="resumen-container">
+
+  <h1>Resumen del Producto</h1>
+
+  <div class="card">
+
+    <div class="card-row">
+      <span class="label">Nombre comercial:</span>
+      <span class="value">{{ producto?.nombreComercial }}</span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Nombre genérico:</span>
+      <span class="value">{{ producto?.nombreGenerico }}</span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Presentación:</span>
+      <span class="value">{{ producto?.presentacion }}</span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Dosificación:</span>
+      <span class="value">
+        {{ producto?.dosificacion }} {{ producto?.unidadMedida }}
+      </span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Stock mínimo:</span>
+      <span class="value">{{ producto?.stockMinimo }}</span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Stock máximo:</span>
+      <span class="value">{{ producto?.stockMaximo }}</span>
+    </div>
+
+    <div class="card-row">
+      <span class="label">Categoría:</span>
+      <span class="value">{{ producto?.categoria }}</span>
+    </div>
+
+  </div>
+
+  <!-- BOTONES -->
+  <div class="button-container">
+
+    <button class="edit-btn" (click)="editar()">Editar</button>
+
+    <button class="final-btn" (click)="finalizar()">Finalizar</button>
+
+  </div>
+
+</div>

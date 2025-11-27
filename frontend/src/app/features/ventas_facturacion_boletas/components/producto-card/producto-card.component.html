@@ -1,0 +1,42 @@
+<div class="product-card">
+  <div class="card-content">
+    <!-- Sección izquierda - Información principal del producto -->
+    <div class="product-main">
+      <h2 class="product-name">{{ producto.nombre }}</h2>
+      <p class="active-ingredient">{{ producto.principioActivo }}</p>
+      <p class="presentation">{{ producto.presentacion }}</p>
+    </div>
+
+    <!-- Sección central - Información de categoría y detalles -->
+    <div class="product-category">
+      <h3 class="category-title">{{ producto.categoria }}</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Disponibilidad:</span>
+          <span class="detail-value">{{ producto.disponibilidad }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Receta:</span>
+          <span class="detail-value">{{ producto.requiereReceta }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección derecha - Stock, precio y ubicación -->
+    <div class="product-side">
+      <div class="stock-price">
+        <div class="detail-item">
+          <span class="detail-label">Stock:</span>
+          <span class="detail-value">{{ producto.unidades }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Precio:</span>
+          <span class="detail-value price">{{ producto.precio }}</span>
+        </div>
+      </div>
+      <div class="location-section">
+        <span class="location-text">{{ producto.ubicacion }}</span>
+      </div>
+    </div>
+  </div>
+</div>

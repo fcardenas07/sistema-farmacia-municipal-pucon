@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <a
+      routerLink="/productos-vendedor"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Productos
+    </a>
+
+    <a
+      routerLink="/detalle-venta-vendedor"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Venta
+    </a>
+  </div>
+
+  <div class="navbar-right">
+    <a
+      routerLink="/vendedor/perfil"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Perfil
+    </a>
+
+    <div class="perfil-icon"></div>
+  </div>
+</nav>

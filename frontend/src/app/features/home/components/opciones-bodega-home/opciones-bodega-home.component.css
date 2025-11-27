@@ -1,0 +1,34 @@
+.container {
+  text-align: center;
+  padding-top: 40px;
+}
+
+.titulo {
+  font-size: 1.6rem;
+  margin-bottom: 40px;
+  font-weight: 600;
+}
+
+.opciones {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 40px;
+}
+
+.opcion {
+  width: 180px;
+  height: 180px;
+  background: #754DFF;
+  color: white;
+  border: none;
+  border-radius: 35px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.opcion:hover {
+  background: #1a1f33;
+}

@@ -1,0 +1,31 @@
+.contenedor {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.titulo {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.input-codigo {
+  width: 350px;
+  height: 50px;
+  border: 2px solid #444;
+  border-radius: 5px;
+  padding: 0 15px;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.continuar {
+  background: #6a4dfc;
+  border: none;
+  padding: 12px 40px;
+  color: white;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}

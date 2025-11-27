@@ -1,0 +1,47 @@
+<div class="resumen-container">
+
+  <h1 class="summary-header">Resumen del pedido</h1>
+
+  <!-- BOTÓN VOLVER -->
+  <button class="btn-back" (click)="volver()">← Volver</button>
+
+  <div class="order-list">
+
+    @if (lotes.length === 0) {
+      <p class="empty-message">No hay lotes agregados.</p>
+    }
+
+    @for (lote of lotes; track lote.numeroLote; let i = $index) {
+
+      <div class="order-item">
+
+        <div class="product-info-card">
+          <div class="card-details">
+            <h3>{{ lote.product.nombreComercial }}</h3>
+            <p class="subtitle">{{ lote.product.nombreGenerico }}</p>
+            <p class="meta">{{ lote.product.categoria }}</p>
+          </div>
+        </div>
+
+        <div class="item-details">
+          <p class="detail-text">Lote: <span>{{ lote.numeroLote }}</span></p>
+          <p class="detail-text">Elaboración: <span>{{ lote.fechaElaboracion }}</span></p>
+          <p class="detail-text">Vencimiento: <span>{{ lote.fechaVencimiento }}</span></p>
+          <p class="detail-text">Cantidad: <span>{{ lote.cantidad }}</span></p>
+          <p class="detail-text">Código Barra: <span>{{ lote.codigoBarra }}</span></p>
+        </div>
+
+        <button class="delete-button" (click)="eliminar(i)">
+          🗑️
+        </button>
+
+      </div>
+    }
+
+  </div>
+
+  <div class="footer-action">
+    <button class="btn-completed" (click)="finalizarPedido()">Finalizar Pedido</button>
+  </div>
+
+</div>
