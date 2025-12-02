@@ -13,7 +13,7 @@ public interface TrazabilidadRepository extends JpaRepository<Lote, String> {
     SELECT
         c.id_codigo          AS idCodigo,
         p.nombre_comercial   AS nombreComercial,
-        l.numero_lote        AS codigoLote,
+        l.numero_lote        AS numeroLote,
         l.fecha_elaboracion  AS fechaElaboracion,
         l.fecha_vencimiento  AS fechaVencimiento,
         s.cantidad_actual    AS cantidad,
@@ -35,10 +35,35 @@ public interface TrazabilidadRepository extends JpaRepository<Lote, String> {
         )
     ) m ON m.id_lote = l.id_lote
 
-    ORDER BY l.fecha_elaboracion DESC
+    ORDER BY m.fecha_movimiento DESC
     """,
             nativeQuery = true
     )
-    List<TrazabilidadProjection> getTrazabilidadDeTodosLosLotes();
+    List<TrazabilidadIngresoProjection> getTrazabilidadDeTodosLosLotes();
+
+
+    @Query(
+            value = """
+        SELECT
+            c.id_codigo          AS idCodigo,
+            p.nombre_comercial   AS nombreComercial,
+            l.numero_lote        AS numeroLote,
+            l.fecha_elaboracion  AS fechaElaboracion,
+            l.fecha_vencimiento  AS fechaVencimiento,
+            m.cantidad           AS cantidad,
+            l.estado             AS estado,
+            m.fecha_movimiento   AS fechaMovimiento,
+            m.tipo_movimiento    AS tipoMovimiento
+        FROM movimiento m
+        JOIN lote l      ON m.id_lote = l.id_lote
+        JOIN codigo c    ON l.id_codigo = c.id_codigo
+        JOIN producto p  ON c.id_producto = p.id_producto
+        WHERE m.tipo_movimiento = 'INGRESO'
+        ORDER BY m.fecha_movimiento DESC
+        """,
+            nativeQuery = true
+    )
+    List<TrazabilidadIngresoProjection> getIngresosOrdenados();
+
 
 }

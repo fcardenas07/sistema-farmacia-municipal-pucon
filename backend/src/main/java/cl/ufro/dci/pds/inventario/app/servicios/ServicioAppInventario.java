@@ -4,7 +4,7 @@ import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
 import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadRepository;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
-import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadLote;
+import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
@@ -56,11 +56,12 @@ public class ServicioAppInventario {
         return mapper.toEntradaIngresada(lote, producto, codigo, stock, null);
     }
 
-    public List<TrazabilidadLote> obtenerTrazabilidad() {
-        var filas = trazabilidadRepository.getTrazabilidadDeTodosLosLotes();
+    public List<TrazabilidadIngreso> obtenerIngresos() {
+        var filas = trazabilidadRepository.getIngresosOrdenados();
         return filas.stream()
                 .map(trazabilidadLoteMapper::toDto)
                 .toList();
     }
+
 
 }

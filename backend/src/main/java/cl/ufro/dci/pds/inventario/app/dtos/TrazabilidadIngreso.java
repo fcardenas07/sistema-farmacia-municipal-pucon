@@ -1,16 +1,14 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
-import java.time.LocalDate;
-
-public record TrazabilidadLote(
+public record TrazabilidadIngreso(
         String idCodigo,
         String nombreComercial,
-        String codigoLote,
+        String numeroLote,
         String fechaElaboracion,
         String fechaVencimiento,
         Integer cantidad,
         String estado,
-        String ultimoMovimiento,
+        String fechaMovimiento,
         String tipoMovimiento
 ) {
 }

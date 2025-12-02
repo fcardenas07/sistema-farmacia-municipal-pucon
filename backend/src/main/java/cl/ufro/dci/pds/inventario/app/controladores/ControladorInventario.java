@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.inventario.app.controladores;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 
-import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadLote;
+import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
 
 import jakarta.validation.Valid;
@@ -39,12 +39,6 @@ public class ControladorInventario {
                 .body(ingresado);
     }
 
-
-    @GetMapping("/trazabilidad")
-    public ResponseEntity<List<TrazabilidadLote>> obtenerTrazabilidad() {
-        var lista = servicioAppInventario.obtenerTrazabilidad();
-        return ResponseEntity.ok(lista);
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {

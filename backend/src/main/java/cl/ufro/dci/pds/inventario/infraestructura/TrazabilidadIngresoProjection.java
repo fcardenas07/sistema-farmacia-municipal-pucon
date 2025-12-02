@@ -1,13 +1,13 @@
 package cl.ufro.dci.pds.inventario.infraestructura;
 
-public interface TrazabilidadProjection {
+public interface TrazabilidadIngresoProjection {
     String getIdCodigo();
     String getNombreComercial();
-    String getCodigoLote();
+    String getNumeroLote();
     String getFechaElaboracion();
     String getFechaVencimiento();
     Integer getCantidad();
     String getEstado();
-    String getUltimoMovimiento();
+    String getFechaMovimiento();
     String getTipoMovimiento();
 }
