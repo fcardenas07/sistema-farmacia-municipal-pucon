@@ -1,6 +1,8 @@
 package cl.ufro.dci.pds.inventario.infraestructura;
 
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -63,7 +65,7 @@ public interface TrazabilidadRepository extends JpaRepository<Lote, String> {
         """,
             nativeQuery = true
     )
-    List<TrazabilidadIngresoProjection> getIngresosOrdenados();
+    Page<TrazabilidadIngresoProjection> getIngresosOrdenados(Pageable pageable);
 
 
 }

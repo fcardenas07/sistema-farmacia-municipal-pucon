@@ -12,6 +12,8 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,11 +58,10 @@ public class ServicioAppInventario {
         return mapper.toEntradaIngresada(lote, producto, codigo, stock, null);
     }
 
-    public List<TrazabilidadIngreso> obtenerIngresos() {
-        var filas = trazabilidadRepository.getIngresosOrdenados();
-        return filas.stream()
-                .map(trazabilidadLoteMapper::toDto)
-                .toList();
+    public Page<TrazabilidadIngreso> obtenerIngresos(Pageable pageable) {
+        var page = trazabilidadRepository.getIngresosOrdenados(pageable);
+
+        return page.map(trazabilidadLoteMapper::toDto);
     }
 
 
