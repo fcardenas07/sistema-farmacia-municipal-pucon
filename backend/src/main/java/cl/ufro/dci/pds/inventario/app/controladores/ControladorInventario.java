@@ -3,6 +3,7 @@ package cl.ufro.dci.pds.inventario.app.controladores;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 
+import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
 
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
