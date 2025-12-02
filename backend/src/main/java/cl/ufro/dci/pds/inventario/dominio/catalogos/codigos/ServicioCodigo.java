@@ -32,6 +32,11 @@ public class ServicioCodigo {
                 });
     }
 
+    public Codigo obtener(String idCodigo){
+        return repositorioCodigo.findById(idCodigo)
+                .orElseThrow(() -> new CodigoNoEncontradoException(idCodigo));
+    }
+
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {
         if (!repositorioCodigo.existsById(dto.idCodigo())) {
             throw new CodigoNoEncontradoException(dto.idCodigo());

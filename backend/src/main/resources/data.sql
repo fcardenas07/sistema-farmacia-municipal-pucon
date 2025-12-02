@@ -131,3 +131,28 @@ VALUES ('stock-001', 100, 100, 'lot-001'),
        ('stock-016', 250, 240, 'lot-016'),
        ('stock-017', 220, 215, 'lot-017'),
        ('stock-018', 210, 205, 'lot-018');
+
+-- ============================================
+-- ============== MOVIMIENTOS ==================
+-- ============================================
+
+INSERT INTO movimiento (id_movimiento, tipo_movimiento, cantidad, fecha_movimiento, detalle, id_lote)
+VALUES
+('mov-001', 'INGRESO', 100, '2024-01-10', 'Ingreso inicial del lote', 'lot-001'),
+('mov-002', 'INGRESO', 150, '2024-02-15', 'Ingreso inicial del lote', 'lot-002'),
+('mov-003', 'INGRESO', 80,  '2024-03-05', 'Ingreso inicial del lote', 'lot-003'),
+('mov-004', 'INGRESO', 200, '2024-01-20', 'Ingreso inicial del lote', 'lot-004'),
+('mov-005', 'INGRESO', 180, '2024-02-22', 'Ingreso inicial del lote', 'lot-005'),
+('mov-006', 'INGRESO', 120, '2024-04-10', 'Ingreso inicial del lote', 'lot-006'),
+('mov-007', 'INGRESO', 160, '2024-05-12', 'Ingreso inicial del lote', 'lot-007'),
+('mov-008', 'INGRESO', 140, '2024-06-10', 'Ingreso inicial del lote', 'lot-008'),
+('mov-009', 'INGRESO', 90,  '2024-01-18', 'Ingreso inicial del lote', 'lot-009'),
+('mov-010', 'INGRESO', 110, '2024-03-14', 'Ingreso inicial del lote', 'lot-010'),
+('mov-011', 'INGRESO', 130, '2024-02-10', 'Ingreso inicial del lote', 'lot-011'),
+('mov-012', 'INGRESO', 100, '2024-04-25', 'Ingreso inicial del lote', 'lot-012'),
+('mov-013', 'INGRESO', 200, '2024-01-05', 'Ingreso inicial del lote', 'lot-013'),
+('mov-014', 'INGRESO', 180, '2024-03-20', 'Ingreso inicial del lote', 'lot-014'),
+('mov-015', 'INGRESO', 300, '2024-01-10', 'Ingreso inicial del lote', 'lot-015'),
+('mov-016', 'INGRESO', 250, '2024-02-15', 'Ingreso inicial del lote', 'lot-016'),
+('mov-017', 'INGRESO', 220, '2024-03-12', 'Ingreso inicial del lote', 'lot-017'),
+('mov-018', 'INGRESO', 210, '2024-04-18', 'Ingreso inicial del lote', 'lot-018');
