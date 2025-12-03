@@ -10,19 +10,30 @@ import { StockCriticoPageComponent } from './features/ver_stock_bodega/pages/sto
 import { StockTotalPageComponent } from './features/ver_stock_bodega/pages/stock-total-page/stock-total-page.component';
 import { CrearProductosPageComponent } from './features/crear_productos_QF/pages/crear-productos-page/crear-productos-page.component';
 import { ResumenCreacionProductoPageComponent } from './features/crear_productos_QF/pages/resumen-creacion-producto-page/resumen-creacion-producto-page.component';
-import {QfHomeComponent} from './features/home/pages/qf-home/qf-home.component';
+import { QfHomeComponent } from './features/home/pages/qf-home/qf-home.component';
+import { ProductosQfPageComponent } from './features/crear_productos_QF/pages/productos-qf-page/productos-qf-page.component';
+import { EditarProductosComponent } from './features/crear_productos_QF/pages/editar-producto/editar-producto.component';
+
 export const routes: Routes = [
-    {path: 'login', component: LoginPageComponent},
-    {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
-    {path: 'productos-vendedor', component: ProductosVendedorPageComponent},
-    {path: 'home-bodega', component: BodegaHomeComponent},
-    {path: 'home-qf', component: QfHomeComponent},
-    {path: 'ingreso-codigo-pedido',component: IngresoCodigoPedidoPageComponent},
-    {path: 'agregar-stock-pedido',component: AgregarStockPedidoPageComponent},
-    {path: 'resumen-pedido',component: ResumenPedidoPageComponent},
-    {path: 'stock-critico',component: StockCriticoPageComponent },
-    {path: 'stock-total',component: StockTotalPageComponent },
-    {path: 'crear-productos',component: CrearProductosPageComponent},
-    {path: 'resumen-creacion-producto',component: ResumenCreacionProductoPageComponent},
-    {path: '**', redirectTo: 'login' }
+  { path: 'login', component: LoginPageComponent },
+  { path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent },
+  { path: 'productos-vendedor', component: ProductosVendedorPageComponent },
+  { path: 'home-bodega', component: BodegaHomeComponent },
+  { path: 'home-qf', component: QfHomeComponent },
+  { path: 'productos-qf', component: ProductosQfPageComponent },
+  {
+    path: 'ingreso-codigo-pedido',
+    component: IngresoCodigoPedidoPageComponent,
+  },
+  { path: 'agregar-stock-pedido', component: AgregarStockPedidoPageComponent },
+  { path: 'resumen-pedido', component: ResumenPedidoPageComponent },
+  { path: 'stock-critico', component: StockCriticoPageComponent },
+  { path: 'stock-total', component: StockTotalPageComponent },
+  { path: 'crear-productos', component: CrearProductosPageComponent },
+  { path: 'editar-producto/:id', component: EditarProductosComponent },
+  {
+    path: 'resumen-creacion-producto',
+    component: ResumenCreacionProductoPageComponent,
+  },
+  { path: '**', redirectTo: 'login' },
 ];

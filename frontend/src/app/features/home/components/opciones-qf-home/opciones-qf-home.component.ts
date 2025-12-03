@@ -15,7 +15,7 @@ export class OpcionesQfHomeComponent {
     this.router.navigate(['/crear-productos']);
   }
 
-  irAModificarProducto() {
-    this.router.navigate(['/modificar-productos']);
+  irAVerProductos() {
+    this.router.navigate(['/productos-qf']);
   }
 }
