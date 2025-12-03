@@ -8,6 +8,7 @@ public record TrazabilidadIngreso(
         String fechaVencimiento,
         Integer cantidad,
         String estado,
+        String idMovimiento,
         String fechaMovimiento,
         String tipoMovimiento
 ) {

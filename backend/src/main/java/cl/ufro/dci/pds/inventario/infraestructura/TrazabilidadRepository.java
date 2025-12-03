@@ -54,6 +54,7 @@ public interface TrazabilidadRepository extends JpaRepository<Lote, String> {
             l.fecha_vencimiento  AS fechaVencimiento,
             m.cantidad           AS cantidad,
             l.estado             AS estado,
+            m.id_movimiento AS idMovimiento,
             m.fecha_movimiento   AS fechaMovimiento,
             m.tipo_movimiento    AS tipoMovimiento
         FROM movimiento m
