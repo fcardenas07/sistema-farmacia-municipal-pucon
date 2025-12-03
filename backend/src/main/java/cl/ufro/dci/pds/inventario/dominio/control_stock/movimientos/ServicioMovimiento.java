@@ -37,4 +37,9 @@ public class ServicioMovimiento {
 
         return repositorioMovimiento.save(movimiento);
     }
+
+    public Movimiento obtenerPorId(String idMovimiento) {
+        return repositorioMovimiento.findById(idMovimiento)
+                .orElseThrow(() -> new MovimientoNoEncontradoException(idMovimiento));
+    }
 }
