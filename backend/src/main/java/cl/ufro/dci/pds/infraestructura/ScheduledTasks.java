@@ -29,9 +29,9 @@ public class ScheduledTasks {
     }
 
     //cada 1 minuto(testing)
-    @Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 * * * * *")
     //Cada 1 mes
-    //@Scheduled(cron = "0 0 8 1 * *")
+    @Scheduled(cron = "0 0 8 1 * *")
     public void verificarVencimiento() {
 
         LocalDate hoy = LocalDate.now();
