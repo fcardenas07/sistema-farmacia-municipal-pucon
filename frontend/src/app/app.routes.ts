@@ -8,6 +8,7 @@ import { AgregarStockPedidoPageComponent } from './features/recepcion-productos-
 import { ResumenPedidoPageComponent } from './features/recepcion-productos-bodega/pages/resumen-pedido-page/resumen-pedido-page.component';
 import { CrearProductosPageComponent } from './features/crear_productos_QF/pages/crear-productos-page/crear-productos-page.component';
 import { ResumenCreacionProductoPageComponent } from './features/crear_productos_QF/pages/resumen-creacion-producto-page/resumen-creacion-producto-page.component';
+import { VerInventarioLotesPageComponent } from './features/ver_inventario_lotes_bodega/pages/ver-inventario-lotes-page/ver-inventario-lotes-page.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
@@ -18,5 +19,8 @@ export const routes: Routes = [
     {path: 'resumen-pedido',component: ResumenPedidoPageComponent},
     {path: 'crear-productos',component: CrearProductosPageComponent},
     {path: 'resumen-creacion-producto',component: ResumenCreacionProductoPageComponent},
-    {path: '**', redirectTo: 'login' }
+    {path: 'inventario-lotes-bodega',component: VerInventarioLotesPageComponent},
+    {path: '**', redirectTo: 'login' },
+  
+
 ];
