@@ -1,20 +1,29 @@
 <nav class="navbar">
   <div class="navbar-left">
     <a
+      routerLink="/stock-critico-qf"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Stock critico
+    </a>
+    <a
+      routerLink="/stock-normal-qf"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Stock Normal
+    </a>
+    
+    <a
       routerLink="/crear-productos"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Químico Farmacéutico
+      Crear medicamentos
     </a>
 
-    <a
-      routerLink="/detalle-venta-vendedor"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-     
-    </a>
+   
   </div>
 
   <div class="navbar-right">
@@ -23,9 +32,9 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Perfil
+      Cerrar sesión
     </a>
 
-    <div class="perfil-icon"></div>
+
   </div>
 </nav>
