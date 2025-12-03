@@ -41,4 +41,8 @@ public class ServicioLote {
         lote.setEstado("INACTIVO");
         repositorioLote.save(lote);
     }
+
+    public void guardarTodos(List<Lote> lotes) {
+        repositorioLote.saveAll(lotes);
+    }
 }
