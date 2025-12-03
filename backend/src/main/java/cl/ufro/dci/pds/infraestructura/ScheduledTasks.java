@@ -72,7 +72,7 @@ public class ScheduledTasks {
         String html = emailBuilder.construirTablaLotesPorVencer(porVencerUnicos);
 
         emailService.enviar(
-                "inventario@farmacia.cl",
+                "thomaswkm6@gmail.com",
                 "Lotes por vencer en los próximos 30 días",
                 html
         );
