@@ -1,16 +1,22 @@
 package cl.ufro.dci.pds.inventario.app.controladores;
 
+import cl.ufro.dci.pds.inventario.app.dtos.MovimientoBuscado;
 import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.MovimientoNoEncontradoException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/trazabilidad")
@@ -34,4 +40,55 @@ public class ControladorTrazabilidad {
         return ResponseEntity.ok(resultado);
     }
 
+    @GetMapping("/movimientos/{id}")
+    public ResponseEntity<MovimientoBuscado> obtenerMovimiento(@PathVariable String id){
+        var resultado = servicioAppInventario.obtenerMovimiento(id);
+        return ResponseEntity.ok(resultado);
+    }
+
+    @ExceptionHandler({MovimientoNoEncontradoException.class})
+    public ResponseEntity<String> manejarNoEncontrado(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {
+        System.out.println(ex.getMessage());
+
+        var body = Map.of("mensaje", "Error interno del servidor");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(body);
+    }
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> manejarBodyFaltante(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body("Body de la solicitud requerido");
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<?> manejarParteFaltante(MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest().body(
+                Map.of("errors", Map.of(
+                        ex.getRequestPartName(), "El archivo no puede estar vacío"
+                ))
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> manejarValidacion(MethodArgumentNotValidException ex) {
+
+        var errores = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        e -> Optional.ofNullable(e.getDefaultMessage()).orElse("Error desconocido"),
+                        (a, _) -> a
+                ));
+
+        System.out.println("Errores de validación: " + errores);
+        return ResponseEntity.badRequest().body(errores);
+    }
 }

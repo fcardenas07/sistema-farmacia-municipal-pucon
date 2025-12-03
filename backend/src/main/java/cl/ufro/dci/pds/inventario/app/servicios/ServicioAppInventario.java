@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
+import cl.ufro.dci.pds.inventario.app.dtos.MovimientoBuscado;
 import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
 import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadRepository;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
@@ -65,4 +66,8 @@ public class ServicioAppInventario {
     }
 
 
+    public MovimientoBuscado obtenerMovimiento(String id) {
+        var movimiento = servicioMovimiento.obtenerPorId(id);
+        return trazabilidadLoteMapper.toDto(movimiento);
+    }
 }
