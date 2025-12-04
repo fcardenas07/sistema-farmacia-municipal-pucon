@@ -55,24 +55,46 @@
   width: 100%;
 }
 
+/* GRAN GRÁFICO (BARRAS) */
 .main-chart {
   grid-row: span 2;
-  height: 430px;
+  height: 600px; /* aumentamos para evitar overflow */
 }
 
+/* TARJETAS DE LOS GRÁFICOS PEQUEÑOS */
 .side-chart {
-  min-height: 260px;
+  min-height: 200px; /* espacio suficiente para ambos gráficos */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* ===============================================
-   CANVAS (gráficos)
+   CANVAS BASE (por defecto)
    =============================================== */
 canvas {
-  width: 100% !important;
-  height: 100% !important;
-  margin-top: 18px;
   border-radius: 10px;
   background: #ffffff;
+}
+
+/* ===============================================
+   AJUSTES ESPECÍFICOS PARA PROPORCIÓN GRÁFICOS
+   =============================================== */
+
+/* PIE CHART → CUADRADO (CÍRCULO PERFECTO) */
+#chart2 {
+  width: 200px !important;
+  height: 200px !important;   /* proporción 1:1 */
+  margin: 10px auto 0 auto;
+  display: block;
+}
+
+/* GRÁFICO INFERIOR (más pequeño) */
+#chart3 {
+  width: 200px !important;
+  height: 120px !important;
+  margin: 10px auto 0 auto;
+  display: block;
 }
 
 /* ===============================================
@@ -88,7 +110,7 @@ canvas {
   }
 
   .side-chart {
-    height: 240px;
+    min-height: 240px;
   }
 }
 
