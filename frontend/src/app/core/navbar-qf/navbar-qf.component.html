@@ -9,11 +9,26 @@
     </a>
 
     <a
+      routerLink="/stock-critico-qf"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Stock critico
+    </a>
+    <a
+      routerLink="/stock-normal-qf"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Stock Normal
+    </a>
+
+    <a
       routerLink="/crear-productos"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Crear Producto
+      Crear medicamentos
     </a>
   </div>
 
@@ -23,9 +38,7 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Perfil
+      Cerrar sesión
     </a>
-
-    <div class="perfil-icon"></div>
   </div>
 </nav>
