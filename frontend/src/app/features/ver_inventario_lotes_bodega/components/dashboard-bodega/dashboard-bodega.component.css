@@ -1,0 +1,103 @@
+/* ===============================================
+   CONTENEDOR PRINCIPAL
+   =============================================== */
+.dashboard-container {
+  width: 100%;
+  padding: 40px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  background: #fafafa;
+}
+
+/* ===============================================
+   TARJETAS SUPERIORES (shadcn style)
+   =============================================== */
+.top-cards {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.card-shadcn {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px 26px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+}
+
+.card-number {
+  margin-top: 12px;
+  font-size: 30px;
+  font-weight: 700;
+  color: #111118;
+}
+
+/* ===============================================
+   GRID CENTRAL
+   =============================================== */
+.middle-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+.main-chart {
+  grid-row: span 2;
+  height: 430px;
+}
+
+.side-chart {
+  min-height: 260px;
+}
+
+/* ===============================================
+   CANVAS (gráficos)
+   =============================================== */
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  margin-top: 18px;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+/* ===============================================
+   RESPONSIVE
+   =============================================== */
+@media (max-width: 1050px) {
+  .middle-section {
+    grid-template-columns: 1fr;
+  }
+
+  .main-chart {
+    height: 350px;
+  }
+
+  .side-chart {
+    height: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-cards {
+    flex-direction: column;
+  }
+
+  .dashboard-container {
+    padding: 25px;
+  }
+}

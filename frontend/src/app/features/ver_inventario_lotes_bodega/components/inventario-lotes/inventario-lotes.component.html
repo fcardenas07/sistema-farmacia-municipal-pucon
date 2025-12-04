@@ -1,0 +1,41 @@
+<!-- inventario-lotes.component.html -->
+
+<div class="table-wrapper">
+
+  <table class="shad-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Producto</th>
+        <th>Lote</th>
+        <th>F.Elab.</th>
+        <th>F.Ven.</th>
+        <th>Stock</th>
+        <th>Estado</th>
+        <th>Último Mov.</th>
+        <th>Tipo mov.</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let lote of lotes">
+        <td>{{ lote.codigo }}</td>
+        <td>{{ lote.producto }}</td>
+        <td>{{ lote.lote }}</td>
+        <td>{{ lote.fElab }}</td>
+        <td>{{ lote.fVen }}</td>
+        <td>{{ lote.stock }}</td>
+        <td>{{ lote.estado }}</td>
+        <td>{{ lote.ultimoMov }}</td>
+        <td>{{ lote.tipoMov }}</td>
+
+        <td>
+          <button class="btn-shad">Ver detalles</button>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+
+</div>

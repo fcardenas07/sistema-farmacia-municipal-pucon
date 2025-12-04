@@ -9,6 +9,9 @@ import { ResumenPedidoPageComponent } from './features/recepcion-productos-bodeg
 import { CrearProductosPageComponent } from './features/crear_productos_QF/pages/crear-productos-page/crear-productos-page.component';
 import { ResumenCreacionProductoPageComponent } from './features/crear_productos_QF/pages/resumen-creacion-producto-page/resumen-creacion-producto-page.component';
 import { VerInventarioLotesPageComponent } from './features/ver_inventario_lotes_bodega/pages/ver-inventario-lotes-page/ver-inventario-lotes-page.component';
+import { FormularioMermaPageComponent } from './features/ver_inventario_lotes_bodega/pages/formulario-merma-page/formulario-merma-page.component';
+import { VerInvnetarioMermasPageComponent } from './features/ver_inventario_lotes_bodega/pages/ver-invnetario-mermas-page/ver-invnetario-mermas-page.component';
+import { DashboardBodegaPageComponent } from './features/ver_inventario_lotes_bodega/pages/dashboard-bodega-page/dashboard-bodega-page.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
@@ -20,6 +23,9 @@ export const routes: Routes = [
     {path: 'crear-productos',component: CrearProductosPageComponent},
     {path: 'resumen-creacion-producto',component: ResumenCreacionProductoPageComponent},
     {path: 'inventario-lotes-bodega',component: VerInventarioLotesPageComponent},
+    {path: 'formularo-merma-inventario',component: FormularioMermaPageComponent},
+    {path: 'mermas-inventario',component: VerInvnetarioMermasPageComponent},
+    {path: 'dashboard-bodega',component: DashboardBodegaPageComponent},
     {path: '**', redirectTo: 'login' },
   
 
