@@ -9,13 +9,11 @@ import java.util.List;
 public interface RepositorioLote extends JpaRepository<Lote, String> {
     Optional<Lote> findByNumeroLote(String numeroLote);
 
-
     @Query("""
-        SELECT DISTINCT l
-        FROM Lote l
-        JOIN FETCH l.codigo c
-        LEFT JOIN FETCH l.stock s
-        WHERE c.idCodigo IN :ids
-        """)
+            SELECT DISTINCT l
+            FROM Lote l
+            JOIN FETCH l.codigo c
+            WHERE c.idCodigo IN :ids
+            """)
     List<Lote> findByCodigo_IdCodigoIn(List<String> ids);
 }

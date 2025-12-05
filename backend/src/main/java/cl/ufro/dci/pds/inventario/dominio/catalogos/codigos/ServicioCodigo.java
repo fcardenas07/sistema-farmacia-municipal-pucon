@@ -18,11 +18,6 @@ public class ServicioCodigo {
         this.repositorioCodigo = repositorioCodigo;
     }
 
-    public Codigo crear(Producto producto, CodigoACrear nuevoCodigo) {
-        var codigo = nuevoCodigo.aEntidad(producto);
-        return repositorioCodigo.save(codigo);
-    }
-
     public Codigo obtenerOCrear(Producto producto, CodigoACrear nuevoCodigo) {
 
         return repositorioCodigo.findByCodigoBarra(nuevoCodigo.codigoBarra())
@@ -30,11 +25,6 @@ public class ServicioCodigo {
                     Codigo nuevo = nuevoCodigo.aEntidad(producto);
                     return repositorioCodigo.save(nuevo);
                 });
-    }
-
-    public Codigo obtener(String idCodigo){
-        return repositorioCodigo.findById(idCodigo)
-                .orElseThrow(() -> new CodigoNoEncontradoException(idCodigo));
     }
 
     public Codigo actualizarParaProducto(String idProducto, CodigoAModificar dto) {

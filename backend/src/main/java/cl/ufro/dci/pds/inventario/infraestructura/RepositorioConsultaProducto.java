@@ -21,16 +21,19 @@ public interface RepositorioConsultaProducto extends JpaRepository<Producto, Str
                     p.stock_minimo         AS stockMinimo,
                     p.stock_maximo         AS stockMaximo,
                     p.url_foto             AS urlFoto,
-                    COALESCE(SUM(s.cantidad_actual), 0) AS stockTotal
+            
+                    COALESCE(SUM(l.stock_actual), 0) AS stockTotal
+            
                 FROM producto p
                 LEFT JOIN fabricante f ON p.id_fabricante = f.id_fabricante
                 LEFT JOIN codigo c ON c.id_producto = p.id_producto
                 LEFT JOIN lote l ON l.id_codigo = c.id_codigo
-                LEFT JOIN stock s ON s.id_lote = l.id_lote
+            
                 WHERE (:nombreComercial IS NULL OR LOWER(p.nombre_comercial) LIKE LOWER(CONCAT('%', :nombreComercial, '%')))
                   AND (:nombreGenerico  IS NULL OR LOWER(p.nombre_generico)  LIKE LOWER(CONCAT('%', :nombreGenerico, '%')))
-                  AND (:categoria       IS NULL OR p.categoria = :categoria)  -- <--- vuelve a estar aquí
+                  AND (:categoria       IS NULL OR p.categoria = :categoria)
                   AND p.activo = TRUE
+            
                 GROUP BY
                     p.id_producto, p.nombre_comercial, p.nombre_generico, f.nombre,
                     p.dosificacion, p.unidad_medida, p.stock_minimo, p.stock_maximo, p.url_foto
@@ -42,29 +45,33 @@ public interface RepositorioConsultaProducto extends JpaRepository<Producto, Str
     );
 
     @Query(value = """
-            SELECT 
-                p.id_producto          AS idProducto,
-                p.nombre_comercial     AS nombreComercial,
-                p.nombre_generico      AS nombreGenerico,
-                p.presentacion         AS presentacion,      
-                f.nombre               AS nombreFabricante,
-                p.dosificacion         AS dosificacion,
-                p.unidad_medida        AS unidadMedida,
-                p.activo               AS activo,
-                p.stock_minimo         AS stockMinimo,
-                p.stock_maximo         AS stockMaximo,
-                p.url_foto             AS urlFoto,
-                COALESCE(SUM(s.cantidad_actual), 0) AS stockTotal
-            FROM producto p
-            LEFT JOIN fabricante f ON p.id_fabricante = f.id_fabricante
-            LEFT JOIN codigo c ON c.id_producto = p.id_producto
-            LEFT JOIN lote l ON l.id_codigo = c.id_codigo
-            LEFT JOIN stock s ON s.id_lote = l.id_lote
-            WHERE p.id_producto = :idProducto
-            GROUP BY 
-                p.id_producto, p.nombre_comercial, p.nombre_generico, p.presentacion,
-                f.nombre, p.dosificacion, p.unidad_medida, p.activo,
-                p.stock_minimo, p.stock_maximo, p.url_foto
+                SELECT 
+                    p.id_producto          AS idProducto,
+                    p.nombre_comercial     AS nombreComercial,
+                    p.nombre_generico      AS nombreGenerico,
+                    p.presentacion         AS presentacion,      
+                    f.nombre               AS nombreFabricante,
+                    p.dosificacion         AS dosificacion,
+                    p.unidad_medida        AS unidadMedida,
+                    p.activo               AS activo,
+                    p.stock_minimo         AS stockMinimo,
+                    p.stock_maximo         AS stockMaximo,
+                    p.url_foto             AS urlFoto,
+            
+                    -- nuevo cálculo correcto
+                    COALESCE(SUM(l.stock_actual), 0) AS stockTotal
+            
+                FROM producto p
+                LEFT JOIN fabricante f ON p.id_fabricante = f.id_fabricante
+                LEFT JOIN codigo c ON c.id_producto = p.id_producto
+                LEFT JOIN lote l ON l.id_codigo = c.id_codigo
+            
+                WHERE p.id_producto = :idProducto
+            
+                GROUP BY 
+                    p.id_producto, p.nombre_comercial, p.nombre_generico, p.presentacion,
+                    f.nombre, p.dosificacion, p.unidad_medida, p.activo,
+                    p.stock_minimo, p.stock_maximo, p.url_foto
             """, nativeQuery = true)
     ProyeccionProductoDetalle obtenerDetalleProducto(@Param("idProducto") String idProducto);
 
