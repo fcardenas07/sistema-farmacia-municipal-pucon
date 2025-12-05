@@ -2,12 +2,9 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos;
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class ServicioMovimiento {
@@ -56,13 +53,5 @@ public class ServicioMovimiento {
     public Movimiento obtenerPorId(String idMovimiento) {
         return repositorioMovimiento.findById(idMovimiento)
                 .orElseThrow(() -> new MovimientoNoEncontradoException(idMovimiento));
-    }
-
-    public Page<Movimiento> obtenerPorTipoMovimiento(TipoMovimiento tipoMovimiento, Pageable pageable) {
-        if (tipoMovimiento == null) {
-            return repositorioMovimiento.findAll(pageable);
-        }
-
-        return repositorioMovimiento.findByTipoMovimiento(tipoMovimiento, pageable);
     }
 }

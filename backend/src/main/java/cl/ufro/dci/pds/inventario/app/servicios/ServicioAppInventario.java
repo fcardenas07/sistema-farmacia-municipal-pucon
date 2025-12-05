@@ -2,7 +2,6 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.ServicioMerma;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
 import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
 import cl.ufro.dci.pds.inventario.infraestructura.RepositorioTrazabilidad;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
@@ -12,7 +11,6 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -69,14 +67,6 @@ public class ServicioAppInventario {
     public MovimientoBuscado obtenerMovimiento(String id) {
         var movimiento = servicioMovimiento.obtenerPorId(id);
         return trazabilidadLoteMapper.toDto(movimiento);
-    }
-
-    @Transactional
-    public Page<MovimientoBuscado> obtenerMovimientosPor(TipoMovimiento tipoMovimiento, int page, int size) {
-        var pageable = PageRequest.of(page, size);
-
-        return servicioMovimiento.obtenerPorTipoMovimiento(tipoMovimiento, pageable)
-                .map(trazabilidadLoteMapper::toDto);
     }
 
     @Transactional

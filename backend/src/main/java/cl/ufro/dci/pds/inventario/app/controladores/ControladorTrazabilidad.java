@@ -4,7 +4,6 @@ import cl.ufro.dci.pds.inventario.app.dtos.MovimientoBuscado;
 import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.MovimientoNoEncontradoException;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -42,18 +41,9 @@ public class ControladorTrazabilidad {
     }
 
     @GetMapping("/movimientos/{id}")
-    public ResponseEntity<MovimientoBuscado> buscarMovimiento(@PathVariable String id) {
+    public ResponseEntity<MovimientoBuscado> obtenerMovimiento(@PathVariable String id){
         var resultado = servicioAppInventario.obtenerMovimiento(id);
         return ResponseEntity.ok(resultado);
-    }
-
-    @GetMapping("/movimientos")
-    public ResponseEntity<Page<MovimientoBuscado>> buscarMovimientos(
-            @RequestParam(required = false) TipoMovimiento tipoMovimiento,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        var resultados = servicioAppInventario.obtenerMovimientosPor(tipoMovimiento, page, size);
-        return ResponseEntity.ok(resultados);
     }
 
     @ExceptionHandler({MovimientoNoEncontradoException.class})
