@@ -23,6 +23,10 @@ public class Merma {
     @Column(name = "cantidad")
     private Integer cantidad;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_merma", nullable = false)
+    private TipoMerma tipoMerma;
+
     @ManyToOne
     @JoinColumn(name = "id_lote", nullable = false)
     private Lote lote;
@@ -70,6 +74,14 @@ public class Merma {
         this.lote = lote;
     }
 
+    public TipoMerma getTipoMerma() {
+        return tipoMerma;
+    }
+
+    public void setTipoMerma(TipoMerma tipoMerma) {
+        this.tipoMerma = tipoMerma;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Merma merma)) return false;
@@ -88,6 +100,7 @@ public class Merma {
                 ", fechaMerma=" + fechaMerma +
                 ", detalle='" + detalle + '\'' +
                 ", cantidad=" + cantidad +
+                ", tipoMerma=" + tipoMerma +
                 ", lote=" + lote +
                 '}';
     }

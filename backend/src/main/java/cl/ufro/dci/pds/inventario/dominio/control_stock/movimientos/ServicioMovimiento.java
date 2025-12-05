@@ -38,6 +38,18 @@ public class ServicioMovimiento {
         return repositorioMovimiento.save(movimiento);
     }
 
+    public Movimiento registrarMovimientoPorMerma(Lote lote, int cantidad, String motivo) {
+        var movimiento = new Movimiento();
+        movimiento.setLote(lote);
+        movimiento.setFechaMovimiento(LocalDate.now());
+        movimiento.setCantidad(cantidad);
+        movimiento.setTipoMovimiento(TipoMovimiento.MERMA);
+        movimiento.setDetalle("Merma de " + cantidad + " unidades en lote " + lote.getNumeroLote() +
+                (motivo != null && !motivo.isBlank() ? " - Motivo: " + motivo : ""));
+
+        return repositorioMovimiento.save(movimiento);
+    }
+
     public Movimiento obtenerPorId(String idMovimiento) {
         return repositorioMovimiento.findById(idMovimiento)
                 .orElseThrow(() -> new MovimientoNoEncontradoException(idMovimiento));

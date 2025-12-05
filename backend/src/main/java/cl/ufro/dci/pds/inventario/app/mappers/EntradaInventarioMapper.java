@@ -6,7 +6,6 @@ import cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso.GuiaIngres
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +27,12 @@ public class EntradaInventarioMapper {
         return lote;
     }
 
-    public EntradaIngresada toEntradaIngresada(Lote lote, Producto producto, Codigo codigo, Stock stock, @Nullable GuiaIngreso guiaIngreso) {
+    public EntradaIngresada toEntradaIngresada(Lote lote, Producto producto, Codigo codigo, @Nullable GuiaIngreso guiaIngreso) {
 
         return new EntradaIngresada(
                 lote.getIdLote(),
                 lote.getNumeroLote(),
-                stock.getCantidadActual(),
+                lote.getStockActual(),
 
                 // DatosProducto
                 new EntradaIngresada.DatosProducto(

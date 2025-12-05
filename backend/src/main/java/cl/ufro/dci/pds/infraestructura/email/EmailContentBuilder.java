@@ -36,7 +36,7 @@ public class EmailContentBuilder {
                     .append("<td>").append(l.getNumeroLote()).append("</td>")
                     .append("<td>").append(l.getFechaElaboracion()).append("</td>")
                     .append("<td>").append(l.getFechaVencimiento()).append("</td>")
-                    .append("<td>").append(l.getStock().getCantidadActual()).append("</td>")
+                    .append("<td>").append(l.getStockActual()).append("</td>")
                     .append("<td>").append(l.getEstado()).append("</td>")
                     .append("</tr>");
         }

@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface RepositorioLote extends JpaRepository<Lote, String> {
     Optional<Lote> findByNumeroLote(String numeroLote);
+    List<Lote> findByNumeroLoteStartingWithIgnoreCase(String prefijo);
 
     @Query("""
             SELECT DISTINCT l
