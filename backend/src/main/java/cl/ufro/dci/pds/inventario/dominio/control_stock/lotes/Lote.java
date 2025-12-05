@@ -2,7 +2,6 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
 import cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso.GuiaIngreso;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -37,12 +36,18 @@ public class Lote {
     @Column(name = "porcentaje_oferta")
     private Float porcentajeOferta;
 
+    @Column(name = "stock_inicial")
+    private Integer stockInicial;
+
+    @Column(name = "stock_actual")
+    private Integer stockActual;
+
+    @Column(name = "stock_reservado")
+    private Integer stockReservado;
+
     @ManyToOne
     @JoinColumn(name = "id_codigo", nullable = false)
     private Codigo codigo;
-
-    @OneToOne(mappedBy = "lote", cascade = CascadeType.ALL)
-    private Stock stock;
 
     @ManyToOne
     @JoinColumn(name = "id_guia_ingreso", nullable = true) //por ahora que no está implementado guiaingreso
@@ -111,20 +116,40 @@ public class Lote {
         this.porcentajeOferta = porcentajeOferta;
     }
 
+    public Integer getStockInicial() {
+        return stockInicial;
+    }
+
+    public void setStockInicial(Integer stockInicial) {
+        this.stockInicial = stockInicial;
+    }
+
+    public Integer getStockActual() {
+        return stockActual;
+    }
+
+    public void setStockActual(Integer stockActual) {
+        this.stockActual = stockActual;
+    }
+
+    public Integer getStockReservado() {
+        return stockReservado;
+    }
+
+    public void setStockReservado(Integer stockReservado) {
+        this.stockReservado = stockReservado;
+    }
+
+    public Integer getStockDisponible() {
+        return stockActual - stockReservado;
+    }
+
     public Codigo getCodigo() {
         return codigo;
     }
 
     public void setCodigo(Codigo codigo) {
         this.codigo = codigo;
-    }
-
-    public Stock getStock() {
-        return stock;
-    }
-
-    public void setStock(Stock stock) {
-        this.stock = stock;
     }
 
     public GuiaIngreso getGuiaIngreso() {
@@ -154,8 +179,13 @@ public class Lote {
                 ", fechaVencimiento=" + fechaVencimiento +
                 ", numeroLote='" + numeroLote + '\'' +
                 ", estado='" + estado + '\'' +
+                ", precioUnitario=" + precioUnitario +
+                ", limiteMerma=" + limiteMerma +
+                ", porcentajeOferta=" + porcentajeOferta +
+                ", stockInicial=" + stockInicial +
+                ", stockActual=" + stockActual +
+                ", stockReservado=" + stockReservado +
                 ", codigo=" + codigo +
-                ", stock=" + stock +
                 ", guiaIngreso=" + guiaIngreso +
                 '}';
     }

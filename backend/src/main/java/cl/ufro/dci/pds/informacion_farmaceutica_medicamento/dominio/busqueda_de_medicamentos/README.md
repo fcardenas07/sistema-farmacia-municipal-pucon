@@ -1,4 +1,4 @@
-﻿# busqueda_de_medicamentos
+# busqueda_de_medicamentos
 
 ## Descripción
 Directorio para el módulo **busqueda_de_medicamentos**.

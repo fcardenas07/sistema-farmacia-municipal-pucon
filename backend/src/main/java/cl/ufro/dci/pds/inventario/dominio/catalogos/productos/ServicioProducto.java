@@ -64,26 +64,6 @@ public class ServicioProducto {
         repositorioProducto.save(producto);
     }
 
-    public Page<Producto> buscarPorCampos(
-            String nombreComercial,
-            String nombreGenerico,
-            Boolean activo,
-            CategoriaProducto categoria,
-            int numeroPagina
-    ) {
-        var pageable = PageRequest.of(numeroPagina, 15);
-        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria, pageable);
-    }
-
-    public List<Producto> buscarPorCampos(
-            String nombreComercial,
-            String nombreGenerico,
-            Boolean activo,
-            CategoriaProducto categoria
-    ) {
-        return repositorioProducto.buscarPorCampos(nombreComercial, nombreGenerico, activo, categoria);
-    }
-
     public void darBaja(String id) {
         var producto = obtenerPorId(id);
         producto.setActivo(false);

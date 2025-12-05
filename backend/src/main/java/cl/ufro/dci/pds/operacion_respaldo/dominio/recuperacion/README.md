@@ -1,4 +1,4 @@
-﻿# recuperacion
+# recuperacion
 
 ## Descripción
 Directorio para el módulo **recuperacion**.

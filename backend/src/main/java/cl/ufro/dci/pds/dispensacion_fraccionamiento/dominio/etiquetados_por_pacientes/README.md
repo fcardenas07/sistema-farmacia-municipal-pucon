@@ -1,4 +1,4 @@
-﻿# etiquetados_por_pacientes
+# etiquetados_por_pacientes
 
 ## Descripción
 Directorio para el módulo **etiquetados_por_pacientes**.

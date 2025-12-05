@@ -1,4 +1,4 @@
-﻿# documentos
+# documentos
 
 ## Descripción
 Directorio para el módulo **documentos**.

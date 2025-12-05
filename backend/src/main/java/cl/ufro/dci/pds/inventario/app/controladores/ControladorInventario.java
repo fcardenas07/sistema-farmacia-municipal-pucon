@@ -1,9 +1,7 @@
 package cl.ufro.dci.pds.inventario.app.controladores;
 
-import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
-import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
+import cl.ufro.dci.pds.inventario.app.dtos.*;
 
-import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
 
 import jakarta.validation.Valid;
@@ -39,6 +37,16 @@ public class ControladorInventario {
                 .body(ingresado);
     }
 
+    @PostMapping("/mermas")
+    public ResponseEntity<Void> registrarMerma(@Valid @RequestBody IngresoMerma dto) {
+        servicioAppInventario.ingresarMerma(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/lotes/buscar")
+    public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam String filtro) {
+        return ResponseEntity.ok(servicioAppInventario.obtenerLotesPor(filtro));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {

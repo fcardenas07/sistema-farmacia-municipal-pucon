@@ -1,4 +1,4 @@
-﻿# pedidos_a_domicilio
+# pedidos_a_domicilio
 
 ## Descripción
 Directorio para el módulo **pedidos_a_domicilio**.
