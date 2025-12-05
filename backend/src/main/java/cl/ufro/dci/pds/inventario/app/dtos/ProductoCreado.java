@@ -16,4 +16,4 @@ public record ProductoCreado(
                 producto.getUrlFoto()
         );
     }
-}
+}   

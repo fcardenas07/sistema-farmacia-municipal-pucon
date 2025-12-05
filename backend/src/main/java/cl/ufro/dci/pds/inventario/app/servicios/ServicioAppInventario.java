@@ -1,8 +1,8 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.MovimientoBuscado;
-import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
-import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadRepository;
+import cl.ufro.dci.pds.inventario.infraestructura.MapeadorTrazabilidadLote;
+import cl.ufro.dci.pds.inventario.infraestructura.RepositorioTrazabilidad;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 import cl.ufro.dci.pds.inventario.app.dtos.TrazabilidadIngreso;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class ServicioAppInventario {
 
@@ -28,8 +26,8 @@ public class ServicioAppInventario {
     private final ServicioProducto  servicioProducto;
     private final ServicioMovimiento servicioMovimiento;
     private final EntradaInventarioMapper mapper;
-    private final TrazabilidadRepository trazabilidadRepository;
-    private final TrazabilidadLoteMapper trazabilidadLoteMapper;
+    private final RepositorioTrazabilidad trazabilidadRepository;
+    private final MapeadorTrazabilidadLote trazabilidadLoteMapper;
 
     public ServicioAppInventario(ServicioLote servicioLote,
                                  ServicioStock servicioStock,
@@ -37,8 +35,8 @@ public class ServicioAppInventario {
                                  ServicioProducto servicioProducto,
                                  ServicioMovimiento servicioMovimiento,
                                  EntradaInventarioMapper mapper,
-                                 TrazabilidadRepository trazabilidadRepository,
-                                 TrazabilidadLoteMapper trazabilidadLoteMapper) {
+                                 RepositorioTrazabilidad trazabilidadRepository,
+                                 MapeadorTrazabilidadLote trazabilidadLoteMapper) {
         this.servicioLote = servicioLote;
         this.servicioStock = servicioStock;
         this.servicioCodigo = servicioCodigo;
