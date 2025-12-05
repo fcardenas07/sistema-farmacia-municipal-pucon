@@ -73,7 +73,7 @@ public class ControladorProducto {
             @RequestParam(required = false) CategoriaProducto categoria,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int limite,
-            @RequestParam ProductoFiltrado.FiltroStock tipoStock
+            @RequestParam(required = false) ProductoFiltrado.FiltroStock tipoStock
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
                 nombreComercial, nombreGenerico, categoria, pagina, limite, tipoStock

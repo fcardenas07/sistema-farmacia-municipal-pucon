@@ -44,7 +44,7 @@ public class ControladorInventario {
     }
 
     @GetMapping("/lotes/buscar")
-    public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam String filtro) {
+    public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam(required = false) String filtro) {
         return ResponseEntity.ok(servicioAppInventario.obtenerLotesPor(filtro));
     }
 

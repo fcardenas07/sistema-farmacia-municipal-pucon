@@ -10,7 +10,6 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
 import cl.ufro.dci.pds.inventario.infraestructura.RepositorioConsultaProducto;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -29,7 +28,6 @@ public class ServicioAppProducto {
     private final ServicioProducto servicioProducto;
     private final ServicioCodigo servicioCodigo;
     private final ServicioLote servicioLote;
-    private final ServicioStock servicioStock;
     private final ServicioMovimiento servicioMovimiento;
     private final ServicioFabricante servicioFabricante;
     private final RepositorioConsultaProducto repositorioConsultaProducto;
@@ -37,14 +35,12 @@ public class ServicioAppProducto {
     public ServicioAppProducto(ServicioProducto servicioProducto,
                                ServicioCodigo servicioCodigo,
                                ServicioLote servicioLote,
-                               ServicioStock servicioStock,
                                ServicioMovimiento servicioMovimiento,
                                ServicioFabricante servicioFabricante,
                                RepositorioConsultaProducto repositorioConsultaProducto) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
-        this.servicioStock = servicioStock;
         this.servicioMovimiento = servicioMovimiento;
         this.servicioFabricante = servicioFabricante;
         this.repositorioConsultaProducto = repositorioConsultaProducto;
@@ -167,13 +163,7 @@ public class ServicioAppProducto {
 
     private void darBajaLotesYStocks(List<Lote> lotes) {
         for (var lote : lotes) {
-            var stock = lote.getStock();
-            var cantidadBajada = 0;
-
-            if (stock != null) {
-                cantidadBajada = servicioStock.darBaja(stock);
-            }
-            servicioLote.darBaja(lote);
+            var cantidadBajada = servicioLote.darBaja(lote);
 
             servicioMovimiento.registrarMovimientoPorBajaProducto(
                     lote.getCodigo().getProducto(),

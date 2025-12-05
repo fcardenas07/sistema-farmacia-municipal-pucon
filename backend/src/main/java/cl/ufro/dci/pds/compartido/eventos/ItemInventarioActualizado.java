@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.compartido.eventos;
+package cl.ufro.dci.pds.compartido.eventos;
 
 public record ItemInventarioActualizado(
         String idProducto,
