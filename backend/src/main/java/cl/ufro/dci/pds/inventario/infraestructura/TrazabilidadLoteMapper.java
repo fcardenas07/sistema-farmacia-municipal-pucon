@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class MapeadorTrazabilidadLote {
+public class TrazabilidadLoteMapper {
 
     public TrazabilidadIngreso toDto(ProyeccionTrazabilidadIngreso p) {
         return new TrazabilidadIngreso(

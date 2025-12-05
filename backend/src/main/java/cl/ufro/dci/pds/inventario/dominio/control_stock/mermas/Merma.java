@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Merma {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_merma")
     private String idMerma;
 

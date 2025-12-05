@@ -2,7 +2,7 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.ServicioMerma;
-import cl.ufro.dci.pds.inventario.infraestructura.MapeadorTrazabilidadLote;
+import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
 import cl.ufro.dci.pds.inventario.infraestructura.RepositorioTrazabilidad;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
@@ -26,7 +26,7 @@ public class ServicioAppInventario {
     private final ServicioMerma servicioMerma;
     private final EntradaInventarioMapper mapper;
     private final RepositorioTrazabilidad trazabilidadRepository;
-    private final MapeadorTrazabilidadLote trazabilidadLoteMapper;
+    private final TrazabilidadLoteMapper trazabilidadLoteMapper;
 
     public ServicioAppInventario(ServicioLote servicioLote,
                                  ServicioCodigo servicioCodigo,
@@ -35,7 +35,7 @@ public class ServicioAppInventario {
                                  ServicioMerma servicioMerma,
                                  EntradaInventarioMapper mapper,
                                  RepositorioTrazabilidad trazabilidadRepository,
-                                 MapeadorTrazabilidadLote trazabilidadLoteMapper) {
+                                 TrazabilidadLoteMapper trazabilidadLoteMapper) {
         this.servicioLote = servicioLote;
         this.servicioCodigo = servicioCodigo;
         this.servicioProducto = servicioProducto;
@@ -77,7 +77,7 @@ public class ServicioAppInventario {
     }
 
     @Transactional
-    public void ingresarMerma(IngresoMerma dto) {
+    public String ingresarMerma(IngresoMerma dto) {
         var lote = servicioLote.obtenerPorId(dto.idLote());
         var cantidadDescontada = servicioLote.descontar(lote, dto.cantidad());
 
@@ -85,6 +85,7 @@ public class ServicioAppInventario {
         merma.setCantidad(cantidadDescontada);
 
         merma = servicioMerma.guardar(merma);
-        servicioMovimiento.registrarMovimientoPorMerma(lote, cantidadDescontada, merma.getDetalle());
+        var movimiento = servicioMovimiento.registrarMovimientoPorMerma(lote, cantidadDescontada, merma.getDetalle());
+        return movimiento.getIdMovimiento();
     }
 }
