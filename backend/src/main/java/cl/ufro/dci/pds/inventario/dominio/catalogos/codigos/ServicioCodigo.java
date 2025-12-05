@@ -53,13 +53,6 @@ public class ServicioCodigo {
         return repositorioCodigo.findAllByProducto_IdProducto(idProducto);
     }
 
-    public List<Codigo> obtenerCodigosConIdProductoEn(List<String> idsProducto) {
-        if (idsProducto == null || idsProducto.isEmpty()) {
-            return List.of();
-        }
-        return repositorioCodigo.findAllByProducto_IdProductoIn(idsProducto);
-    }
-
     public void darBaja(Codigo codigo) {
         codigo.setActivo(false);
         repositorioCodigo.save(codigo);

@@ -1,4 +1,4 @@
-﻿# citas
+# citas
 
 ## Descripción
 Directorio para el módulo **citas**.

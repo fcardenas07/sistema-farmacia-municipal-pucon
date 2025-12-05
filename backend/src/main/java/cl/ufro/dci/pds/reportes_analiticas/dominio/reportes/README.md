@@ -1,4 +1,4 @@
-﻿# reportes
+# reportes
 
 ## Descripción
 Directorio para el módulo **reportes**.

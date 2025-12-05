@@ -1,4 +1,4 @@
-﻿# devoluciones
+# devoluciones
 
 ## Descripción
 Directorio para el módulo **devoluciones**.

@@ -1,4 +1,4 @@
-﻿# detalles_de_medicamentos
+# detalles_de_medicamentos
 
 ## Descripción
 Directorio para el módulo **detalles_de_medicamentos**.

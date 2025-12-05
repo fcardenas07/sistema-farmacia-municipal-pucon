@@ -1,4 +1,4 @@
-﻿# usuarios
+# usuarios
 
 ## Descripción
 Directorio para el módulo **usuarios**.
