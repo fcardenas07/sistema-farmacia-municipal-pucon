@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
+package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
 public class SinStockDisponibleException extends RuntimeException {
     public SinStockDisponibleException(String numeroLote) {

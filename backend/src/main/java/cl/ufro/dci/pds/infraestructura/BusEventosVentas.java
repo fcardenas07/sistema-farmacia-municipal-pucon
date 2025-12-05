@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.infraestructura;
+package cl.ufro.dci.pds.infraestructura;
 
 import cl.ufro.dci.pds.compartido.eventos.EventoInventarioActualizado;
 import cl.ufro.dci.pds.compartido.eventos.EventoPagoAprobado;

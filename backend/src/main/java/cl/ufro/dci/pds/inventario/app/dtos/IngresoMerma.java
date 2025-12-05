@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.app.dtos;
+package cl.ufro.dci.pds.inventario.app.dtos;
 
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.Merma;

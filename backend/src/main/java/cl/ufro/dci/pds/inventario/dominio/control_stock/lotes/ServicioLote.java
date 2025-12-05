@@ -52,9 +52,13 @@ public class ServicioLote {
         return repositorioLote.findByNumeroLoteStartingWithIgnoreCase(filtro);
     }
 
-    public void darBaja(Lote lote) {
+    public int darBaja(Lote lote) {
+        var cantidadBajada = lote.getStockActual();
+        lote.setStockActual(0);
+        lote.setStockReservado(0);
         lote.setEstado("INACTIVO");
         repositorioLote.save(lote);
+        return cantidadBajada;
     }
 
     public int descontar(Lote lote, int cantidadSolicitada) {
