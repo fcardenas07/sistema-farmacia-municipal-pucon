@@ -8,6 +8,7 @@ public interface TrazabilidadIngresoProjection {
     String getFechaVencimiento();
     Integer getCantidad();
     String getEstado();
+    String getIdMovimiento();
     String getFechaMovimiento();
     String getTipoMovimiento();
 }
