@@ -30,9 +30,8 @@ public class ScheduledTasks {
     //Cada 1 mes
     @Scheduled(cron = "0 0 8 1 * *")
     public void verificarVencimiento() {
-
-        LocalDate hoy = LocalDate.now();
-        LocalDate limite = hoy.plusMonths(1);
+        var hoy = LocalDate.now();
+        var limite = hoy.plusMonths(1);
 
         var porVencer = servicioLote.obtenerPorVencerEntre(hoy, limite);
         if (porVencer.isEmpty()) return;
