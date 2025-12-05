@@ -8,9 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,38 +30,24 @@ public class ScheduledTasks {
     //Cada 1 mes
     @Scheduled(cron = "0 0 8 1 * *")
     public void verificarVencimiento() {
+        var hoy = LocalDate.now();
+        var limite = hoy.plusMonths(1);
 
-        LocalDate hoy = LocalDate.now();
-        LocalDate limite = hoy.plusMonths(1);
-
-        var porVencer = servicioLote.obtener().stream()
-                .filter(l -> l.getFechaVencimiento().isAfter(hoy))
-                .filter(l -> l.getFechaVencimiento().isBefore(limite))
-                .peek(l -> l.setEstado("POR_VENCER"))
-                .toList();
-
+        var porVencer = servicioLote.obtenerPorVencerEntre(hoy, limite);
         if (porVencer.isEmpty()) return;
 
+        porVencer.forEach(l -> l.setEstado("POR_VENCER"));
         servicioLote.guardarTodos(porVencer);
 
-        List<Lote> porVencerUnicos = porVencer.stream()
-                .collect(Collectors.groupingBy(
-                        Lote::getNumeroLote           // agrupamos por número de lote
-                ))
-                .entrySet().stream()
-                .map(entry -> {
-
-                    // lote representativo (cualquiera del grupo)
-                    Lote representativo = entry.getValue().get(0);
-
-                    // sumar cantidades
-                    int cantidadTotal = entry.getValue().stream()
-                            .mapToInt(l -> l.getStock().getCantidadActual())
+        var porVencerUnicos = porVencer.stream()
+                .collect(Collectors.groupingBy(Lote::getNumeroLote))
+                .values().stream()
+                .map(lotes -> {
+                    var representativo = lotes.getFirst();
+                    int cantidadTotal = lotes.stream()
+                            .mapToInt(Lote::getStockActual)
                             .sum();
-
-                    // asignar suma al lote representativo
-                    representativo.getStock().setCantidadActual(cantidadTotal);
-
+                    representativo.setStockActual(cantidadTotal);
                     return representativo;
                 })
                 .toList();

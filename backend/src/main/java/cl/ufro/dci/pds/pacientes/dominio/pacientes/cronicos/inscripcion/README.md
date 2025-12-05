@@ -1,4 +1,4 @@
-﻿# inscripcion
+# inscripcion
 
 ## Descripción
 Directorio para el módulo **inscripcion**.

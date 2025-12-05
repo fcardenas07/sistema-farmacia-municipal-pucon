@@ -1,4 +1,4 @@
-﻿# validacion_sii
+# validacion_sii
 
 ## Descripción
 Directorio para el módulo **validacion_sii**.

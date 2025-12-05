@@ -1,4 +1,4 @@
-﻿# precios_y_descuentos
+# precios_y_descuentos
 
 ## Descripción
 Directorio para el módulo **precios_y_descuentos**.

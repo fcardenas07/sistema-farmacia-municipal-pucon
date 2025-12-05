@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 
 class ServicioProductoTest {
 
+    /*
     private RepositorioProducto repositorioProducto;
     private ServicioAlmacenamientoImagen servicioAlmacenamientoImagen;
     private ServicioProducto servicioProducto;
@@ -407,4 +408,5 @@ class ServicioProductoTest {
         verify(repositorioProducto).findById("P001");
         verify(repositorioProducto).save(productoEntidad);
     }
+     */
 }

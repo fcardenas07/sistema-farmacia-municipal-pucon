@@ -16,6 +16,9 @@ public class Fabricante {
     @Embedded
     private DatosContacto contacto;
 
+    @Column(name = "nombre")
+    private String nombre;
+
     public Fabricante() {
     }
 
@@ -25,6 +28,14 @@ public class Fabricante {
 
     public String getIdFabricante() {
         return idFabricante;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public DatosContacto getContacto() {
@@ -48,7 +59,10 @@ public class Fabricante {
 
     @Override
     public String toString() {
-        return "Producto{" + "idFabricante='" + idFabricante + '\'' +
-                ", contacto=" + contacto + '}';
+        return "Fabricante{" +
+                "idFabricante='" + idFabricante + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", contacto=" + contacto +
+                '}';
     }
 }

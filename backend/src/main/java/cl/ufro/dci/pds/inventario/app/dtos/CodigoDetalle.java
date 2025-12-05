@@ -2,12 +2,12 @@ package cl.ufro.dci.pds.inventario.app.dtos;
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 
-public record CodigoBuscado(
+public record CodigoDetalle(
         String idCodigo,
         String codigoBarra
 ) {
-    public static CodigoBuscado desde(Codigo codigo) {
-        return new CodigoBuscado(
+    public static CodigoDetalle desde(Codigo codigo) {
+        return new CodigoDetalle(
                 codigo.getIdCodigo(),
                 codigo.getCodigoBarra()
         );

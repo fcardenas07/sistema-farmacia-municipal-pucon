@@ -61,31 +61,31 @@ public class ControladorProducto {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoBuscado> obtenerProducto(@PathVariable String id) {
+    public ResponseEntity<ProductoDetalle> obtenerProducto(@PathVariable String id) {
         var resultado = servicioAppProducto.obtenerProductoPorId(id);
         return ResponseEntity.ok(resultado);
     }
 
-    @GetMapping("/buscar-stock")
+    @GetMapping("/buscar")
     public ResponseEntity<Page<ProductoFiltrado>> buscarProductosPorStock(
             @RequestParam(required = false) String nombreComercial,
             @RequestParam(required = false) String nombreGenerico,
-            @RequestParam(required = false) Boolean activo,
             @RequestParam(required = false) CategoriaProducto categoria,
             @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int limite,
             @RequestParam ProductoFiltrado.FiltroStock tipoStock
     ) {
         var productos = servicioAppProducto.buscarProductosFiltrados(
-                nombreComercial, nombreGenerico, activo, categoria, pagina, tipoStock
+                nombreComercial, nombreGenerico, categoria, pagina, limite, tipoStock
         );
         return ResponseEntity.ok(productos);
     }
 
-    @GetMapping("/buscar-para-codigo")
-    public ResponseEntity<List<ProductoParaCodigo>> buscarProductosParaCodigo(
+    @GetMapping("/opciones")
+    public ResponseEntity<List<ProductoSimple>> buscarProductosSimples(
             @RequestParam(required = false) String nombreComercial
     ) {
-        var productos = servicioAppProducto.buscarProductosParaCodigo(nombreComercial);
+        var productos = servicioAppProducto.buscarProductosSimples(nombreComercial);
         return ResponseEntity.ok(productos);
     }
 

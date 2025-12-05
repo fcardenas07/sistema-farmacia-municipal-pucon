@@ -9,7 +9,6 @@ import java.util.Objects;
 public class DatosContacto {
 
     private String identificador;
-    private String nombre;
     private String telefonoContacto;
     private String correoElectronico;
 
@@ -19,9 +18,8 @@ public class DatosContacto {
     public DatosContacto() {
     }
 
-    public DatosContacto(String identificador, String nombre, String telefonoContacto, String correoElectronico, Direccion direccion) {
+    public DatosContacto(String identificador, String telefonoContacto, String correoElectronico, Direccion direccion) {
         this.identificador = identificador;
-        this.nombre = nombre;
         this.telefonoContacto = telefonoContacto;
         this.correoElectronico = correoElectronico;
         this.direccion = direccion;
@@ -33,14 +31,6 @@ public class DatosContacto {
 
     public void setIdentificador(String identificador) {
         this.identificador = identificador;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getTelefonoContacto() {
@@ -83,7 +73,6 @@ public class DatosContacto {
     public String toString() {
         return "DatosContacto{" +
                 "identificador='" + identificador + '\'' +
-                ", nombre='" + nombre + '\'' +
                 ", telefonoContacto='" + telefonoContacto + '\'' +
                 ", correoElectronico='" + correoElectronico + '\'' +
                 ", direccion=" + direccion +

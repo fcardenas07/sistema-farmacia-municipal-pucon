@@ -1,4 +1,4 @@
-﻿# ventas
+# ventas
 
 ## Descripción
 Directorio para el módulo **ventas**.

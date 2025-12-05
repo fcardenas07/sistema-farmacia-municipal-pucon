@@ -1,4 +1,4 @@
-﻿# sincronizacion_vademecum
+# sincronizacion_vademecum
 
 ## Descripción
 Directorio para el módulo **sincronizacion_vademecum**.

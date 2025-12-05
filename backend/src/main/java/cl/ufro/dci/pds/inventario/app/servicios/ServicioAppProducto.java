@@ -3,25 +3,25 @@ package cl.ufro.dci.pds.inventario.app.servicios;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.Fabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.fabricantes.ServicioFabricante;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
+import cl.ufro.dci.pds.inventario.infraestructura.RepositorioConsultaProducto;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class ServicioAppProducto {
@@ -32,33 +32,34 @@ public class ServicioAppProducto {
     private final ServicioStock servicioStock;
     private final ServicioMovimiento servicioMovimiento;
     private final ServicioFabricante servicioFabricante;
+    private final RepositorioConsultaProducto repositorioConsultaProducto;
 
     public ServicioAppProducto(ServicioProducto servicioProducto,
                                ServicioCodigo servicioCodigo,
                                ServicioLote servicioLote,
                                ServicioStock servicioStock,
                                ServicioMovimiento servicioMovimiento,
-                               ServicioFabricante servicioFabricante) {
+                               ServicioFabricante servicioFabricante,
+                               RepositorioConsultaProducto repositorioConsultaProducto) {
         this.servicioProducto = servicioProducto;
         this.servicioCodigo = servicioCodigo;
         this.servicioLote = servicioLote;
         this.servicioStock = servicioStock;
         this.servicioMovimiento = servicioMovimiento;
         this.servicioFabricante = servicioFabricante;
+        this.repositorioConsultaProducto = repositorioConsultaProducto;
     }
 
     @Transactional
     public ProductoCreado crearProducto(ProductoACrear dto) {
-        Fabricante fabricante = null;
-        if (dto.idFabricante() != null) {
-            fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
-        }
 
         var producto = dto.aEntidad();
 
-        if (fabricante != null) {
+        if (dto.idFabricante() != null) {
+            var fabricante = servicioFabricante.obtenerPorId(dto.idFabricante());
             producto.setFabricante(fabricante);
         }
+
         var creado = servicioProducto.validarYGuardar(producto);
         return ProductoCreado.desde(creado);
     }
@@ -81,22 +82,24 @@ public class ServicioAppProducto {
     }
 
     @Transactional
-    public ProductoBuscado obtenerProductoPorId(String idProducto) {
-        var producto = servicioProducto.obtenerPorId(idProducto);
-        var codigos = servicioCodigo.obtenerCodigosConIdProducto(idProducto);
-        int stockTotal = calcularStockTotal(codigos);
+    public ProductoDetalle obtenerProductoPorId(String idProducto) {
+        var proyeccion = repositorioConsultaProducto
+                .obtenerDetalleProducto(idProducto);
 
-        return ProductoBuscado.desde(producto, codigos, stockTotal);
+        if (proyeccion == null) {
+            throw new ProductoNoEncontradoException(idProducto);
+        }
+
+        var codigos = servicioCodigo.obtenerCodigosConIdProducto(idProducto);
+        return ProductoDetalle.desdeProyeccion(proyeccion, codigos);
     }
 
     @Transactional
-    public List<ProductoParaCodigo> buscarProductosParaCodigo(String nombreComercial) {
-        var productos = servicioProducto.buscarPorCampos(
-                nombreComercial, null, null, null
-        );
+    public List<ProductoSimple> buscarProductosSimples(String nombreComercial) {
+        var productos = repositorioConsultaProducto.buscarProductosSimples(nombreComercial);
 
         return productos.stream()
-                .map(ProductoParaCodigo::desde)
+                .map(ProductoSimple::desdeProyeccion)
                 .toList();
     }
 
@@ -104,35 +107,45 @@ public class ServicioAppProducto {
     public Page<ProductoFiltrado> buscarProductosFiltrados(
             String nombreComercial,
             String nombreGenerico,
-            Boolean activo,
             CategoriaProducto categoria,
             int numeroPagina,
+            int limite,
             ProductoFiltrado.FiltroStock filtroStock
     ) {
-        var productosPage = servicioProducto.buscarPorCampos(
-                nombreComercial, nombreGenerico, activo, categoria, numeroPagina
+        var proyecciones = repositorioConsultaProducto.buscarProductosConStock(
+                nombreComercial,
+                nombreGenerico,
+                categoria
         );
 
-        var stockPorProducto = calcularStockPorProducto(productosPage.getContent());
-
-        var filtrados = productosPage.getContent().stream()
-                .map(p -> ProductoFiltrado.desde(p, stockPorProducto.getOrDefault(p.getIdProducto(), 0)))
+        var filtradosOrdenados = proyecciones.stream()
+                .map(ProductoFiltrado::desdeProyeccion)
                 .filter(p -> filtrarPorEstado(p, filtroStock))
                 .sorted(Comparator.comparingInt(p -> p.estadoStock().getPrioridad()))
                 .toList();
 
-        return new PageImpl<>(filtrados, productosPage.getPageable(), filtrados.size());
+        var pageable = PageRequest.of(numeroPagina, limite);
+
+        return construirPaginaFiltrados(filtradosOrdenados, pageable);
     }
 
-    private Map<String, Integer> calcularStockPorProducto(List<Producto> productos) {
-        var idsProducto = productos.stream()
-                .map(Producto::getIdProducto)
-                .toList();
-        var codigosPorProducto = mapearCodigosPorProducto(idsProducto);
-        var lotes = obtenerLotesDeCodigos(codigosPorProducto.keySet().stream().toList());
-        return agruparStockPorProducto(lotes, codigosPorProducto);
+    private Page<ProductoFiltrado> construirPaginaFiltrados(
+            List<ProductoFiltrado> filtradosOrdenados,
+            Pageable pageable
+    ) {
+        var fromIndex = (int) pageable.getOffset();
+        var toIndex = Math.min(fromIndex + pageable.getPageSize(), filtradosOrdenados.size());
+
+        List<ProductoFiltrado> pagina;
+        if (fromIndex >= filtradosOrdenados.size()) {
+            pagina = List.of();
+        } else {
+            pagina = filtradosOrdenados.subList(fromIndex, toIndex);
+        }
+
+        return new PageImpl<>(pagina, pageable, filtradosOrdenados.size());
     }
-    
+
     private boolean filtrarPorEstado(ProductoFiltrado producto, ProductoFiltrado.FiltroStock filtro) {
         return filtro == ProductoFiltrado.FiltroStock.NORMAL
                 ? producto.estadoStock() == ProductoFiltrado.EstadoStock.NORMAL
@@ -168,32 +181,5 @@ public class ServicioAppProducto {
                     cantidadBajada
             );
         }
-    }
-
-    private Map<String, Producto> mapearCodigosPorProducto(List<String> idsProducto) {
-        return servicioCodigo.obtenerCodigosConIdProductoEn(idsProducto)
-                .stream()
-                .collect(Collectors.toMap(Codigo::getIdCodigo, Codigo::getProducto));
-    }
-
-    private List<Lote> obtenerLotesDeCodigos(List<String> idsCodigos) {
-        if (idsCodigos == null || idsCodigos.isEmpty()) return List.of();
-        return servicioLote.obtenerLotesDeCodigos(idsCodigos);
-    }
-
-    private Map<String, Integer> agruparStockPorProducto(List<Lote> lotes, Map<String, Producto> codigosPorProducto) {
-        return lotes.stream()
-                .collect(Collectors.groupingBy(
-                        l -> codigosPorProducto.get(l.getCodigo().getIdCodigo()).getIdProducto(),
-                        Collectors.summingInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
-                ));
-    }
-
-    private int calcularStockTotal(List<Codigo> codigos) {
-        var idsCodigos = codigos.stream().map(Codigo::getIdCodigo).toList();
-        var lotes = obtenerLotesDeCodigos(idsCodigos);
-        return lotes.stream()
-                .mapToInt(l -> l.getStock() != null ? l.getStock().getCantidadActual() : 0)
-                .sum();
     }
 }

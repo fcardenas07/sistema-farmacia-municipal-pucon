@@ -1,6 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.inventario.infraestructura.ProyeccionProductoFiltrado;
 
 public record ProductoFiltrado(
         String idProducto,
@@ -15,22 +15,22 @@ public record ProductoFiltrado(
         String estadoStockTitulo
 ) {
 
-    public static ProductoFiltrado desde(Producto producto, int stockTotal) {
-        var nombreFabricante = producto.getFabricante() != null && producto.getFabricante().getContacto() != null
-                ? producto.getFabricante().getContacto().getNombre()
-                : null;
-
-        var estadoStock = calcularEstadoStock(stockTotal, producto.getStockMinimo(), producto.getStockMaximo());
+    public static ProductoFiltrado desdeProyeccion(ProyeccionProductoFiltrado p) {
+        var estadoStock = calcularEstadoStock(
+                p.getStockTotal(),
+                p.getStockMinimo(),
+                p.getStockMaximo()
+        );
 
         return new ProductoFiltrado(
-                producto.getIdProducto(),
-                producto.getNombreComercial(),
-                producto.getNombreGenerico(),
-                nombreFabricante,
-                producto.getDosificacion(),
-                producto.getUnidadMedida(),
-                stockTotal,
-                producto.getUrlFoto(),
+                p.getIdProducto(),
+                p.getNombreComercial(),
+                p.getNombreGenerico(),
+                p.getNombreFabricante(),
+                p.getDosificacion(),
+                p.getUnidadMedida(),
+                p.getStockTotal(),
+                p.getUrlFoto(),
                 estadoStock,
                 estadoStock.getTitulo()
         );
@@ -44,7 +44,7 @@ public record ProductoFiltrado(
 
         if (porcentaje <= 20) return EstadoStock.MUY_BAJO;
         if (porcentaje <= 40) return EstadoStock.BAJO;
-        if (porcentaje <= 59) return EstadoStock.MEDIO;
+        if (porcentaje <= 60) return EstadoStock.MEDIO;
         return EstadoStock.NORMAL;
     }
 
@@ -52,7 +52,7 @@ public record ProductoFiltrado(
         MUY_BAJO("Muy Bajo", 1),
         BAJO("Bajo", 2),
         MEDIO("Medio", 3),
-        NORMAL("Normal", 4);
+        NORMAL("Bien", 4);
 
         private final String titulo;
         private final int prioridad;

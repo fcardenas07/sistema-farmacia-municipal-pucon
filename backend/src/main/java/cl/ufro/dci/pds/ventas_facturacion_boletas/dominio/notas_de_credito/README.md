@@ -1,4 +1,4 @@
-﻿# notas_de_credito
+# notas_de_credito
 
 ## Descripción
 Directorio para el módulo **notas_de_credito**.

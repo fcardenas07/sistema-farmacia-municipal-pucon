@@ -1,4 +1,4 @@
-﻿# respaldos
+# respaldos
 
 ## Descripción
 Directorio para el módulo **respaldos**.
