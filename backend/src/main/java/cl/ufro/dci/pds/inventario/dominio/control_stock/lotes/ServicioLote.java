@@ -47,8 +47,9 @@ public class ServicioLote {
 
     public List<Lote> obtenerPorNumeroLote(String filtro) {
         if (filtro == null || filtro.isBlank()) {
-            return List.of();
+            return repositorioLote.findAll();
         }
+
         return repositorioLote.findByNumeroLoteStartingWithIgnoreCase(filtro);
     }
 
