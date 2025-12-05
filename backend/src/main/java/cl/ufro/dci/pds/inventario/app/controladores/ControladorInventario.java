@@ -38,9 +38,9 @@ public class ControladorInventario {
     }
 
     @PostMapping("/mermas")
-    public ResponseEntity<Void> registrarMerma(@Valid @RequestBody IngresoMerma dto) {
-        servicioAppInventario.ingresarMerma(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<String> registrarMerma(@Valid @RequestBody IngresoMerma dto) {
+        var idMovimiento = servicioAppInventario.ingresarMerma(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(idMovimiento);
     }
 
     @GetMapping("/lotes/buscar")
