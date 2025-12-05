@@ -5,6 +5,7 @@ import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -38,6 +39,10 @@ public class ServicioLote {
 
     public List<Lote> obtener(){
         return repositorioLote.findAll();
+    }
+
+    public List<Lote> obtenerPorVencerEntre(LocalDate hoy, LocalDate limite) {
+        return repositorioLote.findPorVencerEntre(hoy, limite);
     }
 
     public List<Lote> obtenerPorNumeroLote(String filtro) {
