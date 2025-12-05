@@ -14,7 +14,7 @@ export class ProductosService {
     return this.http.post<any>(this.API_URL, producto);
   }
 
-  editarProducto(id: string, data: ProductoCreacion): Observable<any> {
+  editarProducto(id: string, data: Partial<ProductoCreacion>): Observable<any> {
     return this.http.patch<any>(`${this.API_URL}/${id}`, data);
   }
 

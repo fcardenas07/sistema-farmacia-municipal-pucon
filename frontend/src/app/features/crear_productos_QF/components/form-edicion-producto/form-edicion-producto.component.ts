@@ -20,16 +20,12 @@ export class FormEdicionProductoComponent implements OnInit {
   id!: string;
   cargando = true;
 
-  form: ProductoCreacion = {
+  form: Partial<ProductoCreacion> = {
     nombreComercial: '',
     nombreGenerico: '',
     presentacion: '',
     dosificacion: 0,
     unidadMedida: 'mg',
-    stockMinimo: 0,
-    stockMaximo: 0,
-    categoria: 'ANALGESICOS_ANTIINFLAMATORIOS',
-    idFabricante: '',
   };
 
   errors: any = {};
@@ -40,17 +36,12 @@ export class FormEdicionProductoComponent implements OnInit {
 
     this.productosService.getProducto(this.id).subscribe({
       next: (p) => {
-        // Solo usamos los campos que corresponden al DTO ProductoCreacion
         this.form = {
           nombreComercial: p.nombreComercial,
           nombreGenerico: p.nombreGenerico,
           presentacion: p.presentacion,
           dosificacion: p.dosificacion,
           unidadMedida: p.unidadMedida,
-          stockMinimo: p.stockMinimo ?? 0,
-          stockMaximo: p.stockMaximo ?? 0,
-          categoria: p.categoria ?? 'ANALGESICOS_ANTIINFLAMATORIOS',
-          idFabricante: p.idFabricante ?? '',
         };
 
         this.cargando = false;
@@ -67,24 +58,14 @@ export class FormEdicionProductoComponent implements OnInit {
     this.errors = {};
     this.isValid = true;
 
-    if (!this.form.nombreComercial.trim())
+    if (!this.form.nombreComercial!.trim())
       this.errors.nombreComercial = 'El nombre comercial es obligatorio.';
 
-    if (!this.form.nombreGenerico.trim())
+    if (!this.form.nombreGenerico!.trim())
       this.errors.nombreGenerico = 'El nombre genérico es obligatorio.';
 
     if (!this.form.dosificacion || this.form.dosificacion <= 0)
       this.errors.dosificacion = 'La dosificación debe ser mayor a 0.';
-
-    if (this.form.stockMinimo < 0)
-      this.errors.stockMinimo = 'El stock mínimo no puede ser negativo.';
-
-    if (this.form.stockMaximo < 0)
-      this.errors.stockMaximo = 'El stock máximo no puede ser negativo.';
-
-    if (this.form.stockMaximo < this.form.stockMinimo)
-      this.errors.stockMaximo =
-        'El stock máximo debe ser mayor o igual al stock mínimo.';
 
     if (Object.keys(this.errors).length > 0) this.isValid = false;
   }
