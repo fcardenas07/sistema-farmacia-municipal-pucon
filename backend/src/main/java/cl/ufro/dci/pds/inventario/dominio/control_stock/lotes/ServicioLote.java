@@ -4,13 +4,12 @@ import cl.ufro.dci.pds.compartido.eventos.ItemVenta;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.ItemLoteCantidad;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class ServicioLote {
@@ -57,14 +56,6 @@ public class ServicioLote {
         return repositorioLote.findByNumeroLoteStartingWithIgnoreCase(filtro);
     }
 
-    public List<Lote> obtenerLotesPorIds(List<String> ids){
-        var lotes = repositorioLote.findAllById(ids);
-        if(ids.size() != lotes.size()){
-            throw new LotesIncompletosException("No todos los lotes fueron encontrados");
-        }
-        return lotes;
-    }
-
     public int darBaja(Lote lote) {
         var cantidadBajada = lote.getStockActual();
         lote.setStockActual(0);
@@ -89,42 +80,22 @@ public class ServicioLote {
         return descontado;
     }
 
-    @Transactional
-    public List<Lote> reservarLotes(List<ItemVenta> solicitudes) {
+    public void reservarLotes(List<ItemLoteCantidad> reservas) {
+        for (var reserva: reservas) {
+            var lote = reserva.lote();
+            var cantidadSolicitada = reserva.cantidad();
+            var stockReservado = lote.getStockReservado();
 
-        var ids = solicitudes.stream()
-                .map(ItemVenta::idLote)
-                .toList();
-
-        var lotes = obtenerLotesPorIds(ids);
-
-        var lotesPorId = lotes.stream()
-                .collect(Collectors.toMap(Lote::getIdLote, Function.identity()));
-
-        for (var sol : solicitudes) {
-            var lote = lotesPorId.get(sol.idLote());
-            if (lote == null) {
-                throw new LoteInexistenteException(sol.idLote());
+            if (lote.getStockDisponible() < cantidadSolicitada) {
+                throw new SinStockDisponibleException(lote.getNumeroLote());
             }
-            reservar(lote, sol.cantidad());
+            lote.setStockReservado(stockReservado + cantidadSolicitada);
         }
 
-        return lotes;
+        var lotes = reservas.stream().map(ItemLoteCantidad::lote).toList();
+
+        guardarTodos(lotes);
     }
-
-    public void reservar(Lote lote, int cantidadSolicitada) {
-        var stockActual = lote.getStockActual();
-        var stockReservado = lote.getStockReservado();
-
-        var stockDisponible = stockActual - stockReservado;
-
-        if (stockDisponible < cantidadSolicitada) {
-            throw new SinStockDisponibleException(lote.getNumeroLote());
-        }
-
-        lote.setStockReservado(stockReservado + cantidadSolicitada);
-    }
-
 
     public void guardarTodos(List<Lote> lotes) {
         repositorioLote.saveAll(lotes);

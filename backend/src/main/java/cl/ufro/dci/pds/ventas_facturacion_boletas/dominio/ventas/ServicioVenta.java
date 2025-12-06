@@ -1,17 +1,14 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas;
+
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.Cliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 
-import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetalleVentaACrear;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-
 
 @Service
 public class ServicioVenta {
-
     private final RepositorioVenta repositorioVenta;
 
     public ServicioVenta(RepositorioVenta repositorioVenta) {
@@ -19,23 +16,15 @@ public class ServicioVenta {
     }
 
     public Venta crear(Usuario usuario,
-                        Cliente cliente,
-                        LocalDate fechaVenta,
-                       List<DetalleVentaACrear> detalleVenta) {
+                       Cliente cliente,
+                       LocalDate fechaVenta) {
 
-        Venta venta = new Venta();
+        var venta = new Venta();
         venta.setFechaVenta(fechaVenta);
+        venta.setEstadoVenta(EstadoVenta.PENDIENTE_PAGO);
         venta.setCliente(cliente);
         venta.setUsuario(usuario);
-        venta.setEstadoVenta(EstadoVenta.PENDIENTE_PAGO);
-        return repositorioVenta.save(venta);
-    }
-
-
-    public Venta buscarPorId(String idVenta) {
-        return repositorioVenta.findById(idVenta)
-                .orElseThrow(() ->
-                        new VentaNoEncontradaException(idVenta));
+        return guardar(venta);
     }
 
     public Venta guardar(Venta venta) {

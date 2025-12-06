@@ -22,9 +22,6 @@ public class Venta {
     @Column(name = "fecha_venta")
     private LocalDate fechaVenta;
 
-    @Column(name = "total")
-    private Integer total = 0;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_venta")
     private EstadoVenta estadoVenta;
@@ -38,10 +35,14 @@ public class Venta {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetalleVenta> detallesVenta = new ArrayList<>();
-
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
     public Venta() {
+    }
+
+    public void agregarDetalle(Lote lote, Integer cantidad, Integer precioUnitario) {
+        var detalle = new DetalleVenta(this, lote, cantidad, precioUnitario);
+        detalles.add(detalle);
     }
 
     public String getIdVenta() {
@@ -58,24 +59,6 @@ public class Venta {
 
     public void setFechaVenta(LocalDate fechaVenta) {
         this.fechaVenta = fechaVenta;
-    }
-
-    public Integer getTotal() {
-        return total;
-    }
-
-    public int calcularTotal() {
-        return this.detallesVenta.stream()
-                .mapToInt(DetalleVenta::getSubtotal)
-                .sum();
-    }
-
-    public void recalcularTotal() {
-        this.total = calcularTotal();
-    }
-
-    public void setTotal(Integer total) {
-        this.total = total;
     }
 
     public Cliente getCliente() {
@@ -102,19 +85,15 @@ public class Venta {
         this.estadoVenta = estadoVenta;
     }
 
-    public void setDetallesVenta(List<DetalleVenta> detallesVenta) {
-        this.detallesVenta = detallesVenta;
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
     }
 
-    public List<DetalleVenta> getDetallesVenta() {
-        return detallesVenta;
+    public Integer getTotal() {
+        return detalles.stream()
+                .mapToInt(d -> d.getCantidad() * d.getPrecioUnitario())
+                .sum();
     }
-
-    public void agregarDetalle(Lote lote, Integer cantidad, Integer precioUnitario) {
-        var detalle = new DetalleVenta(this, lote, cantidad, precioUnitario);
-        this.detallesVenta.add(detalle);
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -132,7 +111,7 @@ public class Venta {
         return "Venta{" +
                 "idVenta='" + idVenta + '\'' +
                 ", fechaVenta=" + fechaVenta +
-                ", total=" + total +
+                ", estadoVenta=" + estadoVenta +
                 ", cliente=" + cliente +
                 ", usuario=" + usuario +
                 '}';

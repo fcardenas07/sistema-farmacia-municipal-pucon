@@ -83,31 +83,31 @@ VALUES ('cod-001', '7801234001115', 'EAN13', TRUE, 'prod-001'),
 -- ============================================
 -- ================== LOTES ====================
 -- ============================================
-INSERT INTO lote (
-    id_lote, fecha_elaboracion, fecha_vencimiento, numero_lote,
-    estado, precio_unitario, limite_merma, porcentaje_oferta,
-    stock_inicial, stock_actual, stock_reservado,
-    id_codigo, id_guia_ingreso
-)
+
+INSERT INTO lote (id_lote, fecha_elaboracion, fecha_vencimiento, numero_lote,
+                  estado, precio_unitario, limite_merma, porcentaje_oferta,
+                  stock_inicial, stock_actual,                    -- ← aquí
+                  id_codigo, id_guia_ingreso)
 VALUES
-    ('lot-001', '2024-01-10', '2026-01-10', 'LPA-001', 'DISPONIBLE', 1500, 5, 0.0, 100, 100, 0, 'cod-001', NULL),
-    ('lot-002', '2024-02-15', '2026-02-15', 'LPA-002', 'DISPONIBLE', 2000, 5, 10.0, 120, 120, 0, 'cod-002', NULL),
-    ('lot-003', '2024-03-05', '2026-03-05', 'LAM-001', 'DISPONIBLE', 4000, 3, 0.0, 200, 200, 0, 'cod-003', NULL),
-    ('lot-004', '2024-01-20', '2025-12-20', 'LIB-001', 'DISPONIBLE', 2500, 4, 0.0, 150, 150, 0, 'cod-004', NULL),
-    ('lot-005', '2024-02-22', '2026-02-22', 'LIB-002', 'DISPONIBLE', 1000, 4, 5.0, 80, 80, 0, 'cod-005', NULL),
-    ('lot-006', '2024-04-10', '2026-04-10', 'LCE-001', 'DISPONIBLE', 5000, 2, 0.0, 60, 60, 0, 'cod-006', NULL),
-    ('lot-007', '2024-05-12', '2026-05-12', 'LOM-001', 'DISPONIBLE', 450, 3, 0.0, 200, 200, 0, 'cod-007', NULL),
-    ('lot-008', '2024-06-10', '2026-06-10', 'LOM-002', 'DISPONIBLE', 500, 3, 5.0, 200, 200, 0, 'cod-008', NULL),
-    ('lot-009', '2024-01-18', '2025-12-18', 'LME-001', 'DISPONIBLE', 700, 4, 0.0, 100, 100, 0, 'cod-009', NULL),
-    ('lot-010', '2024-03-14', '2026-03-14', 'LME-002', 'DISPONIBLE', 750, 4, 10.0, 90, 90, 0, 'cod-010', NULL),
-    ('lot-011', '2024-02-10', '2026-02-10', 'LLO-001', 'DISPONIBLE', 900, 2, 0.0, 120, 120, 0, 'cod-011', NULL),
-    ('lot-012', '2024-04-25', '2026-04-25', 'LLO-002', 'DISPONIBLE', 920, 2, 5.0, 120, 120, 0, 'cod-012', NULL),
-    ('lot-013', '2024-01-05', '2025-11-05', 'LEN-001', 'DISPONIBLE', 1100, 2, 0.0, 160, 160, 0, 'cod-013', NULL),
-    ('lot-014', '2024-03-20', '2026-03-20', 'LEN-002', 'DISPONIBLE', 1150, 2, 5.0, 160, 160, 0, 'cod-014', NULL),
-    ('lot-015', '2024-01-10', '2026-01-10', 'LASP-001', 'DISPONIBLE', 350, 3, 0.0, 300, 300, 0, 'cod-015', NULL),
-    ('lot-016', '2024-02-15', '2026-02-15', 'LASP-002', 'DISPONIBLE', 360, 3, 5.0, 300, 300, 0, 'cod-016', NULL),
-    ('lot-017', '2024-03-12', '2026-03-12', 'LVIT-001', 'DISPONIBLE', 600, 4, 0.0, 200, 200, 0, 'cod-017', NULL),
-    ('lot-018', '2024-04-18', '2026-04-18', 'LVIT-002', 'DISPONIBLE', 650, 4, 5.0, 200, 200, 0, 'cod-018', NULL);
+    ('lot-001', '2024-01-10', '2026-01-10', 'LPA-001', 'DISPONIBLE', 1500, 5, 0.0, 100, 100, 'cod-001', NULL),
+    ('lot-002', '2024-02-15', '2026-02-15', 'LPA-002', 'DISPONIBLE', 2000, 5, 10.0, 120, 120, 'cod-002', NULL),
+    ('lot-003', '2024-03-05', '2026-03-05', 'LAM-001', 'DISPONIBLE', 4000, 3, 0.0, 200, 200, 'cod-003', NULL),
+    ('lot-004', '2024-01-20', '2025-12-20', 'LIB-001', 'DISPONIBLE', 2500, 4, 0.0, 150, 150, 'cod-004', NULL),
+    ('lot-005', '2024-02-22', '2026-02-22', 'LIB-002', 'DISPONIBLE', 1000, 4, 5.0, 80, 80, 'cod-005', NULL),
+    ('lot-006', '2024-04-10', '2026-04-10', 'LCE-001', 'DISPONIBLE', 5000, 2, 0.0, 60, 60, 'cod-006', NULL),
+    ('lot-007', '2024-05-12', '2026-05-12', 'LOM-001', 'DISPONIBLE', 450, 3, 0.0, 200, 200, 'cod-007', NULL),
+    ('lot-008', '2024-06-10', '2026-06-10', 'LOM-002', 'DISPONIBLE', 500, 3, 5.0, 200, 200, 'cod-008', NULL),
+    ('lot-009', '2024-01-18', '2025-12-18', 'LME-001', 'DISPONIBLE', 700, 4, 0.0, 100, 100, 'cod-009', NULL),
+    ('lot-010', '2024-03-14', '2026-03-14', 'LME-002', 'DISPONIBLE', 750, 4, 10.0, 90, 90, 'cod-010', NULL),
+    ('lot-011', '2024-02-10', '2026-02-10', 'LLO-001', 'DISPONIBLE', 900, 2, 0.0, 120, 120, 'cod-011', NULL),
+    ('lot-012', '2024-04-25', '2026-04-25', 'LLO-002', 'DISPONIBLE', 920, 2, 5.0, 120, 120, 'cod-012', NULL),
+    ('lot-013', '2024-01-05', '2025-11-05', 'LEN-001', 'DISPONIBLE', 1100, 2, 0.0, 160, 160, 'cod-013', NULL),
+    ('lot-014', '2024-03-20', '2026-03-20', 'LEN-002', 'DISPONIBLE', 1150, 2, 5.0, 160, 160, 'cod-014', NULL),
+    ('lot-015', '2024-01-10', '2026-01-10', 'LASP-001', 'DISPONIBLE', 350, 3, 0.0, 300, 300, 'cod-015', NULL),
+    ('lot-016', '2024-02-15', '2026-02-15', 'LASP-002', 'DISPONIBLE', 360, 3, 5.0, 300, 300, 'cod-016', NULL),
+    ('lot-017', '2024-03-12', '2026-03-12', 'LVIT-001', 'DISPONIBLE', 600, 4, 0.0, 200, 200, 'cod-017', NULL),
+    ('lot-018', '2024-04-18', '2026-04-18', 'LVIT-002', 'DISPONIBLE', 650, 4, 5.0, 200, 200, 'cod-018', NULL);
+
 
 -- ============================================
 -- ============== MOVIMIENTOS ==================
@@ -133,15 +133,3 @@ VALUES
 ('mov-016', 'INGRESO', 250, '2024-02-15', 'Ingreso inicial del lote', 'lot-016'),
 ('mov-017', 'INGRESO', 220, '2024-03-12', 'Ingreso inicial del lote', 'lot-017'),
 ('mov-018', 'INGRESO', 210, '2024-04-18', 'Ingreso inicial del lote', 'lot-018');
-
--- mock
-
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR001', 'Usuario Demo');
-
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR002', 'Usuario Demo');
-
-INSERT INTO cliente (rut_cliente, nombre, direccion, id_usuario)
-VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', 'USR002');
-

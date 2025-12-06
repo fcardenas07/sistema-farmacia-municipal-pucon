@@ -1,4 +1,4 @@
-package cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos;
+﻿package cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos;
 
 import java.util.List;
 

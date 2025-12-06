@@ -1,11 +1,9 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas;
 
-import cl.ufro.dci.pds.compartido.eventos.ItemVenta;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetalleVentaCreado;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaCreada;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -21,7 +19,7 @@ public class VentasMapper {
                 venta.getUsuario().getIdUsuario(),
                 venta.getUsuario().getNombreCompleto(),
                 venta.getTotal(),
-                toDto(venta.getDetallesVenta())
+                toDto(venta.getDetalles())
         );
     }
 
