@@ -47,14 +47,19 @@ public class ServicioLote {
 
     public List<Lote> obtenerPorNumeroLote(String filtro) {
         if (filtro == null || filtro.isBlank()) {
-            return List.of();
+            return repositorioLote.findAll();
         }
+
         return repositorioLote.findByNumeroLoteStartingWithIgnoreCase(filtro);
     }
 
-    public void darBaja(Lote lote) {
+    public int darBaja(Lote lote) {
+        var cantidadBajada = lote.getStockActual();
+        lote.setStockActual(0);
+        lote.setStockReservado(0);
         lote.setEstado("INACTIVO");
         repositorioLote.save(lote);
+        return cantidadBajada;
     }
 
     public int descontar(Lote lote, int cantidadSolicitada) {

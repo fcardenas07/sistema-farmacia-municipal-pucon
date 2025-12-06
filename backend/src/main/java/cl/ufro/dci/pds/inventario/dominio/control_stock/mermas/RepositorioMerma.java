@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.dominio.control_stock.mermas;
+package cl.ufro.dci.pds.inventario.dominio.control_stock.mermas;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

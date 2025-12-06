@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
+package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
 import cl.ufro.dci.pds.compartido.eventos.EventoInventarioActualizado;
 import cl.ufro.dci.pds.compartido.eventos.EventoPagoAprobado;

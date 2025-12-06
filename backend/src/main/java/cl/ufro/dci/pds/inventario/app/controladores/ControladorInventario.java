@@ -38,13 +38,13 @@ public class ControladorInventario {
     }
 
     @PostMapping("/mermas")
-    public ResponseEntity<Void> registrarMerma(@Valid @RequestBody IngresoMerma dto) {
-        servicioAppInventario.ingresarMerma(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<String> registrarMerma(@Valid @RequestBody IngresoMerma dto) {
+        var idMovimiento = servicioAppInventario.ingresarMerma(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(idMovimiento);
     }
 
     @GetMapping("/lotes/buscar")
-    public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam String filtro) {
+    public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam(required = false) String filtro) {
         return ResponseEntity.ok(servicioAppInventario.obtenerLotesPor(filtro));
     }
 
