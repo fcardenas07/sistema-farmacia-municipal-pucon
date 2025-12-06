@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
 public class GestorInventario {
 
     private final BusEventosVentas bus;
+    private final ServicioAppInventario servicioAppInventario;
 
-    public GestorInventario(BusEventosVentas bus) {
+    public GestorInventario(BusEventosVentas bus, ServicioAppInventario servicioAppInventario) {
         this.bus = bus;
+        this.servicioAppInventario = servicioAppInventario;
     }
 
     public void emitirStockDisponible(EventoStockDisponible evento) {
@@ -27,7 +29,8 @@ public class GestorInventario {
 
     @EventListener
     public void manejarVentaIniciada(EventoVentaIniciada evento) {
-        // procesar venta iniciada (luego se implementa)
+        servicioAppInventario.reservar(evento);
+
     }
 
     @EventListener

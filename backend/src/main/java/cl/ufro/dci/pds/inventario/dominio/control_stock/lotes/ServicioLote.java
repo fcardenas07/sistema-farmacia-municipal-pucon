@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
+import cl.ufro.dci.pds.compartido.eventos.ItemVenta;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
@@ -89,10 +90,10 @@ public class ServicioLote {
     }
 
     @Transactional
-    public List<Lote> reservarLotes(List<SolicitudReservaLote> solicitudes) {
+    public List<Lote> reservarLotes(List<ItemVenta> solicitudes) {
 
         var ids = solicitudes.stream()
-                .map(SolicitudReservaLote::idLote)
+                .map(ItemVenta::idLote)
                 .toList();
 
         var lotes = obtenerLotesPorIds(ids);

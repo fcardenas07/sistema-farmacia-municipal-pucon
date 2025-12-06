@@ -19,7 +19,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @MapsId("idLote")
-    @JoinColumn(name = "id_lote", nullable = false)
+    @JoinColumn(name = "id_lote", nullable = true)
     private Lote lote;
 
     @Column(name = "cantidad")

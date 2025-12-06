@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoStockDisponible;
 import cl.ufro.dci.pds.compartido.eventos.EventoVentaIniciada;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.*;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.ServicioCliente;
@@ -7,11 +8,13 @@ import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.ServicioUsuario;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetalleVentaACrear;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaACrear;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaCreada;
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.VentasMapper;
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.ServicioVenta;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ServicioAppVenta {
@@ -37,17 +40,11 @@ public class ServicioAppVenta {
     public VentaCreada crear(@Valid VentaACrear dto) {
         var usuario = servicioUsuario.buscarPorId(dto.idVendedor());
         var cliente = servicioCliente.buscarPorRut(dto.rutCliente());
-        var solicitudes = dto.detalleVenta().stream()
-                .map(det -> new SolicitudReservaLote(det.idLote(), det.cantidad()))
-                .toList();
 
-        var lotesReservados = servicioLote.reservarLotes(solicitudes);
         var venta = servicioVenta.crear(
                 usuario,
                 cliente,
                 dto.fechaVenta(),
-                dto.total(),
-                lotesReservados,
                 dto.detalleVenta()
         );
 
@@ -58,6 +55,41 @@ public class ServicioAppVenta {
 
         gestorVentas.emitirVentaIniciada(new EventoVentaIniciada(venta.getIdVenta(), itemsVentas));
         return ventasMapper.toDto(venta);
+    }
+
+    public VentaCreada guardarVenta(EventoStockDisponible evento){
+        var venta = servicioVenta.buscarPorId(evento.idVenta());
+        var lotes = evento.lotes();
+        var itemsVenta = evento.items();
+
+        var lotesPorId = lotes.stream()
+                .collect(Collectors.toMap(Lote::getIdLote, Function.identity()));
+
+        itemsVenta.stream()
+                .map(item -> {
+
+                    var lote = lotesPorId.get(item.idLote());
+                    if (lote == null) {
+                        throw new IllegalStateException("Lote no encontrado para item: " + item.idLote());
+                    }
+
+                    return new DetalleVenta(
+                            venta,
+                            lote,
+                            item.cantidad(),
+                            item.precioUnitario()
+                    );
+                })
+                .forEach(venta.getDetallesVenta()::add);
+
+        venta.recalcularTotal();
+
+        venta.setEstadoVenta(EstadoVenta.PENDIENTE_PAGO);
+
+        var ventaGuardada = servicioVenta.guardar(venta);
+
+        return ventasMapper.toDto(ventaGuardada);
+
     }
 }
 
