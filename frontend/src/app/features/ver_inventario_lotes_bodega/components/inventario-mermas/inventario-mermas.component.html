@@ -1,39 +1,61 @@
-<div class="table-wrapper">
+<div class="inventory-container">
 
-  <table class="shad-table">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Producto</th>
-        <th>Lote</th>
-        <th>Cant. Merma</th>
-        <th>Tipo de Merma</th>
-        <th>Fecha</th>
-        <th>Responsable</th>
-        <th>Descripción</th>
-        <th></th>
-      </tr>
-    </thead>
+  <div class="table-wrapper">
 
-    <tbody>
-      <tr *ngFor="let merma of mermas">
-        <td>{{ merma.codigo }}</td>
-        <td>{{ merma.producto }}</td>
-        <td>{{ merma.lote }}</td>
-        <td>{{ merma.cantidadMerma }}</td>
-        <td>{{ merma.tipoMerma }}</td>
-        <td>{{ merma.fecha }}</td>
-        <td>{{ merma.responsable }}</td>
-        <td class="desc-cell">
-          {{ merma.descripcion.length > 35 ? (merma.descripcion | slice:0:35) + '...' : merma.descripcion }}
-        </td>
+    <table class="shad-table">
+      <thead>
+        <tr>
+          <th>Cantidad</th>
+          <th>Tipo de Merma</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th></th>
+        </tr>
+      </thead>
 
-        <td>
-          <button class="btn-shad" (click)="verDetalles(merma)">Ver detalles</button>
-        </td>
-      </tr>
-    </tbody>
+      <tbody>
+        <tr *ngFor="let merma of mermas">
 
-  </table>
+          <td>{{ merma.cantidad }}</td>
+          <td>{{ merma.tipoMovimiento }}</td>
+          <td>{{ merma.fechaMovimiento }}</td>
+
+          <td class="desc-cell">
+            {{ merma.detalle.length > 35 ? (merma.detalle | slice:0:35) + '...' : merma.detalle }}
+          </td>
+
+          <td>
+            <button class="btn-shad" (click)="verDetalles(merma)">
+              Ver detalles
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-controls">
+
+    <button class="pg-btn"
+            (click)="paginaAnterior()"
+            [disabled]="paginaActual === 0">
+      ◀ Anterior
+    </button>
+
+    <span class="page-info">
+      Página {{ paginaActual + 1 }} de {{ totalPaginas }}
+    </span>
+
+    <button class="pg-btn"
+            (click)="paginaSiguiente()"
+            [disabled]="paginaActual >= totalPaginas - 1">
+      Siguiente ▶
+    </button>
+
+  </div>
 
 </div>

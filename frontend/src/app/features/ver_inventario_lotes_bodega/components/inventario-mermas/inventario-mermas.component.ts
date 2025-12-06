@@ -1,16 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-
-export interface MermaInventario {
-  codigo: string;
-  producto: string;
-  lote: string;
-  cantidadMerma: number;
-  tipoMerma: string;
-  fecha: string;
-  responsable: string;
-  descripcion: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { MovimientosMermaService } from '../../services/movimientos-merma.service';
+import { MovimientoMerma } from '../../models/movimiento-merma';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inventario-mermas',
@@ -19,43 +11,46 @@ export interface MermaInventario {
   templateUrl: './inventario-mermas.component.html',
   styleUrl: './inventario-mermas.component.css'
 })
-export class InventarioMermasComponent {
+export class InventarioMermasComponent implements OnInit {
 
-  mermas: MermaInventario[] = [
-    {
-      codigo: 'PR-001',
-      producto: 'Paracetamol 500mg',
-      lote: 'L-9123',
-      cantidadMerma: 15,
-      tipoMerma: 'Producto dañado',
-      fecha: '20/11/2024',
-      responsable: 'Sebastián Aliante',
-      descripcion: 'Caja dañada durante el transporte. 15 unidades inutilizables.'
-    },
-    {
-      codigo: 'PR-002',
-      producto: 'Ibuprofeno 400mg',
-      lote: 'L-5521',
-      cantidadMerma: 8,
-      tipoMerma: 'Error de inventario',
-      fecha: '03/01/2025',
-      responsable: 'María Torres',
-      descripcion: 'Diferencia detectada durante auditoría interna.'
-    },
-    {
-      codigo: 'PR-003',
-      producto: 'Omeprazol 20mg',
-      lote: 'L-7781',
-      cantidadMerma: 20,
-      tipoMerma: 'Recal del laboratorio',
-      fecha: '15/12/2024',
-      responsable: 'Diego Ramos',
-      descripcion: 'El lote completo fue retirado por indicación del laboratorio fabricante.'
-    }
-  ];
+  mermas: MovimientoMerma[] = [];
+  paginaActual = 0;
+  totalPaginas = 0;
 
-  verDetalles(merma: MermaInventario) {
-    console.log('Detalles de la merma:', merma);
+  constructor(
+    private mermaService: MovimientosMermaService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.cargarPagina(0);
   }
 
+  cargarPagina(page: number) {
+    this.mermaService.getMermas(page).subscribe({
+      next: data => {
+        this.mermas = data.content;
+        this.paginaActual = data.number;
+        this.totalPaginas = data.totalPages;
+      },
+      error: err => console.error('Error cargando mermas:', err)
+    });
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 0) {
+      this.cargarPagina(this.paginaActual - 1);
+    }
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas - 1) {
+      this.cargarPagina(this.paginaActual + 1);
+    }
+  }
+
+  verDetalles(merma: MovimientoMerma) {
+    this.router.navigate(['/detalle-movimiento-merma', merma.idMovimiento]);
+
+  }
 }
