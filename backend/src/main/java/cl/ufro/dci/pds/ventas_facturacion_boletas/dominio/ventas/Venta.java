@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas;
 
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.Cliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ import java.util.Objects;
 public class Venta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_venta")
     private String idVenta;
 
@@ -21,7 +23,10 @@ public class Venta {
     private LocalDate fechaVenta;
 
     @Column(name = "total")
-    private Integer total;
+    private Integer total = 0;
+
+    @Column(name = "estado_venta")
+    private EstadoVenta estadoVenta;
 
     @ManyToOne
     @JoinColumn(name = "rut_cliente")
@@ -58,6 +63,16 @@ public class Venta {
         return total;
     }
 
+    public int calcularTotal() {
+        return this.detallesVenta.stream()
+                .mapToInt(DetalleVenta::getSubtotal)
+                .sum();
+    }
+
+    public void recalcularTotal() {
+        this.total = calcularTotal();
+    }
+
     public void setTotal(Integer total) {
         this.total = total;
     }
@@ -77,6 +92,28 @@ public class Venta {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+    public EstadoVenta getEstadoVenta() {
+        return estadoVenta;
+    }
+
+    public void setEstadoVenta(EstadoVenta estadoVenta) {
+        this.estadoVenta = estadoVenta;
+    }
+
+    public void setDetallesVenta(List<DetalleVenta> detallesVenta) {
+        this.detallesVenta = detallesVenta;
+    }
+
+    public List<DetalleVenta> getDetallesVenta() {
+        return detallesVenta;
+    }
+
+    public void agregarDetalle(Lote lote, Integer cantidad, Integer precioUnitario) {
+        var detalle = new DetalleVenta(this, lote, cantidad, precioUnitario);
+        this.detallesVenta.add(detalle);
+    }
+
 
     @Override
     public boolean equals(Object o) {

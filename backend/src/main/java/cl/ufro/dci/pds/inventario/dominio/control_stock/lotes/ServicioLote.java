@@ -3,10 +3,13 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ServicioLote {
@@ -53,6 +56,14 @@ public class ServicioLote {
         return repositorioLote.findByNumeroLoteStartingWithIgnoreCase(filtro);
     }
 
+    public List<Lote> obtenerLotesPorIds(List<String> ids){
+        var lotes = repositorioLote.findAllById(ids);
+        if(ids.size() != lotes.size()){
+            throw new LotesIncompletosException("No todos los lotes fueron encontrados");
+        }
+        return lotes;
+    }
+
     public int darBaja(Lote lote) {
         var cantidadBajada = lote.getStockActual();
         lote.setStockActual(0);
@@ -76,6 +87,43 @@ public class ServicioLote {
 
         return descontado;
     }
+
+    @Transactional
+    public List<Lote> reservarLotes(List<SolicitudReservaLote> solicitudes) {
+
+        var ids = solicitudes.stream()
+                .map(SolicitudReservaLote::idLote)
+                .toList();
+
+        var lotes = obtenerLotesPorIds(ids);
+
+        var lotesPorId = lotes.stream()
+                .collect(Collectors.toMap(Lote::getIdLote, Function.identity()));
+
+        for (var sol : solicitudes) {
+            var lote = lotesPorId.get(sol.idLote());
+            if (lote == null) {
+                throw new LoteInexistenteException(sol.idLote());
+            }
+            reservar(lote, sol.cantidad());
+        }
+
+        return lotes;
+    }
+
+    public void reservar(Lote lote, int cantidadSolicitada) {
+        var stockActual = lote.getStockActual();
+        var stockReservado = lote.getStockReservado();
+
+        var stockDisponible = stockActual - stockReservado;
+
+        if (stockDisponible < cantidadSolicitada) {
+            throw new SinStockDisponibleException(lote.getNumeroLote());
+        }
+
+        lote.setStockReservado(stockReservado + cantidadSolicitada);
+    }
+
 
     public void guardarTodos(List<Lote> lotes) {
         repositorioLote.saveAll(lotes);

@@ -40,10 +40,10 @@ public class Lote {
     private Integer stockInicial;
 
     @Column(name = "stock_actual")
-    private Integer stockActual;
+    private Integer stockActual = 0;
 
     @Column(name = "stock_reservado")
-    private Integer stockReservado;
+    private Integer stockReservado = 0;
 
     @ManyToOne
     @JoinColumn(name = "id_codigo", nullable = false)

@@ -47,6 +47,10 @@ public class DetalleVenta {
         this.detalleVentaId = detalleVentaId;
     }
 
+    public Integer getSubtotal(){
+        return this.cantidad*this.precioUnitario;
+    }
+
     public Venta getVenta() {
         return venta;
     }
