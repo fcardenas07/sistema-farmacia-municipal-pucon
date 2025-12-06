@@ -1,7 +1,8 @@
-// ingreso-merma-form.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MermasService } from '../../services/mermas.service';
+import { MermaRequest } from '../../models/merma-request';
 
 @Component({
   selector: 'app-ingreso-merma-form',
@@ -13,42 +14,53 @@ import { FormsModule } from '@angular/forms';
 export class IngresoMermaFormComponent {
 
   form = {
-    codigoProducto: '',
-    informacionLote: '',
-    numeroLote: '',
-    cantidadMerma: null,
+    idLote: '',
     tipoMerma: '',
-    descripcion: ''
+    detalle: '',
+    cantidad: null as number | null
   };
 
   opcionesMerma = [
-    "Producto dañado",
-    "Ruptura de stock",
-    "Robo / extravío",
-    "Error de inventario",
-    "Recal del laboratorio"
+    "PRODUCTO_DANIADO",
+    "RUPTURA_STOCK",
+    "ROBO_O_EXTRAVIO",
+    "ERROR_INVENTARIO",
+    "RECALL_LABORATORIO"
   ];
 
-  buscarProducto() {
-    console.log("Buscar producto:", this.form.codigoProducto);
+  constructor(private mermasService: MermasService) {}
 
-    // MOCK TEMPORAL
-    this.form.informacionLote = "Paracetamol 500mg - 120 unidades";
-    this.form.numeroLote = "L-9123";
-  }
+finalizar() {
+  const payload: MermaRequest = {
+    idLote: this.form.idLote.trim(),
+    tipoMerma: this.form.tipoMerma,
+    detalle: this.form.detalle.trim(),
+    cantidad: Number(this.form.cantidad),
+  };
 
-  finalizar() {
-    console.log("Formulario enviado:", this.form);
-  }
+
+  this.mermasService.registrarMerma(payload).subscribe({
+    next: (resp) => {
+      console.log("✅ Merma registrada, ID generado:", resp);
+
+      alert(`✔ Merma registrada correctamente.\nID generado: ${resp}`);
+
+      this.limpiar();
+    },
+    error: (err) => {
+      console.error("❌ Error registrando merma:", err);
+      alert("❌ Ocurrió un error al registrar la merma. Intente nuevamente.");
+    }
+  });
+}
+
 
   limpiar() {
     this.form = {
-      codigoProducto: '',
-      informacionLote: '',
-      numeroLote: '',
-      cantidadMerma: null,
+      idLote: '',
       tipoMerma: '',
-      descripcion: ''
+      detalle: '',
+      cantidad: null
     };
   }
 }

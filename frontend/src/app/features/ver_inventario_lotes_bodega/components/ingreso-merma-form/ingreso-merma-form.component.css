@@ -48,22 +48,21 @@ input, select, textarea {
   resize: none;
 }
 
+textarea {
+  min-height: 120px;
+  font-family: inherit; /* <-- MISMA FUENTE QUE EL RESTO */
+}
+
 input:focus, select:focus, textarea:focus {
   border-color: #333;
 }
 
-textarea {
-  min-height: 120px;
-}
-
-/* Row consistente */
-.input-btn-row {
+.buttons {
+  margin-top: 40px;
   display: flex;
-  gap: 14px;
+  justify-content: space-between;
 }
 
-/* Botones unificados */
-.dark-btn,
 .clear-btn,
 .continue-btn {
   padding: 12px 26px;
@@ -75,27 +74,8 @@ textarea {
   transition: 0.2s ease;
 }
 
-.dark-btn {
-  background: #111118;
-  color: white;
-}
-
-.dark-btn:hover {
-  opacity: 0.85;
-}
-
-.buttons {
-  margin-top: 40px;
-  display: flex;
-  justify-content: space-between;
-}
-
 .clear-btn {
   background: #e8e8e8;
-}
-
-.clear-btn:hover {
-  background: #d6d6d6;
 }
 
 .continue-btn {
@@ -103,6 +83,7 @@ textarea {
   color: white;
 }
 
-.continue-btn:hover {
+.continue-btn:hover,
+.clear-btn:hover {
   opacity: 0.85;
 }
