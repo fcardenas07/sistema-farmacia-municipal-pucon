@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios;
+package cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios;
 
 public interface ServicioUsuario {
     public Usuario buscarPorId(String idUsuario);

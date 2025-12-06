@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -21,7 +21,7 @@ public class Pago {
     private Integer monto;
 
     @Column(name = "fecha_pago")
-    private LocalDate fecha_pago;
+    private LocalDateTime fecha_pago;
 
     @Column(name = "referencia_transaccion")
     private String referencia_transaccion;
@@ -60,11 +60,11 @@ public class Pago {
         this.monto = monto;
     }
 
-    public LocalDate getFecha_pago() {
+    public LocalDateTime getFecha_pago() {
         return fecha_pago;
     }
 
-    public void setFecha_pago(LocalDate fecha_pago) {
+    public void setFecha_pago(LocalDateTime fecha_pago) {
         this.fecha_pago = fecha_pago;
     }
 

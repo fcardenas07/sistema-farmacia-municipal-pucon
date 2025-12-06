@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.facturacion.boletas;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -18,7 +18,7 @@ public class Boleta {
     private Integer numero;
 
     @Column(name = "fecha_emision")
-    private LocalDate fechaEmision;
+    private LocalDateTime fechaEmision;
 
     @Column(name = "monto_total")
     private Integer montoTotal;
@@ -46,11 +46,11 @@ public class Boleta {
         this.numero = numero;
     }
 
-    public LocalDate getFechaEmision() {
+    public LocalDateTime getFechaEmision() {
         return fechaEmision;
     }
 
-    public void setFechaEmision(LocalDate fechaEmision) {
+    public void setFechaEmision(LocalDateTime fechaEmision) {
         this.fechaEmision = fechaEmision;
     }
 

@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.reportes_analiticas.dominio.logs;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -15,7 +15,7 @@ public class Log {
     private String idLog;
 
     @Column(name = "fecha_log")
-    private LocalDate fechaLog;
+    private LocalDateTime fechaLog;
 
     @Column(name = "tipo_cambio")
     private String tipoCambio;
@@ -39,11 +39,11 @@ public class Log {
         this.idLog = idLog;
     }
 
-    public LocalDate getFechaLog() {
+    public LocalDateTime getFechaLog() {
         return fechaLog;
     }
 
-    public void setFechaLog(LocalDate fechaLog) {
+    public void setFechaLog(LocalDateTime fechaLog) {
         this.fechaLog = fechaLog;
     }
 

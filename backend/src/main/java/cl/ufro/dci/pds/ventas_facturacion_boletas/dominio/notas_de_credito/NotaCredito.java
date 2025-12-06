@@ -5,7 +5,7 @@ import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.devoluciones.Devolucio
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.facturacion.boletas.Boleta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -20,7 +20,7 @@ public class NotaCredito {
     private Integer numeroNota;
 
     @Column(name = "fecha_emision")
-    private LocalDate fechaEmision;
+    private LocalDateTime fechaEmision;
 
     @Column(name = "monto")
     private Integer monto;
@@ -61,11 +61,11 @@ public class NotaCredito {
         this.numeroNota = numeroNota;
     }
 
-    public LocalDate getFechaEmision() {
+    public LocalDateTime getFechaEmision() {
         return fechaEmision;
     }
 
-    public void setFechaEmision(LocalDate fechaEmision) {
+    public void setFechaEmision(LocalDateTime fechaEmision) {
         this.fechaEmision = fechaEmision;
     }
 

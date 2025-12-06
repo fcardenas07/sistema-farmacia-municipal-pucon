@@ -1,11 +1,12 @@
-﻿package cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos;
+package cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record VentaCreada(
         String idVenta,
         String estadoVenta,
-        String fechaVenta,
+        LocalDateTime fechaVenta,
 
         // Cliente
         String rutCliente,

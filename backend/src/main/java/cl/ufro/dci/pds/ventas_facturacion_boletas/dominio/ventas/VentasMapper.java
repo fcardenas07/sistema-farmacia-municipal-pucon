@@ -13,7 +13,7 @@ public class VentasMapper {
         return new VentaCreada(
                 venta.getIdVenta(),
                 venta.getEstadoVenta().toString(),
-                venta.getFechaVenta().toString(),
+                venta.getFechaVenta(),
                 venta.getCliente().getRutCliente(),
                 venta.getCliente().getNombre(),
                 venta.getUsuario().getIdUsuario(),

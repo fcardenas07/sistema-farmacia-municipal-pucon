@@ -1,5 +1,7 @@
 package cl.ufro.dci.pds.inventario.app.dtos;
 
+import java.time.LocalDateTime;
+
 public record EntradaIngresada(
         String idLote,
         String numeroLote,
@@ -10,8 +12,8 @@ public record EntradaIngresada(
 
         String idGuiaIngreso,
 
-        String fechaElaboracion,
-        String fechaVencimiento,
+        LocalDateTime fechaElaboracion,
+        LocalDateTime fechaVencimiento,
         String estado
 ) {
 

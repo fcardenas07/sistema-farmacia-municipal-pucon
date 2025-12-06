@@ -8,7 +8,7 @@ import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.ItemLoteCantidad;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -44,7 +44,7 @@ public class ServicioLote {
         return repositorioLote.findAll();
     }
 
-    public List<Lote> obtenerPorVencerEntre(LocalDate hoy, LocalDate limite) {
+    public List<Lote> obtenerPorVencerEntre(LocalDateTime hoy, LocalDateTime limite) {
         return repositorioLote.findPorVencerEntre(hoy, limite);
     }
 

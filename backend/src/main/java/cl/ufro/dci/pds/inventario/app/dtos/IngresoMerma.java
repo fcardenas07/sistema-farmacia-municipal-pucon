@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record IngresoMerma(
         @NotBlank String idLote,
@@ -18,7 +18,7 @@ public record IngresoMerma(
 ) {
     public Merma aEntidad(Lote lote) {
         var merma = new Merma();
-        merma.setFechaMerma(LocalDate.now());
+        merma.setFechaMerma(LocalDateTime.now());
         merma.setDetalle(detalle);
         merma.setTipoMerma(tipoMerma);
         merma.setLote(lote);

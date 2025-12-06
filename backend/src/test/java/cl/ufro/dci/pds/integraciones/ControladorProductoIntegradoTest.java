@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -118,8 +118,8 @@ class ControladorProductoIntegradoTest {
         var lote1 = new Lote();
         lote1.setCodigo(codigo1);
         lote1.setNumeroLote("NUM001");
-        lote1.setFechaElaboracion(LocalDate.now().minusMonths(1));
-        lote1.setFechaVencimiento(LocalDate.now().plusMonths(12));
+        lote1.setFechaElaboracion(LocalDateTime.now().minusMonths(1));
+        lote1.setFechaVencimiento(LocalDateTime.now().plusMonths(12));
         lote1.setEstado("DISPONIBLE");
 
         var stock1 = new Stock();
@@ -151,8 +151,8 @@ class ControladorProductoIntegradoTest {
         var lote2 = new Lote();
         lote2.setCodigo(codigo2);
         lote2.setNumeroLote("NUM002");
-        lote2.setFechaElaboracion(LocalDate.now().minusMonths(2));
-        lote2.setFechaVencimiento(LocalDate.now().plusMonths(10));
+        lote2.setFechaElaboracion(LocalDateTime.now().minusMonths(2));
+        lote2.setFechaVencimiento(LocalDateTime.now().plusMonths(10));
         lote2.setEstado("DISPONIBLE");
 
         var stock2 = new Stock();
@@ -184,8 +184,8 @@ class ControladorProductoIntegradoTest {
         var lote3 = new Lote();
         lote3.setCodigo(codigo3);
         lote3.setNumeroLote("NUM003");
-        lote3.setFechaElaboracion(LocalDate.now().minusMonths(3));
-        lote3.setFechaVencimiento(LocalDate.now().plusMonths(6));
+        lote3.setFechaElaboracion(LocalDateTime.now().minusMonths(3));
+        lote3.setFechaVencimiento(LocalDateTime.now().plusMonths(6));
         lote3.setEstado("NO_DISPONIBLE");
 
         var stock3 = new Stock();

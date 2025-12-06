@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.devoluciones;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -15,7 +15,7 @@ public class Devolucion {
     private String idDevolucion;
 
     @Column(name = "fecha_devolucion")
-    private LocalDate fechaDevolucion;
+    private LocalDateTime fechaDevolucion;
 
     @Column(name = "motivo")
     private String motivo;
@@ -35,11 +35,11 @@ public class Devolucion {
         this.idDevolucion = idDevolucion;
     }
 
-    public LocalDate getFechaDevolucion() {
+    public LocalDateTime getFechaDevolucion() {
         return fechaDevolucion;
     }
 
-    public void setFechaDevolucion(LocalDate fechaDevolucion) {
+    public void setFechaDevolucion(LocalDateTime fechaDevolucion) {
         this.fechaDevolucion = fechaDevolucion;
     }
 

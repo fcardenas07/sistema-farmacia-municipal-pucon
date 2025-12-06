@@ -5,7 +5,7 @@ import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.Cliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -26,7 +26,7 @@ public class Fraccionamiento {
     private String posologia;
 
     @Column(name = "fecha_fraccionamiento")
-    private LocalDate fechaFraccionamiento;
+    private LocalDateTime fechaFraccionamiento;
 
     @Column(name = "etiqueta_generada")
     private String etiquetaGenerada;
@@ -81,11 +81,11 @@ public class Fraccionamiento {
         this.posologia = posologia;
     }
 
-    public LocalDate getFechaFraccionamiento() {
+    public LocalDateTime getFechaFraccionamiento() {
         return fechaFraccionamiento;
     }
 
-    public void setFechaFraccionamiento(LocalDate fechaFraccionamiento) {
+    public void setFechaFraccionamiento(LocalDateTime fechaFraccionamiento) {
         this.fechaFraccionamiento = fechaFraccionamiento;
     }
 

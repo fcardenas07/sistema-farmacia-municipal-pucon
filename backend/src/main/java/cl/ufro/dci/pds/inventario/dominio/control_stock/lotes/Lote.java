@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 import cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso.GuiaIngreso;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -16,10 +16,10 @@ public class Lote {
     private String idLote;
 
     @Column(name = "fecha_elaboracion", nullable = false)
-    private LocalDate fechaElaboracion;
+    private LocalDateTime fechaElaboracion;
 
     @Column(name = "fecha_vencimiento", nullable = false)
-    private LocalDate fechaVencimiento;
+    private LocalDateTime fechaVencimiento;
 
     @Column(name = "numero_lote", nullable = false)
     private String numeroLote;
@@ -54,25 +54,28 @@ public class Lote {
     private GuiaIngreso  guiaIngreso;
 
     public Lote() {
+        stockInicial = 0;
+        stockActual = 0;
+        stockReservado = 0;
     }
 
     public String getIdLote() {
         return idLote;
     }
 
-    public LocalDate getFechaElaboracion() {
+    public LocalDateTime getFechaElaboracion() {
         return fechaElaboracion;
     }
 
-    public void setFechaElaboracion(LocalDate fechaElaboracion) {
+    public void setFechaElaboracion(LocalDateTime fechaElaboracion) {
         this.fechaElaboracion = fechaElaboracion;
     }
 
-    public LocalDate getFechaVencimiento() {
+    public LocalDateTime getFechaVencimiento() {
         return fechaVencimiento;
     }
 
-    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+    public void setFechaVencimiento(LocalDateTime fechaVencimiento) {
         this.fechaVencimiento = fechaVencimiento;
     }
 

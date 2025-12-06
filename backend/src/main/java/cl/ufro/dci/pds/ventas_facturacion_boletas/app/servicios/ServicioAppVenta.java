@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ServicioAppVenta {
 
@@ -47,7 +49,7 @@ public class ServicioAppVenta {
         var venta = servicioVenta.crear(
                 usuario,
                 cliente,
-                dto.fechaVenta()
+                LocalDateTime.now()
         );
 
         dto.detalleVenta().forEach(d -> {

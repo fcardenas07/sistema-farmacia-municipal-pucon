@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,7 +21,7 @@ public class ServicioMovimiento {
     public Movimiento registarMovimientoPorEntradaInventario(Lote lote, int cantidad, String nombreComercial) {
         var movimiento = new Movimiento();
         movimiento.setLote(lote);
-        movimiento.setFechaMovimiento(LocalDate.now());
+        movimiento.setFechaMovimiento(LocalDateTime.now());
         movimiento.setCantidad(cantidad);
         movimiento.setTipoMovimiento(TipoMovimiento.INGRESO);
         movimiento.setDetalle("Ingreso de " + cantidad + " unidades del lote: " + lote.getNumeroLote() + " del producto: " + nombreComercial);
@@ -31,7 +31,7 @@ public class ServicioMovimiento {
     public Movimiento registrarMovimientoPorBajaProducto(Producto producto, Lote lote, int cantidad) {
         var movimiento = new Movimiento();
         movimiento.setLote(lote);
-        movimiento.setFechaMovimiento(LocalDate.now());
+        movimiento.setFechaMovimiento(LocalDateTime.now());
         movimiento.setCantidad(cantidad);
         movimiento.setTipoMovimiento(TipoMovimiento.BAJA);
         var nombreProducto = producto.getNombreComercial();
@@ -44,7 +44,7 @@ public class ServicioMovimiento {
     public Movimiento registrarMovimientoPorMerma(Lote lote, int cantidad, String motivo) {
         var movimiento = new Movimiento();
         movimiento.setLote(lote);
-        movimiento.setFechaMovimiento(LocalDate.now());
+        movimiento.setFechaMovimiento(LocalDateTime.now());
         movimiento.setCantidad(cantidad);
         movimiento.setTipoMovimiento(TipoMovimiento.MERMA);
         movimiento.setDetalle("Merma de " + cantidad + " unidades en lote " + lote.getNumeroLote() +

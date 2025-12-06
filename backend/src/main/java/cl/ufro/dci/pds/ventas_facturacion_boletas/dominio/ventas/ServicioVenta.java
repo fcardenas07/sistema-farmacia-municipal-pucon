@@ -5,7 +5,8 @@ import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 @Service
 public class ServicioVenta {
@@ -17,7 +18,7 @@ public class ServicioVenta {
 
     public Venta crear(Usuario usuario,
                        Cliente cliente,
-                       LocalDate fechaVenta) {
+                       LocalDateTime fechaVenta) {
 
         var venta = new Venta();
         venta.setFechaVenta(fechaVenta);

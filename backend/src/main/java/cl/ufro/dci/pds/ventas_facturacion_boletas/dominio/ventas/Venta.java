@@ -5,7 +5,8 @@ import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.Cliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class Venta {
     private String idVenta;
 
     @Column(name = "fecha_venta")
-    private LocalDate fechaVenta;
+    private LocalDateTime fechaVenta;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado_venta")
@@ -53,11 +54,11 @@ public class Venta {
         this.idVenta = idVenta;
     }
 
-    public LocalDate getFechaVenta() {
+    public LocalDateTime getFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(LocalDate fechaVenta) {
+    public void setFechaVenta(LocalDateTime fechaVenta) {
         this.fechaVenta = fechaVenta;
     }
 
