@@ -1,8 +1,11 @@
 .resumen-container {
-  padding: 40px;
-  max-width: 1100px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
+  width: 100%;
+  padding: 40px 60px;
+  background: #fafafa;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
 /* ---------------- HEADER ---------------- */
@@ -15,7 +18,7 @@
 
 /* BOTÓN VOLVER */
 .btn-back {
-  background: #e0e0e0;
+  background: #e5e7eb;
   color: #333;
   padding: 10px 18px;
   border-radius: 8px;
@@ -26,7 +29,7 @@
 }
 
 .btn-back:hover {
-  background: #c7c7c7;
+  background: #d1d5db;
 }
 
 /* ---------------- TARJETAS ---------------- */
@@ -38,41 +41,47 @@
 
 .order-item {
   display: grid;
-  grid-template-columns: 300px 1fr auto;
+  grid-template-columns: 280px 1fr auto;
   gap: 20px;
   padding: 20px;
   border-radius: 14px;
-  border: 1px solid #ddd;
-  background: #fff;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.04);
   align-items: center;
 }
 
-/* Tarjeta lado izquierdo */
+/* PRODUCTO CARD */
 .product-info-card {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e5e7eb;
   background: #fafafa;
   padding: 15px;
   border-radius: 10px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
 }
 
-.product-info-card h3 {
-  font-size: 1.2rem;
-  margin: 0 0 5px 0;
+/* FOTO PRODUCTO */
+.product-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Texto producto */
+.card-details h3 {
+  font-size: 1.15rem;
+  margin: 0 0 4px 0;
   font-weight: 700;
   color: #333;
 }
 
 .subtitle {
   font-size: 0.95rem;
-  color: #777;
-  margin: 0 0 4px 0;
-}
-
-.meta {
-  font-size: 0.9rem;
   color: #555;
-  font-weight: 600;
   margin: 0;
 }
 
@@ -98,7 +107,7 @@
 .delete-button {
   background: none;
   border: none;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   cursor: pointer;
   color: #d32f2f;
   padding: 5px;
@@ -108,9 +117,10 @@
   color: #b71c1c;
 }
 
+/* MENSAJE VACÍO */
 .empty-message {
   font-size: 1.2rem;
-  color: #666;
+  color: #777;
   text-align: center;
   margin-top: 2rem;
 }

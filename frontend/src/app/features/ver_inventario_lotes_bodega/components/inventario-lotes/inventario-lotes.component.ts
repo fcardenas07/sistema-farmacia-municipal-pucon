@@ -1,18 +1,8 @@
-// inventario-lotes.component.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-export interface LoteInventario {
-  codigo: string;
-  producto: string;
-  lote: string;
-  fElab: string;
-  fVen: string;
-  stock: number;
-  estado: string;
-  ultimoMov: string;
-  tipoMov: string;
-}
+import { Router } from '@angular/router';
+import { IngresosService } from '../../services/ingresos.service';
+import { IngresoLote } from '../../models/ingreso-lote';
 
 @Component({
   selector: 'app-inventario-lotes',
@@ -21,34 +11,46 @@ export interface LoteInventario {
   templateUrl: './inventario-lotes.component.html',
   styleUrls: ['./inventario-lotes.component.css']
 })
-export class InventarioLotesComponent {
+export class InventarioLotesComponent implements OnInit {
 
-  lotes: LoteInventario[] = [
-    {
-      codigo: 'PR-001',
-      producto: 'Paracetamol 500mg',
-      lote: 'L-9123',
-      fElab: '01-2023',
-      fVen: '10-2025',
-      stock: 120,
-      estado: 'Por vencer',
-      ultimoMov: '20/11/2023',
-      tipoMov: 'Ingreso'
-    },
-    {
-      codigo: 'PR-002',
-      producto: 'Paracetamol 1000mg',
-      lote: 'L-10123',
-      fElab: '01-2024',
-      fVen: '10-2026',
-      stock: 130,
-      estado: 'Vencido',
-      ultimoMov: '20/11/2027',
-      tipoMov: 'Merma'
-    }
-  ];
+  lotes: IngresoLote[] = [];
+  paginaActual: number = 0;
+  totalPaginas: number = 0;
 
-  verDetalles(lote: LoteInventario) {
-    console.log('Detalles del lote:', lote);
+  constructor(
+    private ingresosService: IngresosService,
+    private router: Router   // ✔ AHORA SI
+  ) {}
+
+  ngOnInit() {
+    this.cargarPagina(0);
   }
+
+  cargarPagina(page: number) {
+    this.ingresosService.getIngresos(page).subscribe({
+      next: (data) => {
+        this.lotes = data.content;
+        this.paginaActual = data.number;
+        this.totalPaginas = data.totalPages;
+      },
+      error: (err) => console.error('Error cargando ingresos:', err)
+    });
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 0) {
+      this.cargarPagina(this.paginaActual - 1);
+    }
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas - 1) {
+      this.cargarPagina(this.paginaActual + 1);
+    }
+  }
+
+  verDetalles(lote: IngresoLote) {
+    this.router.navigate(['/detalle-movimiento', lote.idMovimiento]);  // ✔ AHORA FUNCIONA
+  }
+
 }

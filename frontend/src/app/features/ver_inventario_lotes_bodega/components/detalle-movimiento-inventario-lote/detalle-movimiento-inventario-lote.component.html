@@ -1,0 +1,21 @@
+<div class="detalle-container">
+
+  <button class="btn-back" (click)="volver()">← Volver</button>
+
+  @if (movimiento) {
+    <h2>Detalle del Movimiento</h2>
+
+    <div class="detalle-card">
+
+      <p><strong>ID Movimiento:</strong> {{ movimiento.idMovimiento }}</p>
+      <p><strong>Tipo:</strong> {{ movimiento.tipoMovimiento }}</p>
+      <p><strong>Cantidad:</strong> {{ movimiento.cantidad }}</p>
+      <p><strong>Fecha:</strong> {{ movimiento.fechaMovimiento }}</p>
+      <p><strong>Detalle:</strong> {{ movimiento.detalle }}</p>
+
+    </div>
+  } @else {
+    <p>Cargando información...</p>
+  }
+
+</div>

@@ -12,6 +12,7 @@ import { VerInventarioLotesPageComponent } from './features/ver_inventario_lotes
 import { FormularioMermaPageComponent } from './features/ver_inventario_lotes_bodega/pages/formulario-merma-page/formulario-merma-page.component';
 import { VerInvnetarioMermasPageComponent } from './features/ver_inventario_lotes_bodega/pages/ver-invnetario-mermas-page/ver-invnetario-mermas-page.component';
 import { DashboardBodegaPageComponent } from './features/ver_inventario_lotes_bodega/pages/dashboard-bodega-page/dashboard-bodega-page.component';
+import { VerDetalleInvnetarioLotesPagesComponent } from './features/ver_inventario_lotes_bodega/pages/ver-detalle-invnetario-lotes-pages/ver-detalle-invnetario-lotes-pages.component';
 export const routes: Routes = [
     {path: 'login', component: LoginPageComponent},
     {path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent},
@@ -26,6 +27,7 @@ export const routes: Routes = [
     {path: 'formularo-merma-inventario',component: FormularioMermaPageComponent},
     {path: 'mermas-inventario',component: VerInvnetarioMermasPageComponent},
     {path: 'dashboard-bodega',component: DashboardBodegaPageComponent},
+    {path: 'detalle-movimiento/:id',component: VerDetalleInvnetarioLotesPagesComponent},
     {path: '**', redirectTo: 'login' },
   
 

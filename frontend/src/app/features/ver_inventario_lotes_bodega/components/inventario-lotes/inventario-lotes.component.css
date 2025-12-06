@@ -1,4 +1,14 @@
-/* Margen solicitado */
+/* CONTENEDOR PRINCIPAL (tipo dashboard) */
+.inventory-container {
+  width: 100%;
+  padding: 40px 60px;  /* Igual al otro componente */
+  background: #fafafa;
+  box-sizing: border-box;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* Tabla contenedor */
 .table-wrapper {
   margin-top: 2%;
   width: 100%;
@@ -42,7 +52,7 @@
   background: #f3f4f6;
 }
 
-/* Botón tipo shadcn */
+/* Botón shadcn */
 .btn-shad {
   background: black;
   color: white;
@@ -56,4 +66,37 @@
 
 .btn-shad:hover {
   opacity: 0.85;
+}
+
+/* PAGINACIÓN */
+.pagination-controls {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 15px;
+}
+
+.pg-btn {
+  background: #111;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.pg-btn:hover {
+  opacity: 0.85;
+}
+
+.pg-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.page-info {
+  font-weight: 500;
+  color: #333;
 }
