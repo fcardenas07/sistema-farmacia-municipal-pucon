@@ -25,6 +25,7 @@ public class Venta {
     @Column(name = "total")
     private Integer total = 0;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado_venta")
     private EstadoVenta estadoVenta;
 

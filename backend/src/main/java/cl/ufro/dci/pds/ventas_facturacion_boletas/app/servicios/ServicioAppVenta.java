@@ -1,8 +1,10 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoVentaIniciada;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.*;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.ServicioCliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.ServicioUsuario;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetalleVentaACrear;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaACrear;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaCreada;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.VentasMapper;
@@ -19,14 +21,16 @@ public class ServicioAppVenta {
     private final ServicioCliente servicioCliente;
     private final ServicioLote servicioLote;
     private final VentasMapper ventasMapper;
+    private final GestorVentas gestorVentas;
 
 
-    public ServicioAppVenta(ServicioVenta servicioVenta, ServicioUsuario servicioUsuario, ServicioCliente servicioCliente, ServicioLote servicioLote, VentasMapper ventasMapper) {
+    public ServicioAppVenta(ServicioVenta servicioVenta, ServicioUsuario servicioUsuario, ServicioCliente servicioCliente, ServicioLote servicioLote, VentasMapper ventasMapper, GestorVentas gestorVentas) {
         this.servicioVenta = servicioVenta;
         this.servicioUsuario = servicioUsuario;
         this.servicioCliente = servicioCliente;
         this.servicioLote = servicioLote;
         this.ventasMapper = ventasMapper;
+        this.gestorVentas = gestorVentas;
     }
 
     @Transactional
@@ -46,6 +50,13 @@ public class ServicioAppVenta {
                 lotesReservados,
                 dto.detalleVenta()
         );
+
+        var itemsVentas = dto.detalleVenta()
+                        .stream()
+                        .map(DetalleVentaACrear::toItemVenta)
+                        .toList();
+
+        gestorVentas.emitirVentaIniciada(new EventoVentaIniciada(venta.getIdVenta(), itemsVentas));
         return ventasMapper.toDto(venta);
     }
 }
