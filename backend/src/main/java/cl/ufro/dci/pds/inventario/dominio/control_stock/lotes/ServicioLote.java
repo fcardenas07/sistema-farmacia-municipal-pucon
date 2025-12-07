@@ -100,4 +100,28 @@ public class ServicioLote {
     public void guardarTodos(List<Lote> lotes) {
         repositorioLote.saveAll(lotes);
     }
+
+    public void consumirReserva(List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var lote = item.lote();
+            var cantidad = item.cantidad();
+
+            var descontado = descontar(lote, cantidad);
+
+            var reservadoActual = lote.getStockReservado();
+            lote.setStockReservado(Math.max(0, reservadoActual - descontado));
+
+            repositorioLote.save(lote);
+        }
+    }
+
+    public void liberarReserva(List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var lote = item.lote();
+            var cantidad = item.cantidad();
+            lote.setStockReservado(Math.max(0, lote.getStockReservado() - cantidad));
+
+            repositorioLote.save(lote);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.ServicioMerma;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
@@ -10,7 +11,10 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.ServicioCodigo;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.ItemLoteCantidad;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.transaction.Transactional;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +59,7 @@ public class ServicioAppInventario {
         var lote = servicioLote.crear(dto, codigo);
         lote.setStockInicial(dto.cantidad());
         lote.setStockActual(dto.cantidad());
-        servicioMovimiento.registarMovimientoPorEntradaInventario(lote, dto.cantidad(), producto.getNombreComercial());
+        servicioMovimiento.registrarMovimientoPorEntradaInventario(lote, dto.cantidad(), producto.getNombreComercial());
         return mapper.toEntradaIngresada(lote, producto, codigo, null);
     }
 
@@ -97,5 +101,62 @@ public class ServicioAppInventario {
         merma = servicioMerma.guardar(merma);
         var movimiento = servicioMovimiento.registrarMovimientoPorMerma(lote, cantidadDescontada, merma.getDetalle());
         return movimiento.getIdMovimiento();
+    }
+
+    @EventListener
+    @Transactional
+    public void OnEventoResultadoPago(EventoResultadoPago resultadoPago) {
+        var venta = resultadoPago.venta();
+
+        if (resultadoPago.aprobado()) {
+            manejarPagoAprobado(venta);
+            return;
+        }
+        manejarPagoNoAprobado(venta);
+    }
+
+    private void manejarPagoAprobado(Venta venta) {
+        var items = venta.getDetalles().stream()
+                .map(d -> new ItemLoteCantidad(d.getLote(), d.getCantidad()))
+                .toList();
+
+        servicioLote.consumirReserva(items);
+        registrarMovimientosDeVenta(venta, items);
+    }
+
+
+    private void registrarMovimientosDeVenta(Venta venta, List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var producto = item.lote().getCodigo().getProducto();
+
+            servicioMovimiento.registrarMovimientoPorVentaAprobada(
+                    item.lote(),
+                    venta,
+                    producto,
+                    item.cantidad()
+            );
+        }
+    }
+
+    private void manejarPagoNoAprobado(Venta venta) {
+        var items = venta.getDetalles().stream()
+                .map(d -> new ItemLoteCantidad(d.getLote(), d.getCantidad()))
+                .toList();
+
+        servicioLote.liberarReserva(items);
+        registrarMovimientosDeVentaRechazada(venta, items);
+    }
+
+    private void registrarMovimientosDeVentaRechazada(Venta venta, List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var producto = item.lote().getCodigo().getProducto();
+
+            servicioMovimiento.registrarMovimientoPorVentaRechazada(
+                    item.lote(),
+                    venta,
+                    producto,
+                    item.cantidad()
+            );
+        }
     }
 }

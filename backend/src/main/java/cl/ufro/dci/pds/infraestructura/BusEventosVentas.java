@@ -1,7 +1,7 @@
 package cl.ufro.dci.pds.infraestructura;
 
 import cl.ufro.dci.pds.compartido.eventos.EventoInventarioActualizado;
-import cl.ufro.dci.pds.compartido.eventos.EventoPagoAprobado;
+import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
 import cl.ufro.dci.pds.compartido.eventos.EventoStockDisponible;
 import cl.ufro.dci.pds.compartido.eventos.EventoVentaIniciada;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,7 +25,7 @@ public class BusEventosVentas {
         publisher.publishEvent(evento);
     }
 
-    public void emitirPagoAprobado(EventoPagoAprobado evento) {
+    public void emitirResultadoPago(EventoResultadoPago evento) {
         publisher.publishEvent(evento);
     }
 

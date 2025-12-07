@@ -1,5 +1,7 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
+import cl.ufro.dci.pds.infraestructura.BusEventosVentas;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.*;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.ServicioCliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.ServicioUsuario;
@@ -21,17 +23,20 @@ public class ServicioAppVenta {
     private final ServicioCliente servicioCliente;
     private final ServicioLote servicioLote;
     private final VentasMapper ventasMapper;
+    private final BusEventosVentas busEventosVentas;
 
     public ServicioAppVenta(ServicioVenta servicioVenta,
                             ServicioUsuario servicioUsuario,
                             ServicioCliente servicioCliente,
                             ServicioLote servicioLote,
-                            VentasMapper ventasMapper) {
+                            VentasMapper ventasMapper,
+                            BusEventosVentas busEventosVentas) {
         this.servicioVenta = servicioVenta;
         this.servicioUsuario = servicioUsuario;
         this.servicioCliente = servicioCliente;
         this.servicioLote = servicioLote;
         this.ventasMapper = ventasMapper;
+        this.busEventosVentas = busEventosVentas;
     }
 
     @Transactional
@@ -66,6 +71,10 @@ public class ServicioAppVenta {
                 .toList();
 
         servicioLote.reservarLotes(reservas);
+    }
+
+    private void publicarResultadoPago(EventoResultadoPago EventoResultadoPago) {
+        busEventosVentas.emitirResultadoPago(EventoResultadoPago);
     }
 }
 
