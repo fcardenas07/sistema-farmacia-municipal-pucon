@@ -23,20 +23,17 @@ public class ServicioAppVenta {
     private final ServicioCliente servicioCliente;
     private final ServicioLote servicioLote;
     private final VentasMapper ventasMapper;
-    private final BusEventosVentas busEventosVentas;
 
     public ServicioAppVenta(ServicioVenta servicioVenta,
                             ServicioUsuario servicioUsuario,
                             ServicioCliente servicioCliente,
                             ServicioLote servicioLote,
-                            VentasMapper ventasMapper,
-                            BusEventosVentas busEventosVentas) {
+                            VentasMapper ventasMapper) {
         this.servicioVenta = servicioVenta;
         this.servicioUsuario = servicioUsuario;
         this.servicioCliente = servicioCliente;
         this.servicioLote = servicioLote;
         this.ventasMapper = ventasMapper;
-        this.busEventosVentas = busEventosVentas;
     }
 
     @Transactional
@@ -71,10 +68,6 @@ public class ServicioAppVenta {
                 .toList();
 
         servicioLote.reservarLotes(reservas);
-    }
-
-    private void publicarResultadoPago(EventoResultadoPago EventoResultadoPago) {
-        busEventosVentas.emitirResultadoPago(EventoResultadoPago);
     }
 }
 

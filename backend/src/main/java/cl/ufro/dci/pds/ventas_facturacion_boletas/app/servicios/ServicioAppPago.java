@@ -1,14 +1,12 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
+import cl.ufro.dci.pds.infraestructura.BusEventosVentas;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.*;
 import org.springframework.stereotype.Service;
 
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.EstadoPago;
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.Pago;
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.PagoEstrategia;
-import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.ServicioPago;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.ServicioVenta;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.transaction.Transactional;
@@ -21,23 +19,48 @@ public class ServicioAppPago {
     private final ServicioPago servicioPago;
     private final ServicioVenta servicioVenta;
     private final Map<String, PagoEstrategia> estrategias;
+    private final BusEventosVentas busEventosVentas;
 
-    ServicioAppPago(ServicioPago servicioPago, ServicioVenta servicioVenta, Map<String, PagoEstrategia> estrategias) {
+    ServicioAppPago(ServicioPago servicioPago,
+                    ServicioVenta servicioVenta,
+                    Map<String, PagoEstrategia> estrategias,
+                    BusEventosVentas busEventosVentas) {
         this.servicioPago = servicioPago;
         this.servicioVenta = servicioVenta;
         this.estrategias = estrategias;
+        this.busEventosVentas = busEventosVentas;
     }
 
+    @Transactional
+    public PagoProcesado crearYProcesar(String idVenta, String tipoEstrategia, DetallesPago detalles) {
+        var venta = servicioVenta.buscarPorId(idVenta);
+        var pago = crear(venta, detalles);
+        var resultado = procesarPago(tipoEstrategia, pago.getId_pago(), detalles);
 
-    public Pago crear(Venta venta, DetallesPago dto){
+        publicarResultadoPago(venta, pago.getEstado());
+
+        return new PagoProcesado(
+                resultado.getId_pago(),
+                idVenta,
+                resultado.getMonto(),
+                resultado.getMetodo_pago(),
+                resultado.getEstado().toString(),
+                resultado.getReferencia_transaccion(),
+                "Procesado con estrategia: " + tipoEstrategia,
+                "AUTH-MOCK", // o real si aplica
+                resultado.getFecha_pago()
+        );
+    }
+
+    public Pago crear(Venta venta, DetallesPago dto) {
         return servicioPago.crear(venta, dto);
     }
 
-    public Pago procesarPago(String tipoEstrategia, String pagoId, DetallesPago detalles){
-
+    public Pago procesarPago(String tipoEstrategia, String pagoId, DetallesPago detalles) {
         var estrategia = estrategias.get(tipoEstrategia);
-        if (estrategia == null)
-            throw new IllegalArgumentException("Estrategia inválida: " + tipoEstrategia);
+        if (estrategia == null) {
+            throw new EstrategiaPagoNoEncontradaException(tipoEstrategia);
+        }
 
         var resultado = estrategia.ejecutar(detalles);
 
@@ -48,23 +71,7 @@ public class ServicioAppPago {
         return servicioPago.actualizarEstado(pagoId, nuevoEstado);
     }
 
-    @Transactional
-    public PagoProcesado crearYProcesar(String idVenta, String tipoEstrategia, DetallesPago detalles){
-        var venta = servicioVenta.buscarPorId(idVenta);
-        var pago = crear(venta, detalles); 
-        var resultado = procesarPago(tipoEstrategia, pago.getId_pago(), detalles);
-        
-        return new PagoProcesado(
-        resultado.getId_pago(),
-        idVenta,
-        resultado.getMonto(),
-        resultado.getMetodo_pago(),
-        resultado.getEstado().toString(),
-        resultado.getReferencia_transaccion(),
-        "Procesado con estrategia: " + tipoEstrategia,
-        "AUTH-MOCK", // o real si aplica
-        resultado.getFecha_pago()
-    );
+    private void publicarResultadoPago(Venta venta, EstadoPago estadoPago) {
+        busEventosVentas.emitirResultadoPago(new EventoResultadoPago(venta, estadoPago));
     }
-
 }

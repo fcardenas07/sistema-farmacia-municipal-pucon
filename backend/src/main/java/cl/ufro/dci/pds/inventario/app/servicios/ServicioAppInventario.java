@@ -1,9 +1,15 @@
 package cl.ufro.dci.pds.inventario.app.servicios;
 
+import cl.ufro.dci.pds.compartido.eventos.EventoInventarioActualizado;
 import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
+import cl.ufro.dci.pds.compartido.eventos.ItemInventarioActualizado;
+import cl.ufro.dci.pds.infraestructura.BusEventosVentas;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.ServicioMerma;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
+import cl.ufro.dci.pds.inventario.infraestructura.ProyeccionProductoStock;
+import cl.ufro.dci.pds.inventario.infraestructura.RepositorioConsultaProducto;
 import cl.ufro.dci.pds.inventario.infraestructura.TrazabilidadLoteMapper;
 import cl.ufro.dci.pds.inventario.infraestructura.RepositorioTrazabilidad;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
@@ -12,6 +18,8 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ServicioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.ItemLoteCantidad;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.EstadoPago;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.DetalleVenta;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.transaction.Transactional;
 import org.springframework.context.event.EventListener;
@@ -20,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,8 +40,10 @@ public class ServicioAppInventario {
     private final ServicioMovimiento servicioMovimiento;
     private final ServicioMerma servicioMerma;
     private final EntradaInventarioMapper mapper;
-    private final RepositorioTrazabilidad trazabilidadRepository;
+    private final RepositorioConsultaProducto repositorioConsultaProducto;
+    private final RepositorioTrazabilidad repositorioTrazabilidad;
     private final TrazabilidadLoteMapper trazabilidadLoteMapper;
+    private final BusEventosVentas busEventosVentas;
 
     public ServicioAppInventario(ServicioLote servicioLote,
                                  ServicioCodigo servicioCodigo,
@@ -40,16 +51,20 @@ public class ServicioAppInventario {
                                  ServicioMovimiento servicioMovimiento,
                                  ServicioMerma servicioMerma,
                                  EntradaInventarioMapper mapper,
-                                 RepositorioTrazabilidad trazabilidadRepository,
-                                 TrazabilidadLoteMapper trazabilidadLoteMapper) {
+                                 RepositorioConsultaProducto repositorioConsultaProducto,
+                                 RepositorioTrazabilidad repositorioTrazabilidad,
+                                 TrazabilidadLoteMapper trazabilidadLoteMapper,
+                                 BusEventosVentas busEventosVentas) {
         this.servicioLote = servicioLote;
         this.servicioCodigo = servicioCodigo;
         this.servicioProducto = servicioProducto;
         this.servicioMovimiento = servicioMovimiento;
         this.servicioMerma = servicioMerma;
         this.mapper = mapper;
-        this.trazabilidadRepository = trazabilidadRepository;
+        this.repositorioConsultaProducto = repositorioConsultaProducto;
+        this.repositorioTrazabilidad = repositorioTrazabilidad;
         this.trazabilidadLoteMapper = trazabilidadLoteMapper;
+        this.busEventosVentas = busEventosVentas;
     }
 
     @Transactional
@@ -65,7 +80,7 @@ public class ServicioAppInventario {
 
     @Transactional
     public Page<TrazabilidadIngreso> obtenerIngresos(Pageable pageable) {
-        var page = trazabilidadRepository.getIngresosOrdenados(pageable);
+        var page = repositorioTrazabilidad.buscarIngresosOrdenados(pageable);
         return page.map(trazabilidadLoteMapper::toDto);
     }
 
@@ -108,11 +123,36 @@ public class ServicioAppInventario {
     public void OnEventoResultadoPago(EventoResultadoPago resultadoPago) {
         var venta = resultadoPago.venta();
 
-        if (resultadoPago.aprobado()) {
+        var lotes = venta.getDetalles().stream().map(DetalleVenta::getLote).toList();
+        var ids = lotes.stream().map(Lote::getIdLote).toList();
+
+        var stocksAntes = repositorioConsultaProducto.buscarStockPorLotes(ids);
+
+        if (resultadoPago.estadoPago() == EstadoPago.APROBADO) {
             manejarPagoAprobado(venta);
-            return;
+        } else {
+            manejarPagoNoAprobado(venta);
         }
-        manejarPagoNoAprobado(venta);
+
+        var stocksAhora = repositorioConsultaProducto.buscarStockPorLotes(ids);
+
+        emitirEventoInventarioActualizado(stocksAntes, stocksAhora);
+    }
+
+    private void emitirEventoInventarioActualizado(
+            List<ProyeccionProductoStock> stocksAntes,
+            List<ProyeccionProductoStock> stocksAhora
+    ) {
+        var itemInventarioActualizado = new ArrayList<ItemInventarioActualizado>();
+
+        for (var i = 0; i < stocksAntes.size(); i++) {
+            var idProducto = stocksAntes.get(i).getIdProducto();
+            var cantidadAntes = stocksAntes.get(i).getStockDisponible();
+            var cantidadAhora = stocksAhora.get(i).getStockDisponible();
+            itemInventarioActualizado.add(new ItemInventarioActualizado(idProducto, cantidadAntes, cantidadAhora));
+        }
+
+        busEventosVentas.emitirInventarioActualizado(new EventoInventarioActualizado(itemInventarioActualizado));
     }
 
     private void manejarPagoAprobado(Venta venta) {

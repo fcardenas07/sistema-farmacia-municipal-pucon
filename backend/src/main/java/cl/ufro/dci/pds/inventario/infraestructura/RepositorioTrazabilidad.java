@@ -43,7 +43,7 @@ public interface RepositorioTrazabilidad extends JpaRepository<Lote, String> {
                     """,
             nativeQuery = true
     )
-    List<ProyeccionTrazabilidadIngreso> getTrazabilidadDeTodosLosLotes();
+    List<ProyeccionTrazabilidadIngreso> buscarTrazabilidadTodosLosLotes();
 
     @Query(
             value = """
@@ -67,5 +67,5 @@ public interface RepositorioTrazabilidad extends JpaRepository<Lote, String> {
         """,
             nativeQuery = true
     )
-    Page<ProyeccionTrazabilidadIngreso> getIngresosOrdenados(Pageable pageable);
+    Page<ProyeccionTrazabilidadIngreso> buscarIngresosOrdenados(Pageable pageable);
 }

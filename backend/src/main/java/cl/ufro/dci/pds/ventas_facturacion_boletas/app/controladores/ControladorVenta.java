@@ -81,7 +81,6 @@ public class ControladorVenta {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> manejarValidacion(MethodArgumentNotValidException ex) {
 
@@ -96,6 +95,4 @@ public class ControladorVenta {
         System.out.println("Errores de validación: " + errores);
         return ResponseEntity.badRequest().body(errores);
     }
-
-
 }

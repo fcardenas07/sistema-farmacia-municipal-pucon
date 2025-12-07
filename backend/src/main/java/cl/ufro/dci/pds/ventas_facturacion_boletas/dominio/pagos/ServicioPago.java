@@ -17,7 +17,7 @@ public class ServicioPago {
     }
 
     public Pago crear(Venta venta, DetallesPago dto) {
-        Pago p = new Pago();
+        var p = new Pago();
         p.setVenta(venta);
         p.setEstado(EstadoPago.PENDIENTE);
         p.setFecha_pago(LocalDateTime.now());
@@ -33,5 +33,4 @@ public class ServicioPago {
         pago.setEstado(nuevoEstado);
         return repositorioPago.save(pago);
     }
-
 }
