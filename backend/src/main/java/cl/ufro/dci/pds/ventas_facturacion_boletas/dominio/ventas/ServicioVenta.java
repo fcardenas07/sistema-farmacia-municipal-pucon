@@ -6,7 +6,6 @@ import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 
 @Service
 public class ServicioVenta {
@@ -30,5 +29,11 @@ public class ServicioVenta {
 
     public Venta guardar(Venta venta) {
         return repositorioVenta.save(venta);
+    }
+
+    public Venta buscarPorId(String id) {
+        return repositorioVenta.findById(id)
+            .orElseThrow(() ->
+            new VentaNoEncontradaException(id));
     }
 }
