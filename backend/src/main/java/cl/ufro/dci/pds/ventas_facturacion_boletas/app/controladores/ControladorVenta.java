@@ -3,6 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.app.controladores;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.LoteNoEncontradoException;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaACrear;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.VentaCreada;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios.ServicioAppPago;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios.ServicioAppVenta;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetallesPago;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.PagoCreado;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.PagoProcesado;
 
 import java.net.URI;
 import java.util.Map;
@@ -22,9 +27,11 @@ import java.util.stream.Collectors;
 public class ControladorVenta {
 
     private final ServicioAppVenta servicioAppVenta;
+    private final ServicioAppPago servicioAppPago;
 
-    public ControladorVenta(ServicioAppVenta servicioAppVenta) {
+    public ControladorVenta(ServicioAppVenta servicioAppVenta, ServicioAppPago servicioAppPago) {
         this.servicioAppVenta = servicioAppVenta;
+        this.servicioAppPago = servicioAppPago;
     }
 
     @PostMapping
@@ -34,6 +41,25 @@ public class ControladorVenta {
                 .created(URI.create("/ventas/" + ventaCreada.idVenta()))
                 .body(ventaCreada);
     }
+
+    @PostMapping("/{id}/pago")
+    public ResponseEntity<PagoProcesado> crearPago(
+            @PathVariable String id,
+            @Valid @RequestBody DetallesPago dto) {
+
+
+
+        var pagoProcesado = servicioAppPago.crearYProcesar(
+                id,
+                dto.metodoPago(),
+                dto
+        );
+
+    return ResponseEntity
+            .created(URI.create("/ventas/" + id + "/pago/" + pagoProcesado.idPago()))
+            .body(pagoProcesado);
+}
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> manejarErrorGeneral(Exception ex) {

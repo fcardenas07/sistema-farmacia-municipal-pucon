@@ -6,7 +6,6 @@ import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

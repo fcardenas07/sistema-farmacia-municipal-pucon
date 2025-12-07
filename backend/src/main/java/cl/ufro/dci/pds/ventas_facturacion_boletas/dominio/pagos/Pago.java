@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Pago {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_pago")
     private String id_pago;
 
@@ -26,8 +27,9 @@ public class Pago {
     @Column(name = "referencia_transaccion")
     private String referencia_transaccion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private String estado;
+    private EstadoPago estado;
 
     @OneToOne
     @JoinColumn(name = "id_venta", nullable = false)
@@ -76,13 +78,7 @@ public class Pago {
         this.referencia_transaccion = referencia_transaccion;
     }
 
-    public String getEstado() {
-        return estado;
-    }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
 
     public Venta getVenta() {
         return venta;
@@ -114,5 +110,13 @@ public class Pago {
                 ", estado='" + estado + '\'' +
                 ", venta=" + venta +
                 '}';
+    }
+
+    public EstadoPago getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPago estado) {
+        this.estado = estado;
     }
 }
