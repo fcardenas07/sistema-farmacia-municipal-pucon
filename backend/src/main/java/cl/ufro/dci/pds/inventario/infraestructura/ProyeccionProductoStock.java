@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.infraestructura;
+package cl.ufro.dci.pds.inventario.infraestructura;
 
 public interface ProyeccionProductoStock {
     String getIdProducto();

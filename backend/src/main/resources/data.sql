@@ -144,3 +144,15 @@ VALUES ('USR002', 'Usuario Demo');
 
 INSERT INTO cliente (rut_cliente, nombre, direccion, id_usuario)
 VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', 'USR002');
+
+-- ============================================
+-- =========== SECUENCIA BOLETAS ==============
+-- ============================================
+
+-- Crear la secuencia para numero_boleta
+CREATE SEQUENCE IF NOT EXISTS seq_num_boleta START WITH 1 INCREMENT BY 1;
+
+-- Configurar la columna numero_boleta para usar la secuencia por defecto
+ALTER TABLE boleta
+    ALTER COLUMN numero_boleta
+    SET DEFAULT NEXT VALUE FOR seq_num_boleta;

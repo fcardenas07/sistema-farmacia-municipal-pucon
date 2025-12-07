@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.inventario.infraestructura;
+package cl.ufro.dci.pds.inventario.infraestructura;
 
 import cl.ufro.dci.pds.compartido.eventos.EventoInventarioActualizado;
 import org.springframework.context.event.EventListener;

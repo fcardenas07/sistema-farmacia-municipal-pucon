@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos;
+package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos;
 
 public class EstrategiaPagoNoEncontradaException extends RuntimeException {
     public EstrategiaPagoNoEncontradaException(String tipo) {

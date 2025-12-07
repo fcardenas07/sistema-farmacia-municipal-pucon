@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public record PagoProcesado(
         String idPago,
         String idVenta,
+        String idBoleta,
         Integer monto,
         String metodoPago,
         String estado,

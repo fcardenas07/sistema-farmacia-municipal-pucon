@@ -6,7 +6,7 @@ import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos.PagoEstrategia;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.infraestructura.procesadores.ProcesadorTarjetaCredito;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.DetallesPago;
 
-@Service("tarjetaCredito")
+@Service("TARJETA_CREDITO")
 public class TarjetaCreditoEstrategia implements PagoEstrategia {
 
     private final ProcesadorTarjetaCredito procesadorTarjetaCredito;

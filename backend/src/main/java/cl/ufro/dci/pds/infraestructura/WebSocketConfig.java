@@ -1,4 +1,4 @@
-﻿package cl.ufro.dci.pds.infraestructura;
+package cl.ufro.dci.pds.infraestructura;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

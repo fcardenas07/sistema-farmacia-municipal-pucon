@@ -11,11 +11,18 @@ import java.util.Objects;
 public class Boleta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_boleta")
     private String idBoleta;
 
-    @Column(name = "numero")
-    private Integer numero;
+    @Column(
+            name = "numero_boleta",
+            unique = true,
+            nullable = false,
+            insertable = false,
+            updatable = false
+    )
+    private Long numeroBoleta;
 
     @Column(name = "fecha_emision")
     private LocalDateTime fechaEmision;
@@ -38,12 +45,12 @@ public class Boleta {
         this.idBoleta = idBoleta;
     }
 
-    public Integer getNumero() {
-        return numero;
+    public Long getNumeroBoleta() {
+        return numeroBoleta;
     }
 
-    public void setNumero(Integer numero) {
-        this.numero = numero;
+    public void setNumeroBoleta(Long numeroBoleta) {
+        this.numeroBoleta = numeroBoleta;
     }
 
     public LocalDateTime getFechaEmision() {
@@ -85,7 +92,7 @@ public class Boleta {
     public String toString() {
         return "Boleta{" +
                 "idBoleta='" + idBoleta + '\'' +
-                ", numero=" + numero +
+                ", numeroBoleta=" + numeroBoleta +
                 ", fechaEmision=" + fechaEmision +
                 ", montoTotal=" + montoTotal +
                 ", venta=" + venta +
