@@ -46,7 +46,7 @@ public class ServicioAppPago {
         var pago = crear(venta, detalles);
         var resultado = procesarPago(tipoEstrategia, pago.getId_pago(), detalles);
 
-        publicarResultadoPago(venta, pago.getEstado());
+        publicarResultadoPago(venta, resultado.getEstado());
 
         String idBoleta = null;
         if (resultado.getEstado() == EstadoPago.APROBADO) {
