@@ -1,10 +1,11 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas;
 
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.Cliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,14 +15,16 @@ import java.util.Objects;
 public class Venta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_venta")
     private String idVenta;
 
     @Column(name = "fecha_venta")
-    private LocalDate fechaVenta;
+    private LocalDateTime fechaVenta;
 
-    @Column(name = "total")
-    private Integer total;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_venta")
+    private EstadoVenta estadoVenta;
 
     @ManyToOne
     @JoinColumn(name = "rut_cliente")
@@ -32,10 +35,14 @@ public class Venta {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetalleVenta> detallesVenta = new ArrayList<>();
-
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
     public Venta() {
+    }
+
+    public void agregarDetalle(Lote lote, Integer cantidad, Integer precioUnitario) {
+        var detalle = new DetalleVenta(this, lote, cantidad, precioUnitario);
+        detalles.add(detalle);
     }
 
     public String getIdVenta() {
@@ -46,20 +53,12 @@ public class Venta {
         this.idVenta = idVenta;
     }
 
-    public LocalDate getFechaVenta() {
+    public LocalDateTime getFechaVenta() {
         return fechaVenta;
     }
 
-    public void setFechaVenta(LocalDate fechaVenta) {
+    public void setFechaVenta(LocalDateTime fechaVenta) {
         this.fechaVenta = fechaVenta;
-    }
-
-    public Integer getTotal() {
-        return total;
-    }
-
-    public void setTotal(Integer total) {
-        this.total = total;
     }
 
     public Cliente getCliente() {
@@ -78,6 +77,24 @@ public class Venta {
         this.usuario = usuario;
     }
 
+    public EstadoVenta getEstadoVenta() {
+        return estadoVenta;
+    }
+
+    public void setEstadoVenta(EstadoVenta estadoVenta) {
+        this.estadoVenta = estadoVenta;
+    }
+
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
+    }
+
+    public Integer getTotal() {
+        return detalles.stream()
+                .mapToInt(d -> d.getCantidad() * d.getPrecioUnitario())
+                .sum();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Venta venta)) return false;
@@ -94,7 +111,7 @@ public class Venta {
         return "Venta{" +
                 "idVenta='" + idVenta + '\'' +
                 ", fechaVenta=" + fechaVenta +
-                ", total=" + total +
+                ", estadoVenta=" + estadoVenta +
                 ", cliente=" + cliente +
                 ", usuario=" + usuario +
                 '}';

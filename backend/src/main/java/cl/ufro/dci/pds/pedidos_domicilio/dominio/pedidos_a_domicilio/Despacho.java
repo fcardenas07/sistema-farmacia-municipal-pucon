@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.pedidos_domicilio.dominio.pedidos_a_domicilio;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -15,7 +15,7 @@ public class Despacho {
     private String idDespacho;
 
     @Column(name = "fecha_entrega")
-    private LocalDate fechaEntrega;
+    private LocalDateTime fechaEntrega;
 
     @Column(name = "estado")
     private String estado;
@@ -38,11 +38,11 @@ public class Despacho {
         this.idDespacho = idDespacho;
     }
 
-    public LocalDate getFechaEntrega() {
+    public LocalDateTime getFechaEntrega() {
         return fechaEntrega;
     }
 
-    public void setFechaEntrega(LocalDate fechaEntrega) {
+    public void setFechaEntrega(LocalDateTime fechaEntrega) {
         this.fechaEntrega = fechaEntrega;
     }
 

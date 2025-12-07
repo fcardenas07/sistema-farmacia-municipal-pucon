@@ -29,7 +29,7 @@ public class TrazabilidadLoteMapper {
                 m.getIdMovimiento(),
                 m.getTipoMovimiento().getNombreLegible(),
                 m.getCantidad(),
-                m.getFechaMovimiento().toString(),
+                m.getFechaMovimiento(),
                 m.getDetalle()
         );
     }

@@ -1,11 +1,14 @@
 package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 
+import cl.ufro.dci.pds.compartido.eventos.ItemVenta;
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaInventario;
 import cl.ufro.dci.pds.inventario.app.mappers.EntradaInventarioMapper;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
+import cl.ufro.dci.pds.ventas_facturacion_boletas.app.dtos.ItemLoteCantidad;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,7 +44,7 @@ public class ServicioLote {
         return repositorioLote.findAll();
     }
 
-    public List<Lote> obtenerPorVencerEntre(LocalDate hoy, LocalDate limite) {
+    public List<Lote> obtenerPorVencerEntre(LocalDateTime hoy, LocalDateTime limite) {
         return repositorioLote.findPorVencerEntre(hoy, limite);
     }
 
@@ -77,7 +80,48 @@ public class ServicioLote {
         return descontado;
     }
 
+    public void reservarLotes(List<ItemLoteCantidad> reservas) {
+        for (var reserva: reservas) {
+            var lote = reserva.lote();
+            var cantidadSolicitada = reserva.cantidad();
+            var stockReservado = lote.getStockReservado();
+
+            if (lote.getStockDisponible() < cantidadSolicitada) {
+                throw new SinStockDisponibleException(lote.getNumeroLote());
+            }
+            lote.setStockReservado(stockReservado + cantidadSolicitada);
+        }
+
+        var lotes = reservas.stream().map(ItemLoteCantidad::lote).toList();
+
+        guardarTodos(lotes);
+    }
+
     public void guardarTodos(List<Lote> lotes) {
         repositorioLote.saveAll(lotes);
+    }
+
+    public void consumirReserva(List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var lote = item.lote();
+            var cantidad = item.cantidad();
+
+            var descontado = descontar(lote, cantidad);
+
+            var reservadoActual = lote.getStockReservado();
+            lote.setStockReservado(Math.max(0, reservadoActual - descontado));
+
+            repositorioLote.save(lote);
+        }
+    }
+
+    public void liberarReserva(List<ItemLoteCantidad> items) {
+        for (var item : items) {
+            var lote = item.lote();
+            var cantidad = item.cantidad();
+            lote.setStockReservado(Math.max(0, lote.getStockReservado() - cantidad));
+
+            repositorioLote.save(lote);
+        }
     }
 }

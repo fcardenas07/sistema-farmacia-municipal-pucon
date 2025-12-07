@@ -7,7 +7,7 @@ import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.devoluciones.Devolucio
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -27,7 +27,7 @@ public class Movimiento {
     private Integer cantidad;
 
     @Column(name = "fecha_movimiento")
-    private LocalDate fechaMovimiento;
+    private LocalDateTime fechaMovimiento;
 
     @Column(name = "detalle")
     private String detalle;
@@ -79,11 +79,11 @@ public class Movimiento {
         this.cantidad = cantidad;
     }
 
-    public LocalDate getFechaMovimiento() {
+    public LocalDateTime getFechaMovimiento() {
         return fechaMovimiento;
     }
 
-    public void setFechaMovimiento(LocalDate fechaMovimiento) {
+    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
         this.fechaMovimiento = fechaMovimiento;
     }
 

@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.facturacion.boletas;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -11,14 +11,21 @@ import java.util.Objects;
 public class Boleta {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_boleta")
     private String idBoleta;
 
-    @Column(name = "numero")
-    private Integer numero;
+    @Column(
+            name = "numero_boleta",
+            unique = true,
+            nullable = false,
+            insertable = false,
+            updatable = false
+    )
+    private Long numeroBoleta;
 
     @Column(name = "fecha_emision")
-    private LocalDate fechaEmision;
+    private LocalDateTime fechaEmision;
 
     @Column(name = "monto_total")
     private Integer montoTotal;
@@ -38,19 +45,19 @@ public class Boleta {
         this.idBoleta = idBoleta;
     }
 
-    public Integer getNumero() {
-        return numero;
+    public Long getNumeroBoleta() {
+        return numeroBoleta;
     }
 
-    public void setNumero(Integer numero) {
-        this.numero = numero;
+    public void setNumeroBoleta(Long numeroBoleta) {
+        this.numeroBoleta = numeroBoleta;
     }
 
-    public LocalDate getFechaEmision() {
+    public LocalDateTime getFechaEmision() {
         return fechaEmision;
     }
 
-    public void setFechaEmision(LocalDate fechaEmision) {
+    public void setFechaEmision(LocalDateTime fechaEmision) {
         this.fechaEmision = fechaEmision;
     }
 
@@ -85,7 +92,7 @@ public class Boleta {
     public String toString() {
         return "Boleta{" +
                 "idBoleta='" + idBoleta + '\'' +
-                ", numero=" + numero +
+                ", numeroBoleta=" + numeroBoleta +
                 ", fechaEmision=" + fechaEmision +
                 ", montoTotal=" + montoTotal +
                 ", venta=" + venta +

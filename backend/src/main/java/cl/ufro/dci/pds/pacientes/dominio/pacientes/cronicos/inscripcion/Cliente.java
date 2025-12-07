@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.Usuario;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -21,13 +21,13 @@ public class Cliente {
     private String direccion;
 
     @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
+    private LocalDateTime fechaNacimiento;
 
     @Column(name = "email")
     private String email;
 
     @Column(name = "fecha_inscripcion")
-    private LocalDate fechaInscripcion;
+    private LocalDateTime fechaInscripcion;
 
     @Column(name = "estado")
     private String estado;
@@ -72,11 +72,11 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    public LocalDate getFechaNacimiento() {
+    public LocalDateTime getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+    public void setFechaNacimiento(LocalDateTime fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
@@ -88,11 +88,11 @@ public class Cliente {
         this.email = email;
     }
 
-    public LocalDate getFechaInscripcion() {
+    public LocalDateTime getFechaInscripcion() {
         return fechaInscripcion;
     }
 
-    public void setFechaInscripcion(LocalDate fechaInscripcion) {
+    public void setFechaInscripcion(LocalDateTime fechaInscripcion) {
         this.fechaInscripcion = fechaInscripcion;
     }
 

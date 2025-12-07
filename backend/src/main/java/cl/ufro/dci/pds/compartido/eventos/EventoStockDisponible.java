@@ -1,8 +1,11 @@
 package cl.ufro.dci.pds.compartido.eventos;
 
+import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
+
+import java.util.List;
+
 public record EventoStockDisponible(
-        Long idVenta,
-        String idProducto,
-        int cantidadSolicitada,
-        boolean disponible
+        String idVenta,
+        List<Lote> lotes,
+        List<ItemVenta> items
 ) {}

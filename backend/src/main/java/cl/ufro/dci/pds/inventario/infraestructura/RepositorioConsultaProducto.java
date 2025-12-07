@@ -38,11 +38,7 @@ public interface RepositorioConsultaProducto extends JpaRepository<Producto, Str
                     p.id_producto, p.nombre_comercial, p.nombre_generico, f.nombre,
                     p.dosificacion, p.unidad_medida, p.stock_minimo, p.stock_maximo, p.url_foto
             """, nativeQuery = true)
-    List<ProyeccionProductoFiltrado> buscarProductosConStock(
-            @Param("nombreComercial") String nombreComercial,
-            @Param("nombreGenerico") String nombreGenerico,
-            @Param("categoria") CategoriaProducto categoria
-    );
+    List<ProyeccionProductoFiltrado> buscarProductosConStock(@Param("nombreComercial") String nombreComercial, @Param("nombreGenerico") String nombreGenerico, @Param("categoria") CategoriaProducto categoria);
 
     @Query(value = """
                 SELECT 
@@ -73,7 +69,7 @@ public interface RepositorioConsultaProducto extends JpaRepository<Producto, Str
                     f.nombre, p.dosificacion, p.unidad_medida, p.activo,
                     p.stock_minimo, p.stock_maximo, p.url_foto
             """, nativeQuery = true)
-    ProyeccionProductoDetalle obtenerDetalleProducto(@Param("idProducto") String idProducto);
+    ProyeccionProductoDetalle buscarDetalleProducto(@Param("idProducto") String idProducto);
 
     @Query(value = """
             SELECT
@@ -87,7 +83,18 @@ public interface RepositorioConsultaProducto extends JpaRepository<Producto, Str
               AND p.activo = true
             ORDER BY p.nombre_comercial
             """, nativeQuery = true)
-    List<ProyeccionProductoSimple> buscarProductosSimples(
-            @Param("nombreComercial") String nombreComercial
-    );
+    List<ProyeccionProductoSimple> buscarProductosSimples(@Param("nombreComercial") String nombreComercial);
+
+    @Query(value = """
+        SELECT
+            p.id_producto AS idProducto,
+            COALESCE(SUM(l.stock_actual - l.stock_reservado), 0) AS stockDisponible
+        FROM lote l
+        JOIN codigo c   ON l.id_codigo = c.id_codigo
+        JOIN producto p ON c.id_producto = p.id_producto
+        WHERE l.id_lote IN :idsLotes
+        GROUP BY p.id_producto
+        ORDER BY p.id_producto
+        """, nativeQuery = true)
+    List<ProyeccionProductoStock> buscarStockPorLotes(@Param("idsLotes") List<String> idsLotes);
 }
