@@ -124,7 +124,6 @@ public class ServicioAppInventario {
         registrarMovimientosDeVenta(venta, items);
     }
 
-
     private void registrarMovimientosDeVenta(Venta venta, List<ItemLoteCantidad> items) {
         for (var item : items) {
             var producto = item.lote().getCodigo().getProducto();
