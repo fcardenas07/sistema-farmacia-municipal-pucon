@@ -84,7 +84,7 @@ public class ServicioAppPago {
                 ? EstadoPago.APROBADO
                 : EstadoPago.RECHAZADO;
 
-        return servicioPago.actualizarEstado(pagoId, EstadoPago.APROBADO);
+        return servicioPago.actualizarEstado(pagoId, nuevoEstado);
     }
 
     private void publicarResultadoPago(Venta venta, EstadoPago estadoPago) {

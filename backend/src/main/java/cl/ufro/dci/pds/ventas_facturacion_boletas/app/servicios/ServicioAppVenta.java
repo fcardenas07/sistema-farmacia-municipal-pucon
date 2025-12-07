@@ -1,7 +1,5 @@
 package cl.ufro.dci.pds.ventas_facturacion_boletas.app.servicios;
 
-import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
-import cl.ufro.dci.pds.infraestructura.BusEventosVentas;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.*;
 import cl.ufro.dci.pds.pacientes.dominio.pacientes.cronicos.inscripcion.ServicioCliente;
 import cl.ufro.dci.pds.usuarios_permisos.dominio.usuarios.ServicioUsuario;
