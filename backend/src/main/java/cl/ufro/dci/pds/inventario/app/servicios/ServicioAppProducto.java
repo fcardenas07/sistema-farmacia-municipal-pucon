@@ -80,7 +80,7 @@ public class ServicioAppProducto {
     @Transactional
     public ProductoDetalle obtenerProductoPorId(String idProducto) {
         var proyeccion = repositorioConsultaProducto
-                .obtenerDetalleProducto(idProducto);
+                .buscarDetalleProducto(idProducto);
 
         if (proyeccion == null) {
             throw new ProductoNoEncontradoException(idProducto);

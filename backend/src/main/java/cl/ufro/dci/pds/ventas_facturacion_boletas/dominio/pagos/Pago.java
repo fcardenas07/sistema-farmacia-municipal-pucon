@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.pagos;
 import cl.ufro.dci.pds.ventas_facturacion_boletas.dominio.ventas.Venta;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -11,6 +11,7 @@ import java.util.Objects;
 public class Pago {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_pago")
     private String id_pago;
 
@@ -21,13 +22,14 @@ public class Pago {
     private Integer monto;
 
     @Column(name = "fecha_pago")
-    private LocalDate fecha_pago;
+    private LocalDateTime fecha_pago;
 
     @Column(name = "referencia_transaccion")
     private String referencia_transaccion;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private String estado;
+    private EstadoPago estado;
 
     @OneToOne
     @JoinColumn(name = "id_venta", nullable = false)
@@ -60,11 +62,11 @@ public class Pago {
         this.monto = monto;
     }
 
-    public LocalDate getFecha_pago() {
+    public LocalDateTime getFecha_pago() {
         return fecha_pago;
     }
 
-    public void setFecha_pago(LocalDate fecha_pago) {
+    public void setFecha_pago(LocalDateTime fecha_pago) {
         this.fecha_pago = fecha_pago;
     }
 
@@ -76,13 +78,7 @@ public class Pago {
         this.referencia_transaccion = referencia_transaccion;
     }
 
-    public String getEstado() {
-        return estado;
-    }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
 
     public Venta getVenta() {
         return venta;
@@ -114,5 +110,13 @@ public class Pago {
                 ", estado='" + estado + '\'' +
                 ", venta=" + venta +
                 '}';
+    }
+
+    public EstadoPago getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPago estado) {
+        this.estado = estado;
     }
 }

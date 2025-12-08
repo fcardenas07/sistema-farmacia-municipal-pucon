@@ -5,6 +5,7 @@ public enum TipoMovimiento {
     BAJA("Baja de producto"),
     MERMA("Merma"),
     VENTA("Venta"),
+    VENTA_RECHAZADA("Venta rechazada"),
     DEVOLUCION("Devolución"),
     FRACCIONAMIENTO("Fraccionamiento");
 

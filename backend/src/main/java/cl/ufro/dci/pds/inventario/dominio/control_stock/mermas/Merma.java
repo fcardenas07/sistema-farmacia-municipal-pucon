@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.mermas;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +16,7 @@ public class Merma {
     private String idMerma;
 
     @Column(name = "fecha_merma")
-    private LocalDate fechaMerma;
+    private LocalDateTime fechaMerma;
 
     @Column(name = "detalle")
     private String detalle;
@@ -43,11 +43,11 @@ public class Merma {
         this.idMerma = idMerma;
     }
 
-    public LocalDate getFechaMerma() {
+    public LocalDateTime getFechaMerma() {
         return fechaMerma;
     }
 
-    public void setFechaMerma(LocalDate fechaMerma) {
+    public void setFechaMerma(LocalDateTime fechaMerma) {
         this.fechaMerma = fechaMerma;
     }
 

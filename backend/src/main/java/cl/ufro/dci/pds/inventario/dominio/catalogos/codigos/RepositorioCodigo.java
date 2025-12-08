@@ -1,12 +1,12 @@
 package cl.ufro.dci.pds.inventario.dominio.catalogos.codigos;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public interface RepositorioCodigo extends JpaRepository<Codigo, String> {
 
     Optional<Codigo> findByIdCodigoAndProducto_IdProducto(String idCodigo, String idProducto);

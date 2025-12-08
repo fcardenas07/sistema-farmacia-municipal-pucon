@@ -19,7 +19,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @MapsId("idLote")
-    @JoinColumn(name = "id_lote", nullable = false)
+    @JoinColumn(name = "id_lote", nullable = true)
     private Lote lote;
 
     @Column(name = "cantidad")
@@ -77,6 +77,10 @@ public class DetalleVenta {
 
     public void setPrecioUnitario(Integer precioUnitario) {
         this.precioUnitario = precioUnitario;
+    }
+
+    public Integer getSubtotal() {
+        return cantidad * precioUnitario;
     }
 
     @Override

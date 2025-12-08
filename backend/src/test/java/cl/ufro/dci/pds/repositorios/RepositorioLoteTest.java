@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,8 +80,8 @@ class RepositorioLoteTest {
         lote.setCodigo(codigo);
         lote.setNumeroLote(numeroLote);
         lote.setEstado("Disponible");
-        lote.setFechaElaboracion(LocalDate.now().minusDays(5));
-        lote.setFechaVencimiento(LocalDate.now().plusMonths(6));
+        lote.setFechaElaboracion(LocalDateTime.now().minusDays(5));
+        lote.setFechaVencimiento(LocalDateTime.now().plusMonths(6));
 
         var stock = new Stock();
         stock.setCantidadActual(50);

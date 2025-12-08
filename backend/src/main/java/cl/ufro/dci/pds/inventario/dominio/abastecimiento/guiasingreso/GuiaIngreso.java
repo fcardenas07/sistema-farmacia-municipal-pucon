@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.inventario.dominio.abastecimiento.guiasingreso;
 import cl.ufro.dci.pds.inventario.dominio.abastecimiento.proveedores.Proveedor;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +21,7 @@ public class GuiaIngreso {
     private String factura;
 
     @Column(name = "fecha_ingreso")
-    private LocalDate fechaIngreso;
+    private LocalDateTime fechaIngreso;
 
     @Column(name = "observaciones")
     private String observaciones;
@@ -63,11 +63,11 @@ public class GuiaIngreso {
         this.factura = factura;
     }
 
-    public LocalDate getFechaIngreso() {
+    public LocalDateTime getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(LocalDate fechaIngreso) {
+    public void setFechaIngreso(LocalDateTime fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 

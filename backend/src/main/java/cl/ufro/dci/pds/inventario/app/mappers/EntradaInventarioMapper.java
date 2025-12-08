@@ -50,8 +50,8 @@ public class EntradaInventarioMapper {
 
                 guiaIngreso != null ? guiaIngreso.getIdGuiaIngreso() : null,
 
-                lote.getFechaElaboracion().toString(),
-                lote.getFechaVencimiento().toString(),
+                lote.getFechaElaboracion(),
+                lote.getFechaVencimiento(),
                 lote.getEstado()
         );
     }}

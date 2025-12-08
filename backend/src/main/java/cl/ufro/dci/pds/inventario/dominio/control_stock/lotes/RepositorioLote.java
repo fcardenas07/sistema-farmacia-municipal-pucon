@@ -3,7 +3,7 @@ package cl.ufro.dci.pds.inventario.dominio.control_stock.lotes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 
@@ -26,5 +26,5 @@ public interface RepositorioLote extends JpaRepository<Lote, String> {
     WHERE l.fechaVencimiento > :hoy
       AND l.fechaVencimiento < :limite
     """)
-    List<Lote> findPorVencerEntre(LocalDate hoy, LocalDate limite);
+    List<Lote> findPorVencerEntre(LocalDateTime hoy, LocalDateTime limite);
 }

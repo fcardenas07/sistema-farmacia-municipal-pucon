@@ -7,7 +7,7 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,7 +30,7 @@ public class ScheduledTasks {
     //Cada 1 mes
     @Scheduled(cron = "0 0 8 1 * *")
     public void verificarVencimiento() {
-        var hoy = LocalDate.now();
+        var hoy = LocalDateTime.now();
         var limite = hoy.plusMonths(1);
 
         var porVencer = servicioLote.obtenerPorVencerEntre(hoy, limite);

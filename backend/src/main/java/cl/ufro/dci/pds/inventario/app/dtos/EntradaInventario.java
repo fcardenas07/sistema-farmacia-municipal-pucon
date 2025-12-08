@@ -7,15 +7,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record EntradaInventario(
 
         @NotNull(message = "La fecha de elaboración es obligatoria")
-        LocalDate fechaElaboracion,
+        LocalDateTime fechaElaboracion,
 
         @NotNull(message = "La fecha de vencimiento es obligatoria")
-        LocalDate fechaVencimiento,
+        LocalDateTime fechaVencimiento,
 
         @NotBlank(message = "El estado es obligatorio")
         String estado,
