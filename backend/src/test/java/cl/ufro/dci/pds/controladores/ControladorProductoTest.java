@@ -1,40 +1,12 @@
 package cl.ufro.dci.pds.controladores;
 
-import cl.ufro.dci.pds.infraestructura.ImagenAlmacenadaException;
 import cl.ufro.dci.pds.infraestructura.SecurityConfig;
 import cl.ufro.dci.pds.inventario.app.controladores.ControladorProducto;
-import cl.ufro.dci.pds.inventario.app.dtos.*;
-import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoDuplicadoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoEncontradoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.CodigoNoPerteneceProductoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.ProductoNoEncontradoException;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(ControladorProducto.class)
@@ -1585,5 +1557,9 @@ public class ControladorProductoTest {
     }
 
      */
+
+    static class ControladorInventarioTest {
+
+    }
 }
 

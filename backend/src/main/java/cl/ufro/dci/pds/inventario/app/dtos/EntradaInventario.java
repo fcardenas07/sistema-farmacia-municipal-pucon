@@ -39,6 +39,7 @@ public record EntradaInventario(
 
         String idGuiaIngreso,
 
+        @NotNull(message = "El código es obligatorio")
         @Valid
         CodigoACrear codigo
 

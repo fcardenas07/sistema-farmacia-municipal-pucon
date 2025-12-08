@@ -11,8 +11,6 @@ import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.RepositorioMovimiento;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.RepositorioStock;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.AfterEach;
