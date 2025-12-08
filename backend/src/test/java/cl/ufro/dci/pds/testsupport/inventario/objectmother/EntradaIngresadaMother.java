@@ -1,4 +1,4 @@
-package cl.ufro.dci.pds.testmother.inventario.objectmother;
+package cl.ufro.dci.pds.testsupport.inventario.objectmother;
 
 import cl.ufro.dci.pds.inventario.app.dtos.EntradaIngresada;
 
