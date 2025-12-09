@@ -1,0 +1,79 @@
+/* CONTENEDOR PRINCIPAL (tipo dashboard, igual que inventario-lotes) */
+.inventory-container {
+  width: 100%;
+  padding: 40px 60px;
+  background: #fafafa;
+  box-sizing: border-box;
+
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* Tabla contenedor */
+.table-wrapper {
+  margin-top: 2%;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Tabla estilo shadcn */
+.shad-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Texto en header */
+.shad-table thead {
+  background: #f9fafb;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.shad-table th {
+  padding: 12px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+/* Filas */
+.shad-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.shad-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+/* Botón tipo shadcn */
+.btn-shad {
+  background: black;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-shad:hover {
+  opacity: 0.85;
+}
+
+/* Descripción truncada */
+.desc-cell {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

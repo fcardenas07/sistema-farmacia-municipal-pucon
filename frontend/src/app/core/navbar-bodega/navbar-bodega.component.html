@@ -1,12 +1,44 @@
 <nav class="navbar">
   <div class="navbar-left">
     <a
-      routerLink="/home-bodega"
+      routerLink="/dashboard-bodega"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Bodega
+      Inicio
     </a>
+
+    <a
+      routerLink="/agregar-stock-pedido"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Recepcion de stock
+    </a>
+    <a
+      routerLink="/inventario-lotes-bodega"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Inventario Lotes
+    </a>
+    
+       <a
+      routerLink="/formularo-merma-inventario"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Ingreso merma
+    </a>
+
+          <a
+      routerLink="/mermas-inventario"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      Inventario Mermas
+    </a>
+    
 
     <a
       routerLink="/detalle-venta-vendedor"
@@ -23,9 +55,7 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Perfil
+      Cerrar sesion
     </a>
-
-    <div class="perfil-icon"></div>
   </div>
 </nav>

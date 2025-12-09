@@ -1,0 +1,31 @@
+<div class="detalle-container">
+
+  <!-- BOTÓN VOLVER -->
+  <button class="btn-back" (click)="volver()">← Volver</button>
+
+  <!-- ESTADO DE CARGA -->
+  @if (cargando) {
+    <p class="loading">Cargando información...</p>
+  }
+
+  <!-- ERROR -->
+  @if (error) {
+    <p class="error-msg">No se pudo cargar el movimiento.</p>
+  }
+
+  <!-- DETALLE -->
+  @if (!cargando && !error && movimiento) {
+    <h2>Detalle del Movimiento</h2>
+
+    <div class="detalle-card">
+
+      <p><strong>ID Movimiento:</strong> {{ movimiento.idMovimiento }}</p>
+      <p><strong>Tipo:</strong> {{ movimiento.tipoMovimiento }}</p>
+      <p><strong>Cantidad:</strong> {{ movimiento.cantidad }}</p>
+      <p><strong>Fecha:</strong> {{ movimiento.fechaMovimiento }}</p>
+      <p><strong>Detalle:</strong> {{ movimiento.detalle }}</p>
+
+    </div>
+  }
+
+</div>

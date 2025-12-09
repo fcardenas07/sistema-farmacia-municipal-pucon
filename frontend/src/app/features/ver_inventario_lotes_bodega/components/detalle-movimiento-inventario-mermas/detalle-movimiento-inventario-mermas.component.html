@@ -1,0 +1,30 @@
+<div class="detalle-container">
+
+  <!-- BOTÓN VOLVER -->
+ <button class="btn-back" (click)="volver()">← Volver</button>
+
+  <!-- ESTADO DE CARGA -->
+  <p *ngIf="cargando" class="loading">Cargando información...</p>
+
+  <!-- ERROR -->
+  <p *ngIf="error" class="error-msg">No se pudo cargar el movimiento de merma.</p>
+
+  <!-- DETALLE -->
+  <div *ngIf="!cargando && !error && movimiento" class="detalle-card">
+
+    <h2>Detalle del Movimiento de Merma</h2>
+
+    <p><strong>Tipo de movimiento:</strong> {{ movimiento.tipoMovimiento }}</p>
+    <p><strong>Cantidad:</strong> {{ movimiento.cantidad }}</p>
+    <p><strong>Fecha:</strong> {{ movimiento.fechaMovimiento }}</p>
+
+    <div class="detalle-descripcion">
+      <strong>Descripción detallada:</strong>
+      <div class="detalle-texto-largo">
+        {{ movimiento.detalle }}
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,55 @@
+<div class="form-container">
+
+  <h2>Formulario de merma</h2>
+
+  <div class="section-title">Identificación del lote</div>
+
+  <div class="form-grid">
+
+    <!-- ID del lote -->
+    <div class="form-group">
+      <label>ID del lote</label>
+      <input type="text" [(ngModel)]="form.idLote" placeholder="Ej: lot-003" />
+    </div>
+
+    <!-- Tipo de merma -->
+    <div class="form-group">
+      <label>Tipo de merma</label>
+      <select [(ngModel)]="form.tipoMerma">
+        <option value="" disabled>Seleccione un tipo...</option>
+        <option *ngFor="let opcion of opcionesMerma" [value]="opcion">
+          {{ opcion }}
+        </option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="section-title">Detalle de la merma</div>
+
+  <div class="form-grid">
+
+    <div class="form-group">
+      <label>Cantidad (unidades)</label>
+      <input 
+        type="number" 
+        [(ngModel)]="form.cantidad" 
+        min="1"
+        placeholder="Ej: 15"
+      />
+    </div>
+
+    <div class="form-group full">
+      <label>Descripción detallada</label>
+      <textarea [(ngModel)]="form.detalle" placeholder="Ej: Se rompieron durante el transporte"></textarea>
+    </div>
+
+  </div>
+
+  <!-- Botones -->
+  <div class="buttons">
+    <button class="clear-btn" (click)="limpiar()">Limpiar</button>
+    <button class="continue-btn" (click)="finalizar()">Finalizar</button>
+  </div>
+
+</div>
