@@ -38,6 +38,7 @@
           <p class="detail-text">Vencimiento: <span>{{ lote.fechaVencimiento }}</span></p>
           <p class="detail-text">Cantidad: <span>{{ lote.cantidad }}</span></p>
           <p class="detail-text">Código Barra: <span>{{ lote.codigoBarra }}</span></p>
+          <p class="detail-text">Precio Unitario: <span>${{ lote.precioUnitario }}</span></p>
         </div>
 
         <!-- BOTÓN ELIMINAR -->
@@ -48,6 +49,7 @@
 
   </div>
 
+  <!-- FINALIZAR PEDIDO -->
   <div class="footer-action">
     <button class="btn-completed" (click)="finalizarPedido()">Finalizar Pedido</button>
   </div>

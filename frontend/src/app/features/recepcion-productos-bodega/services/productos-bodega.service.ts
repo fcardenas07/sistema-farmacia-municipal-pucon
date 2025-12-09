@@ -13,8 +13,7 @@ export class ProductosBodegaService {
 
   constructor(private http: HttpClient) {}
 
-  // GET - Buscar productos desde backend
-buscarProductos(nombre: string): Observable<ProductoBackend[]> {
+  buscarProductos(nombre: string): Observable<ProductoBackend[]> {
   return this.http.get<ProductoBackend[]>(
     `${this.api}/productos/opciones?nombreComercial=${nombre}`
   );

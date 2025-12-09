@@ -1,0 +1,90 @@
+<div class="stock-container">
+
+  <!-- 🔍 FILTROS -->
+  <div class="filters-container">
+
+    <!-- Nombre comercial -->
+    <select
+      class="filter-select"
+      [(ngModel)]="filters.name"
+    >
+      <option value="">Nombre comercial</option>
+      @for (n of names; track n) {
+        <option [value]="n">{{ n }}</option>
+      }
+    </select>
+
+    <!-- Nombre genérico -->
+    <select
+      class="filter-select"
+      [(ngModel)]="filters.generic"
+    >
+      <option value="">Nombre genérico</option>
+      @for (g of generics; track g) {
+        <option [value]="g">{{ g }}</option>
+      }
+    </select>
+
+  </div>
+
+  <!-- Botones -->
+  <div class="search-buttons">
+    <button class="btn-search" (click)="buscarProductos()">Buscar</button>
+    <button class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <button class="nav-btn" (click)="prevPage()" [disabled]="currentPage === 0">◀</button>
+
+    <h2>Stock Crítico (Página {{ currentPage + 1 }} de {{ totalPages }})</h2>
+
+    <button class="nav-btn" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">▶</button>
+
+  </div>
+
+  <!-- LISTA DE TARJETAS -->
+  <div class="cards-list">
+
+    @if (filteredList.length === 0) {
+      <p class="no-results">No se encontraron productos.</p>
+    }
+
+    @for (product of filteredList; track product.id) {
+
+      <div class="product-card">
+
+        <!-- Imagen -->
+        <div class="img-section">
+          <img [src]="product.imageUrl" alt="Producto">
+        </div>
+
+        <!-- Información -->
+        <div class="info-section">
+          <h3>{{ product.name }}</h3>
+          <span class="generic">{{ product.generic }}</span>
+
+          <span class="dosage">Dosificación: {{ product.dosage }}</span>
+          <span class="manufacturer">Fabricante: {{ product.manufacturer }}</span>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-section">
+          <span class="tag tag-dark">Stock crítico</span>
+          <span class="tag" [ngClass]="getStatusClass(product.status)">
+            {{ product.status }}
+          </span>
+        </div>
+
+        <!-- Unidades -->
+        <div class="units-section">
+          <span>{{ product.units }} unidades</span>
+        </div>
+
+      </div>
+
+    }
+  </div>
+
+</div>

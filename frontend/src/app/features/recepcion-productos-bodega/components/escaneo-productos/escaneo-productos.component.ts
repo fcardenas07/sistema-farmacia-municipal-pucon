@@ -8,16 +8,16 @@ import {
   Validators
 } from '@angular/forms';
 
-import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { ProductoBackend } from '../../models/producto-backend';
 import { LoteInfo } from '../../models/lote-info';
-import { Router } from '@angular/router';
+import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { LotesService } from '../../services/lotes.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-escaneo-productos',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './escaneo-productos.component.html',
   styleUrls: ['./escaneo-productos.component.css']
 })
@@ -34,6 +34,9 @@ export class EscaneoProductosComponent {
   // Lotes añadidos
   batches: LoteInfo[] = [];
 
+  // Manejo de errores visuales
+  productoError = false;
+
   constructor(
     private fb: FormBuilder,
     private productosService: ProductosBodegaService,
@@ -41,13 +44,18 @@ export class EscaneoProductosComponent {
     private router: Router
   ) {
     this.loteForm = this.fb.group({
+      // 1. DATOS DEL LOTE
       numeroLote: ['', Validators.required],
       fechaElaboracion: ['', Validators.required],
       fechaVencimiento: ['', Validators.required],
-      cantidad: [0, [Validators.required, Validators.min(1)]],
-      limiteMerma: [0, Validators.required],
-      precioUnitario: [null, Validators.required],
+
+      // 3. CONTENIDO DEL LOTE
+      cantidad: [null, [Validators.required, Validators.min(1)]],
+      limiteMerma: [null, [Validators.required, Validators.min(1)]],
+      precioUnitario: [null, [Validators.required, Validators.min(1)]],
       codigoBarra: ['', Validators.required],
+
+      // ID PRODUCTO (LO LLENAMOS AUTOMÁTICAMENTE)
       idProducto: [null, Validators.required]
     });
 
@@ -85,14 +93,24 @@ export class EscaneoProductosComponent {
 
     // Relacionar lote con producto
     this.loteForm.patchValue({ idProducto: p.idProducto });
+    this.productoError = false; // quita mensaje de error si ya se seleccionó
   }
 
   // ===============================
   //      AGREGAR LOTE
   // ===============================
   addBatch() {
-    if (this.loteForm.invalid || !this.selectedProduct) {
-      alert('Completa todos los campos');
+    this.productoError = false;
+
+    // Validación 1: PRODUCTO DEBE ESTAR SELECCIONADO
+    if (!this.selectedProduct) {
+      this.productoError = true;
+      return;
+    }
+
+    // Validación 2: FORMULARIO COMPLETO
+    if (this.loteForm.invalid) {
+      this.loteForm.markAllAsTouched();
       return;
     }
 
@@ -136,4 +154,5 @@ export class EscaneoProductosComponent {
     this.lotesService.setLotes(this.batches);
     this.router.navigate(['/resumen-pedido']);
   }
+
 }

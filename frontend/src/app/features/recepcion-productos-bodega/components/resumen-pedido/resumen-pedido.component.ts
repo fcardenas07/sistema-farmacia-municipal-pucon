@@ -28,24 +28,18 @@ export class ResumenPedidoComponent implements OnInit {
     console.log("📦 Lotes recibidos en resumen:", this.lotes);
   }
 
-  // -------------------------------
-  // VOLVER A ESCANEAR PRODUCTOS
-  // -------------------------------
+  // VOLVER A ESCANEAR
   volver() {
     this.router.navigate(['/agregar-stock-pedido']);
   }
 
-  // -------------------------------
   // ELIMINAR LOTE
-  // -------------------------------
   eliminar(index: number) {
     this.lotes.splice(index, 1);
     this.lotesService.setLotes(this.lotes);
   }
 
-  // -------------------------------
-  // FINALIZAR PEDIDO (ENVIAR POST)
-  // -------------------------------
+  // FINALIZAR PEDIDO
   finalizarPedido() {
     if (this.lotes.length === 0) {
       alert("No hay lotes para enviar.");
@@ -65,8 +59,9 @@ export class ResumenPedidoComponent implements OnInit {
         porcentajeOferta: null,
         precioUnitario: lote.precioUnitario,
         idGuiaIngreso: null,
+
         codigo: {
-          idProducto: lote.product.idProducto!,
+          idProducto: lote.product.idProducto,
           codigoBarra: lote.codigoBarra,
           tipoCodigo: "EAN",
           activo: true
@@ -79,7 +74,6 @@ export class ResumenPedidoComponent implements OnInit {
         next: (resp) => {
           console.log(`✔ Lote ${index + 1} enviado correctamente`, resp);
 
-          // Si es el último lote => limpiar memoria y volver al inicio
           if (index === this.lotes.length - 1) {
             this.lotesService.clear();
             alert("Pedido enviado correctamente.");
