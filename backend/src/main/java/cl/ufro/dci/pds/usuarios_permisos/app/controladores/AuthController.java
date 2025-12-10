@@ -53,6 +53,7 @@ public class AuthController {
 
         var response = new AuthResponse(
                 jwt,
+                usuario.getIdUsuario(),
                 usuario.getUsername(),
                 usuario.getNombreCompleto(),
                 usuario.getEmail(),
