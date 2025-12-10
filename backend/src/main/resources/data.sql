@@ -136,14 +136,14 @@ VALUES
 
 -- mock
 
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR001', 'Usuario Demo');
+-- INSERT INTO usuario(id_usuario, nombre_completo)
+-- VALUES ('USR001', 'Usuario Demo');
+--
+-- INSERT INTO usuario(id_usuario, nombre_completo)
+-- VALUES ('USR002', 'Usuario Demo');
 
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR002', 'Usuario Demo');
-
-INSERT INTO cliente (rut_cliente, nombre, direccion, id_usuario)
-VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', 'USR002');
+-- INSERT INTO cliente (rut_cliente, nombre, direccion, id_usuario)
+-- VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', 'USR002');
 
 -- ============================================
 -- =========== SECUENCIA BOLETAS ==============
