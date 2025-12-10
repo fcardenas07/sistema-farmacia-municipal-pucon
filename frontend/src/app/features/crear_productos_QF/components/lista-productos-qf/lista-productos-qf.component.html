@@ -1,0 +1,55 @@
+<div class="stock-container">
+  <!-- FILTROS -->
+  <div class="filters-container">
+    <select [(ngModel)]="filters.nombreComercial" class="filter-select">
+      <option value="">Nombre comercial</option>
+      @for (n of nombresComerciales; track n) {
+      <option [value]="n">{{ n }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="filters.nombreGenerico" class="filter-select">
+      <option value="">Nombre genérico</option>
+      @for (g of nombresGenericos; track g) {
+      <option [value]="g">{{ g }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- BOTONES -->
+  <div class="search-buttons">
+    <button class="btn-search" (click)="buscarProductos()">Buscar</button>
+    <button class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+
+  <!-- LISTA DE CARDS -->
+  <div class="cards-list">
+    @for (product of filteredList; track product.idProducto) {
+
+    <div class="product-card">
+      <div class="img-section">
+        <img
+          [src]="product.urlFoto || 'https://via.placeholder.com/100'"
+          alt="Producto"
+        />
+      </div>
+
+      <div class="info-section">
+        <h3>{{ product.nombreComercial }}</h3>
+        <p class="generic">{{ product.nombreGenerico }}</p>
+        <p>{{ product.dosificacion }} {{ product.unidadMedida }}</p>
+        <p>Fabricante: {{ product.nombreFabricante || "—" }}</p>
+      </div>
+
+      <div class="units-section">
+        <span>{{ product.stockTotal }} unidades</span>
+      </div>
+
+      <div class="actions-section">
+        <button class="btn-edit" (click)="onEditar(product)">Editar</button>
+      </div>
+    </div>
+
+    }
+  </div>
+</div>

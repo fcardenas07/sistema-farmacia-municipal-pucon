@@ -21,36 +21,35 @@ export class ProductoResumenComponent {
   producto: ProductoCreacion | null = null;
 
   constructor() {
-    // Obtenemos los datos desde el draft
+    // Cargar el borrador guardado
     this.producto = this.productoFormService.getDraft();
   }
 
   editar() {
+    // Volver al formulario para editar
     this.router.navigate(['/crear-productos']);
   }
 
-finalizar() {
-  if (!this.producto) {
-    alert("No hay datos para enviar.");
-    return;
-  }
-
-  this.productosService.crearProducto(this.producto).subscribe({
-    next: () => {
-      alert("Producto creado correctamente.");
-
-      // limpiar el borrador
-      this.productoFormService.clearDraft();
-
-      // redirigir al formulario vacío
-      this.router.navigate(['/crear-productos']);
-    },
-    error: (err) => {
-      console.error(err);
-      alert("Ocurrió un error al crear el producto.");
+  finalizar() {
+    if (!this.producto) {
+      alert("No hay datos para enviar.");
+      return;
     }
-  });
-}
 
+    this.productosService.crearProducto(this.producto).subscribe({
+      next: () => {
+        alert("Producto creado correctamente.");
 
+        // Limpiar borrador
+        this.productoFormService.clearDraft();
+
+        // Redirigir a formulario limpio
+        this.router.navigate(['/crear-productos']);
+      },
+      error: (err) => {
+        console.error("❌ Error al crear producto:", err);
+        alert("Ocurrió un error al crear el producto.");
+      }
+    });
+  }
 }

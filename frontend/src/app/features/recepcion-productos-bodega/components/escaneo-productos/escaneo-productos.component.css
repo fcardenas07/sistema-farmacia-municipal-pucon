@@ -1,7 +1,7 @@
 /* GRID PRINCIPAL — 2 COLUMNAS */
 .scan-container {
   display: grid;
-  grid-template-columns: 1fr 0.45fr; /* Formulario izquierda, lotes derecha */
+  grid-template-columns: 1fr 0.45fr;
   gap: 40px;
   padding: 40px;
   max-width: 1500px;
@@ -64,6 +64,22 @@
   background: #f5f5f5;
 }
 
+/* → Nueva imagen */
+.dropdown-photo {
+  width: 50px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+}
+
+/* → Foto de producto en lote */
+.product-photo {
+  width: 80px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
 /* BOTÓN AÑADIR LOTE */
 .btn-add-batch {
   margin-top: 10px;
@@ -87,7 +103,6 @@
 .right-panel {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
 }
 
 /* LISTA DE LOTES */
@@ -98,7 +113,7 @@
   gap: 15px;
 }
 
-/* TARJETAS DE LOTES */
+/* TARJETAS */
 .batch-card {
   padding: 20px;
   border-radius: 10px;
@@ -109,7 +124,7 @@
   align-items: center;
 }
 
-.batch-info {
+.left-info, .right-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -125,7 +140,7 @@
   color: #d32f2f;
 }
 
-/* BOTÓN FINALIZAR – ABAJO A LA DERECHA */
+/* FINALIZAR */
 .btn-finalize {
   width: 100%;
   padding: 15px;
@@ -140,3 +155,10 @@
 .btn-finalize:hover {
   background: #5343d6;
 }
+
+/* Separación extra entre secciones */
+.section-title {
+  margin-top: 25px;
+  display: block;
+}
+

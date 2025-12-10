@@ -87,3 +87,12 @@ input:focus, select:focus {
 .continue-btn:hover {
   opacity: 0.85;
 }
+.error {
+  border: 2px solid #d9534f !important;
+}
+
+.error-msg {
+  font-size: 13px;
+  color: #d9534f;
+  margin-top: 4px;
+}

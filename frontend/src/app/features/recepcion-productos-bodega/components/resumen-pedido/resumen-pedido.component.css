@@ -48,12 +48,13 @@
   align-items: center;
 }
 
-/* Tarjeta lado izquierdo */
+/* ----- Tarjeta izquierda del producto ----- */
 .product-info-card {
   border: 1px solid #e0e0e0;
   background: #fafafa;
   padding: 15px;
   border-radius: 10px;
+  text-align: left;
 }
 
 .product-info-card h3 {
@@ -66,17 +67,19 @@
 .subtitle {
   font-size: 0.95rem;
   color: #777;
-  margin: 0 0 4px 0;
+  margin: 0 0 8px 0;
 }
 
-.meta {
-  font-size: 0.9rem;
-  color: #555;
-  font-weight: 600;
-  margin: 0;
+/* Imagen del producto */
+.product-photo {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid #ddd;
 }
 
-/* Información del lote */
+/* ----- Información del lote ----- */
 .item-details {
   display: flex;
   flex-direction: column;
@@ -94,7 +97,7 @@
   font-weight: 500;
 }
 
-/* BOTÓN ELIMINAR */
+/* ----- BOTÓN ELIMINAR ----- */
 .delete-button {
   background: none;
   border: none;
@@ -108,6 +111,7 @@
   color: #b71c1c;
 }
 
+/* Mensaje vacío */
 .empty-message {
   font-size: 1.2rem;
   color: #666;
