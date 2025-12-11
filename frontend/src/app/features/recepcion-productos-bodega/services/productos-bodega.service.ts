@@ -13,12 +13,11 @@ export class ProductosBodegaService {
 
   constructor(private http: HttpClient) {}
 
-  // GET - Buscar productos desde backend
-  buscarProductos(nombre: string): Observable<{ content: ProductoBackend[] }> {
-    return this.http.get<{ content: ProductoBackend[] }>(
-      `${this.api}/productos/buscar?nombreComercial=${nombre}`
-    );
-  }
+  buscarProductos(nombre: string): Observable<ProductoBackend[]> {
+  return this.http.get<ProductoBackend[]>(
+    `${this.api}/productos/opciones?nombreComercial=${nombre}`
+  );
+}
 
   // POST - Enviar lote individual
   postInventario(payload: LoteBackendPayload): Observable<any> {

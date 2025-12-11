@@ -1,0 +1,61 @@
+<div class="inventory-container">
+
+  <div class="table-wrapper">
+
+    <table class="shad-table">
+      <thead>
+        <tr>
+          <th>Cantidad</th>
+          <th>Tipo de Merma</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let merma of mermas">
+
+          <td>{{ merma.cantidad }}</td>
+          <td>{{ merma.tipoMovimiento }}</td>
+          <td>{{ merma.fechaMovimiento }}</td>
+
+          <td class="desc-cell">
+            {{ merma.detalle.length > 35 ? (merma.detalle | slice:0:35) + '...' : merma.detalle }}
+          </td>
+
+          <td>
+            <button class="btn-shad" (click)="verDetalles(merma)">
+              Ver detalles
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-controls">
+
+    <button class="pg-btn"
+            (click)="paginaAnterior()"
+            [disabled]="paginaActual === 0">
+      ◀ Anterior
+    </button>
+
+    <span class="page-info">
+      Página {{ paginaActual + 1 }} de {{ totalPaginas }}
+    </span>
+
+    <button class="pg-btn"
+            (click)="paginaSiguiente()"
+            [disabled]="paginaActual >= totalPaginas - 1">
+      Siguiente ▶
+    </button>
+
+  </div>
+
+</div>

@@ -1,0 +1,67 @@
+<div class="inventory-container">
+
+  <div class="table-wrapper">
+
+    <table class="shad-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Lote</th>
+          <th>F.Elab.</th>
+          <th>F.Ven.</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Último Mov.</th>
+          <th>Tipo mov.</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let lote of lotes">
+
+          <!-- YA NO MOSTRAMOS idCodigo -->
+          <td>{{ lote.nombreComercial }}</td>
+          <td>{{ lote.numeroLote }}</td>
+          <td>{{ lote.fechaElaboracion }}</td>
+          <td>{{ lote.fechaVencimiento }}</td>
+          <td>{{ lote.cantidad }}</td>
+          <td>{{ lote.estado }}</td>
+          <td>{{ lote.fechaMovimiento }}</td>
+          <td>{{ lote.tipoMovimiento }}</td>
+
+          <td>
+            <button class="btn-shad" (click)="verDetalles(lote)">
+              Ver detalles
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination-controls">
+
+    <button class="pg-btn"
+            (click)="paginaAnterior()"
+            [disabled]="paginaActual === 0">
+      ◀ Anterior
+    </button>
+
+    <span class="page-info">
+      Página {{ paginaActual + 1 }} de {{ totalPaginas }}
+    </span>
+
+    <button class="pg-btn"
+            (click)="paginaSiguiente()"
+            [disabled]="paginaActual >= totalPaginas - 1">
+      Siguiente ▶
+    </button>
+
+  </div>
+
+</div>

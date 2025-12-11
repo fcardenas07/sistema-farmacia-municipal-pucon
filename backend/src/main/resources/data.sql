@@ -134,16 +134,9 @@ VALUES
 ('mov-017', 'INGRESO', 220, '2024-03-12', 'Ingreso inicial del lote', 'lot-017'),
 ('mov-018', 'INGRESO', 210, '2024-04-18', 'Ingreso inicial del lote', 'lot-018');
 
--- mock
-
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR001', 'Usuario Demo');
-
-INSERT INTO usuario(id_usuario, nombre_completo)
-VALUES ('USR002', 'Usuario Demo');
 
 INSERT INTO cliente (rut_cliente, nombre, direccion, id_usuario)
-VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', 'USR002');
+VALUES ('12.345.678-9', 'Cliente Demo', 'Calle de prueba 123', null);
 
 -- ============================================
 -- =========== SECUENCIA BOLETAS ==============
