@@ -10,7 +10,7 @@ import { ProductoFiltradoQF } from '../models/producto-filtrado-qf';
 })
 export class StockNormalService {
 
-  private API_URL = 'http://localhost:8080/productos/buscar-stock';
+  private API_URL = 'http://localhost:8080/productos/buscar';
 
   constructor(private http: HttpClient) {}
 
