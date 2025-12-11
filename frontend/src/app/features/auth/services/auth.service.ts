@@ -86,7 +86,7 @@ export class AuthService {
       case 'ADMIN':
         return '/home-admin';
       case 'BODEGUERO':
-        return '/home-bodega';
+        return '/dashboard-bodega';
       case 'QF':
         return '/home-qf';
       case 'VENDEDOR':
