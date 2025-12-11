@@ -1,4 +1,4 @@
-# comprobantes
+omprobantes
 
 ## Descripción
 Directorio para el módulo **comprobantes**.

@@ -1,4 +1,4 @@
-# boletas
+oletas
 
 ## Descripción
 Directorio para el módulo **boletas**.

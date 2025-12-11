@@ -1,4 +1,4 @@
-# permisos
+ermisos
 
 ## Descripción
 Directorio para el módulo **permisos**.
