@@ -1,7 +1,23 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ProductoCardComponent } from '../producto-card/producto-card.component';
-import { ProductoVentas } from '../../models/producto-ventas';
+import {Router} from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ProductoCardComponent} from '../producto-card/producto-card.component';
+import {ProductoVentas} from '../../models/producto-ventas';
+import {HttpClient} from '@angular/common/http';
+
+interface ProductoPaginado {
+  content: ProductoVentas[];
+  pageable: any;
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  sort: any;
+  numberOfElements: number;
+  empty: boolean;
+}
 
 @Component({
   selector: 'app-productos-tabla-vendedor',
@@ -10,51 +26,29 @@ import { ProductoVentas } from '../../models/producto-ventas';
   templateUrl: './productos-tabla-vendedor.component.html',
   styleUrls: ['./productos-tabla-vendedor.component.css']
 })
-export class ProductosTablaComponent {
-  productos: ProductoVentas[] = [
-    {
-      nombre: 'Lipitor 20mg',
-      principioActivo: 'Atorvastatina',
-      presentacion: '30 Comprimidos',
-      categoria: 'Respiratorio',
-      disponibilidad: 'En Stock',
-      requiereReceta: 'Sin receta',
-      unidades: '20 Unidades',
-      precio: '5000',
-      ubicacion: 'Buscar en otro sucursal'
-    },
-    {
-      nombre: 'Omeprazol 20mg',
-      principioActivo: 'Prilosec',
-      presentacion: '30 Comprimidos',
-      categoria: 'Cardiovascular',
-      disponibilidad: 'En Stock',
-      requiereReceta: 'Con Receta',
-      unidades: '20 Unidades',
-      precio: '3000',
-      ubicacion: 'Buscar en otro sucursal'
-    },
-    {
-      nombre: 'Zocor 10Mg',
-      principioActivo: 'Simvastatina',
-      presentacion: '30 Comprimidos',
-      categoria: 'Diabetes',
-      disponibilidad: 'En Stock',
-      requiereReceta: 'Sin receta',
-      unidades: '20 Unidades',
-      precio: '3590',
-      ubicacion: 'Buscar en otro sucursal'
-    },
-    {
-      nombre: 'Norvasc 10Mg',
-      principioActivo: 'Amlodipino',
-      presentacion: '30 Comprimidos',
-      categoria: 'Hipertensión',
-      disponibilidad: 'En Stock',
-      requiereReceta: 'Con Receta',
-      unidades: '20 Unidades',
-      precio: '4990',
-      ubicacion: 'Buscar en otro sucursal'
-    }
-  ];
+export class ProductosTablaComponent implements OnInit {
+
+  productos: ProductoVentas[] = [];
+
+  constructor(private http: HttpClient, private router: Router) {
+  }
+
+  ngOnInit(): void {
+    this.http.get<ProductoPaginado>('http://localhost:8080/productos/buscar')
+      .subscribe({
+        next: (data) =>
+          this.productos = data.content.sort((a, b) => b.stockTotal - a.stockTotal),
+
+        error: err => console.error('Error cargando productos', err)
+      });
+  }
+
+  agregarProducto(producto: ProductoVentas) {
+    console.log("Producto agregado:", producto);
+
+    // 👇 Aquí rediriges al detalle con un parámetro
+    this.router.navigate(['/detalle-venta-vendedor'], {
+      state: {producto}
+    });
+  }
 }

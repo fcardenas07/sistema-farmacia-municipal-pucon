@@ -1,11 +1,12 @@
 export interface ProductoVentas {
-  nombre: string;
-  principioActivo: string;
-  presentacion: string;
-  categoria: string;
-  disponibilidad: string;
-  requiereReceta: string;
-  unidades: string;
-  precio: string;
-  ubicacion: string;
+  idProducto: string;
+  nombreComercial: string;
+  nombreGenerico: string;
+  nombreFabricante: string;
+  dosificacion: number;
+  unidadMedida: string;
+  stockTotal: number;
+  urlFoto: string;
+  estadoStock: string;
+  estadoStockTitulo: string;
 }
