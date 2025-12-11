@@ -1,11 +1,16 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable, BehaviorSubject, map} from 'rxjs';
-import {Router} from '@angular/router';
-import {AuthResponse, LoginRequest, Usuario, Rol} from '../../../shared/models/auth.models';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, map } from 'rxjs';
+import { Router } from '@angular/router';
+import {
+  AuthResponse,
+  LoginRequest,
+  Usuario,
+  Rol,
+} from '../../../shared/models/auth.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
@@ -19,12 +24,14 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      map(response => {
-        this.storeAuthData(response);
-        return response;
-      })
-    );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        map((response) => {
+          this.storeAuthData(response);
+          return response;
+        })
+      );
   }
 
   logout(): void {
@@ -77,7 +84,7 @@ export class AuthService {
     const rol = this.getCurrentUserRol();
     switch (rol) {
       case 'ADMIN':
-        return '/admin-dashboard'; // Deberás crear este componente si es necesario
+        return '/home-admin';
       case 'BODEGUERO':
         return '/home-bodega';
       case 'QF':
@@ -96,7 +103,7 @@ export class AuthService {
       username: response.username,
       nombreCompleto: response.nombreCompleto,
       email: response.email,
-      rol: response.rol
+      rol: response.rol,
     };
     localStorage.setItem(this.userKey, JSON.stringify(usuario));
     this.currentUserSubject.next(usuario);

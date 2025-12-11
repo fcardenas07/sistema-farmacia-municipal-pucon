@@ -22,9 +22,17 @@ import { EditarProductosComponent } from './features/crear_productos_QF/pages/ed
 import { StockCriticoQfPageComponent } from './features/ver_stock_QF/pages/stock-critico-qf-page/stock-critico-qf-page.component';
 import { StockNormalQfPageComponent } from './features/ver_stock_QF/pages/stock-normal-qf-page/stock-normal-qf-page.component';
 import { AuthGuard } from './features/auth/guards/auth.guard';
+import { AdminHomeComponent } from './features/home/pages/admin-home/admin-home.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
+
+  {
+    path: 'home-admin',
+    component: AdminHomeComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['ADMIN'] },
+  },
 
   // Rutas para VENDEDOR
   {
