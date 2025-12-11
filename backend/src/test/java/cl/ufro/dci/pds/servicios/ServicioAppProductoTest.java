@@ -8,8 +8,7 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.*;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.ServicioLote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.ServicioMovimiento;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.ServicioStock;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

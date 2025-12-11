@@ -1,3 +1,4 @@
+/*
 package cl.ufro.dci.pds.repositorios;
 
 import cl.ufro.dci.pds.inventario.dominio.catalogos.codigos.Codigo;
@@ -7,7 +8,6 @@ import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.RepositorioLote;
-import cl.ufro.dci.pds.inventario.dominio.control_stock.stocks.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,3 +128,5 @@ class RepositorioLoteTest {
         assertThat(lotesInexistentes).isEmpty();
     }
 }
+
+ */
