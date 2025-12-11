@@ -42,7 +42,7 @@ public class Cliente {
     private String rutTutor;
 
     @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     public Cliente() {
