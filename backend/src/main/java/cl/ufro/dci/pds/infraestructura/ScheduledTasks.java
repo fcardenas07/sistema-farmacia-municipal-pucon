@@ -26,9 +26,9 @@ public class ScheduledTasks {
     }
 
     //cada 1 minuto(testing)
-    //@Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     //Cada 1 mes
-    @Scheduled(cron = "0 0 8 1 * *")
+    //@Scheduled(cron = "0 0 8 1 * *")
     public void verificarVencimiento() {
         var hoy = LocalDateTime.now();
         var limite = hoy.plusMonths(1);
@@ -55,7 +55,7 @@ public class ScheduledTasks {
         String html = emailBuilder.construirTablaLotesPorVencer(porVencerUnicos);
 
         emailService.enviar(
-                "thomaswkm6@gmail.com",
+                "s.aliante01@ufromail.cl",
                 "Lotes por vencer en los próximos 30 días",
                 html
         );
