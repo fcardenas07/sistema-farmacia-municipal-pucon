@@ -22,7 +22,7 @@
     >
       Inventario Lotes
     </a>
-    
+
        <a
       routerLink="/formularo-merma-inventario"
       routerLinkActive="active"
@@ -38,24 +38,18 @@
     >
       Inventario Mermas
     </a>
-    
+
 
     <a
       routerLink="/detalle-venta-vendedor"
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-     
+
     </a>
   </div>
 
   <div class="navbar-right">
-    <a
-      routerLink="/vendedor/perfil"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      Cerrar sesion
-    </a>
+    <app-logout-button></app-logout-button>
   </div>
 </nav>

@@ -10,7 +10,7 @@ import { ProductoFiltrado } from '../models/producto-filtrado';
 })
 export class ProductosStockCriticoService {
 
-  private API_URL = 'http://localhost:8080/productos/buscar-stock';
+  private API_URL = 'http://localhost:8080/productos/buscar';
 
   constructor(private http: HttpClient) {}
 

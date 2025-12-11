@@ -1,0 +1,20 @@
+.logout-link {
+  margin-right: 2vw;
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: #b9b9b9;
+  transition: 0.2s;
+}
+
+.logout-link {
+  cursor: pointer;
+}
+
+.logout-link:hover {
+  color: white;
+}
+
+.active {
+  color: white !important;
+  font-weight: 600;
+}
