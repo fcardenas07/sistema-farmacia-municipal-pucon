@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/registro").hasRole("ADMIN")
                         .requestMatchers("/auth/**").authenticated()
                         .requestMatchers("/inventario/**").hasAnyRole("BODEGUERO", "ADMIN")
-                        .requestMatchers("/productos/**").hasAnyRole("BODEGUERO", "QF", "ADMIN")
+                        .requestMatchers("/productos/**").hasAnyRole("BODEGUERO", "QF", "ADMIN", "VENDEDOR")
                         .requestMatchers("/trazabilidad/**").hasAnyRole("BODEGUERO", "QF", "ADMIN")
                         .requestMatchers("/ventas/**").hasAnyRole("VENDEDOR", "ADMIN")
                         .anyRequest().authenticated())

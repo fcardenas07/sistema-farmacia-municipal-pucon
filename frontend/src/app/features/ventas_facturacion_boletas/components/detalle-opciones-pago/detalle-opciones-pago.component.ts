@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-detalle-opciones-pago',
   imports: [],
   templateUrl: './detalle-opciones-pago.component.html',
+  standalone: true,
   styleUrl: './detalle-opciones-pago.component.css'
 })
 export class DetalleOpcionesPagoComponent {

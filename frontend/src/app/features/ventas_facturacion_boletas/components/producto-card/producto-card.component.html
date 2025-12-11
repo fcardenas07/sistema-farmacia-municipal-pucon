@@ -1,42 +1,54 @@
 <div class="product-card">
   <div class="card-content">
-    <!-- Sección izquierda - Información principal del producto -->
+
+    <!-- SECCIÓN PRINCIPAL DE INFORMACIÓN -->
     <div class="product-main">
-      <h2 class="product-name">{{ producto.nombre }}</h2>
-      <p class="active-ingredient">{{ producto.principioActivo }}</p>
-      <p class="presentation">{{ producto.presentacion }}</p>
-    </div>
+      <div class="product-header">
+        <h2 class="product-name">{{ producto.nombreComercial }}</h2>
+        <p class="active-ingredient">{{ producto.nombreGenerico }}</p>
+      </div>
 
-    <!-- Sección central - Información de categoría y detalles -->
-    <div class="product-category">
-      <h3 class="category-title">{{ producto.categoria }}</h3>
-      <div class="details-grid">
-        <div class="detail-item">
-          <span class="detail-label">Disponibilidad:</span>
-          <span class="detail-value">{{ producto.disponibilidad }}</span>
+      <div class="product-details">
+        <div class="detail-row">
+          <span class="label">Fabricante:</span>
+          <span class="value">{{ producto.nombreFabricante }}</span>
         </div>
-        <div class="detail-item">
-          <span class="detail-label">Receta:</span>
-          <span class="detail-value">{{ producto.requiereReceta }}</span>
+        <div class="detail-row">
+          <span class="label">Presentación:</span>
+          <span class="value">{{ producto.dosificacion }} {{ producto.unidadMedida }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Sección derecha - Stock, precio y ubicación -->
-    <div class="product-side">
-      <div class="stock-price">
-        <div class="detail-item">
-          <span class="detail-label">Stock:</span>
-          <span class="detail-value">{{ producto.unidades }}</span>
+    <!-- FOTO PRODUCTO -->
+    <div class="image-section">
+      <img ngSrc="producto.urlFoto" alt="{{producto.nombreComercial}}" width="80" height="80"/>
+    </div>
+
+    <!-- SECCIÓN DE ESTADO Y ACCIONES -->
+    <div class="product-status">
+      <div class="status-info">
+        <div class="stock-status" [class]="'stock-' + producto.estadoStock.toLowerCase()">
+          {{ producto.estadoStockTitulo }}
         </div>
-        <div class="detail-item">
-          <span class="detail-label">Precio:</span>
-          <span class="detail-value price">{{ producto.precio }}</span>
+        <div class="stock-count">
+          {{ producto.stockTotal }} unidades disponibles
         </div>
       </div>
-      <div class="location-section">
-        <span class="location-text">{{ producto.ubicacion }}</span>
+      <div class="product-price">
+        <span class="price-label">Precio:</span>
+        <span class="price-value">$ {{ precioRandom | number:'1.0-0' }}</span>
       </div>
     </div>
+
+    <!-- ACCIONES -->
+    <div class="product-actions">
+      <button class="btn btn-primary"
+              [disabled]="producto.stockTotal === 0"
+              (click)="onAgregar()">
+        Agregar al pedido
+      </button>
+    </div>
+
   </div>
 </div>

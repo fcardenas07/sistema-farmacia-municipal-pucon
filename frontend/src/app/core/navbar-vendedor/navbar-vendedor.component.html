@@ -5,7 +5,7 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Venta 
+      Inicio
     </a>
 
     <a
@@ -13,17 +13,12 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: true }"
     >
-      Venta
+      Ver carro de compras
     </a>
   </div>
 
+  <
   <div class="navbar-right">
-    <a
-      routerLink="/vendedor/perfil"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-    >
-      Cerrar sesión
-    </a>
+    <app-logout-button></app-logout-button>
   </div>
 </nav>
