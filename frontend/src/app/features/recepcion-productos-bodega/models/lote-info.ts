@@ -2,7 +2,7 @@ import { ProductInfo } from "./product-info";
 
 export interface LoteInfo {
   numeroLote: string;
-  fechaElaboracion: string;
+  fechaElaboracion: string; 
   fechaVencimiento: string;
   cantidad: number;
   limiteMerma: number;
@@ -10,3 +10,4 @@ export interface LoteInfo {
   codigoBarra: string;
   product: ProductInfo;
 }
+

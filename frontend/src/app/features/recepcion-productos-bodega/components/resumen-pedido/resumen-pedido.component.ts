@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { LotesService } from '../../services/lotes.service';
 import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { LoteInfo } from '../../models/lote-info';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -49,31 +48,15 @@ export class ResumenPedidoComponent implements OnInit {
     console.log("🚀 Enviando pedido completo...");
 
     this.lotes.forEach((lote, index) => {
-      const payload = {
-        fechaElaboracion: lote.fechaElaboracion,
-        fechaVencimiento: lote.fechaVencimiento,
-        estado: "ACTIVO",
-        numeroLote: lote.numeroLote,
-        cantidad: lote.cantidad,
-        limiteMerma: lote.limiteMerma,
-        porcentajeOferta: null,
-        precioUnitario: lote.precioUnitario,
-        idGuiaIngreso: null,
 
-        codigo: {
-          idProducto: lote.product.idProducto,
-          codigoBarra: lote.codigoBarra,
-          tipoCodigo: "EAN",
-          activo: true
-        }
-      };
+      console.log("📤 Preparando envío de lote:", lote);
 
-      console.log("📤 Enviando lote:", payload);
-
-      this.productosService.postInventario(payload).subscribe({
+      // ✔ Usa el método que ya crea el payload correcto
+      this.productosService.postInventarioFromLote(lote).subscribe({
         next: (resp) => {
           console.log(`✔ Lote ${index + 1} enviado correctamente`, resp);
 
+          // Si es el último lote
           if (index === this.lotes.length - 1) {
             this.lotesService.clear();
             alert("Pedido enviado correctamente.");
@@ -85,6 +68,7 @@ export class ResumenPedidoComponent implements OnInit {
           alert("Error enviando el pedido, revisa consola.");
         }
       });
+
     });
   }
 }

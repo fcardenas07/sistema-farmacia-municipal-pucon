@@ -23,18 +23,13 @@ import { Router } from '@angular/router';
 })
 export class EscaneoProductosComponent {
 
-  // Formulario del lote
   loteForm!: FormGroup;
 
-  // Buscador de productos
   productoSearch: string = '';
   productosFiltrados: ProductoBackend[] = [];
   selectedProduct: ProductoBackend | null = null;
 
-  // Lotes añadidos
   batches: LoteInfo[] = [];
-
-  // Manejo de errores visuales
   productoError = false;
 
   constructor(
@@ -44,71 +39,47 @@ export class EscaneoProductosComponent {
     private router: Router
   ) {
     this.loteForm = this.fb.group({
-      // 1. DATOS DEL LOTE
       numeroLote: ['', Validators.required],
       fechaElaboracion: ['', Validators.required],
       fechaVencimiento: ['', Validators.required],
-
-      // 3. CONTENIDO DEL LOTE
       cantidad: [null, [Validators.required, Validators.min(1)]],
       limiteMerma: [null, [Validators.required, Validators.min(1)]],
       precioUnitario: [null, [Validators.required, Validators.min(1)]],
       codigoBarra: ['', Validators.required],
-
-      // ID PRODUCTO (LO LLENAMOS AUTOMÁTICAMENTE)
       idProducto: [null, Validators.required]
     });
 
-    // Recuperar lotes guardados temporalmente
     this.batches = this.lotesService.getLotes();
   }
 
-  // ===============================
-  //     BUSCAR PRODUCTOS BACKEND
-  // ===============================
   buscarProductosBackend() {
     const texto = this.productoSearch.trim();
     if (!texto) return;
 
     this.productosService.buscarProductos(texto).subscribe({
       next: (resp) => {
-        // Resp ahora devuelve: idProducto, nombreComercial, nombreFabricante, urlFoto
         this.productosFiltrados = resp;
       },
       error: (err) => console.error(err)
     });
   }
 
-  // ===============================
-  //   SELECCIONAR PRODUCTO
-  // ===============================
   seleccionarProducto(p: ProductoBackend) {
     this.selectedProduct = p;
-
-    // Mostrar en el input
     this.productoSearch = p.nombreComercial;
-
-    // Ocultar lista
     this.productosFiltrados = [];
-
-    // Relacionar lote con producto
     this.loteForm.patchValue({ idProducto: p.idProducto });
-    this.productoError = false; // quita mensaje de error si ya se seleccionó
+    this.productoError = false;
   }
 
-  // ===============================
-  //      AGREGAR LOTE
-  // ===============================
   addBatch() {
     this.productoError = false;
 
-    // Validación 1: PRODUCTO DEBE ESTAR SELECCIONADO
     if (!this.selectedProduct) {
       this.productoError = true;
       return;
     }
 
-    // Validación 2: FORMULARIO COMPLETO
     if (this.loteForm.invalid) {
       this.loteForm.markAllAsTouched();
       return;
@@ -133,26 +104,22 @@ export class EscaneoProductosComponent {
     this.batches.push(lote);
     this.lotesService.setLotes(this.batches);
 
-    // Reset form y búsqueda
     this.loteForm.reset();
     this.productoSearch = '';
     this.selectedProduct = null;
   }
 
-  // ===============================
-  //       ELIMINAR LOTE
-  // ===============================
   eliminarLote(index: number) {
     this.batches.splice(index, 1);
     this.lotesService.setLotes(this.batches);
   }
 
-  // ===============================
-  //          FINALIZAR
-  // ===============================
   finalize() {
+
+    // 🔎 VER QUÉ LOTES QUIERES ENVIAR
+    console.log("🟦 Lotes preparados para envío:", this.batches);
+
     this.lotesService.setLotes(this.batches);
     this.router.navigate(['/resumen-pedido']);
   }
-
 }
