@@ -13,31 +13,110 @@ import { ResumenCreacionProductoPageComponent } from './features/crear_productos
 import { QfHomeComponent } from './features/home/pages/qf-home/qf-home.component';
 import { ProductosQfPageComponent } from './features/crear_productos_QF/pages/productos-qf-page/productos-qf-page.component';
 import { EditarProductosComponent } from './features/crear_productos_QF/pages/editar-producto/editar-producto.component';
-
 import { StockCriticoQfPageComponent } from './features/ver_stock_QF/pages/stock-critico-qf-page/stock-critico-qf-page.component';
 import { StockNormalQfPageComponent } from './features/ver_stock_QF/pages/stock-normal-qf-page/stock-normal-qf-page.component';
+import { AuthGuard } from './features/auth/guards/auth.guard';
+
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
-  { path: 'detalle-venta-vendedor', component: DetalleVentaVendedorComponent },
-  { path: 'productos-vendedor', component: ProductosVendedorPageComponent },
-  { path: 'home-bodega', component: BodegaHomeComponent },
-  { path: 'home-qf', component: QfHomeComponent },
-  { path: 'productos-qf', component: ProductosQfPageComponent },
+
+  // Rutas para VENDEDOR
+  {
+    path: 'detalle-venta-vendedor',
+    component: DetalleVentaVendedorComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['VENDEDOR'] }
+  },
+  {
+    path: 'productos-vendedor',
+    component: ProductosVendedorPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['VENDEDOR'] }
+  },
+
+  // Rutas para BODEGUERO
+  {
+    path: 'home-bodega',
+    component: BodegaHomeComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
+  },
   {
     path: 'ingreso-codigo-pedido',
     component: IngresoCodigoPedidoPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
   },
-  { path: 'agregar-stock-pedido', component: AgregarStockPedidoPageComponent },
-  { path: 'resumen-pedido', component: ResumenPedidoPageComponent },
-  { path: 'stock-critico', component: StockCriticoPageComponent },
-  { path: 'stock-total', component: StockTotalPageComponent },
-  { path: 'crear-productos', component: CrearProductosPageComponent },
-  { path: 'editar-producto/:id', component: EditarProductosComponent },
+  {
+    path: 'agregar-stock-pedido',
+    component: AgregarStockPedidoPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
+  },
+  {
+    path: 'resumen-pedido',
+    component: ResumenPedidoPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
+  },
+  {
+    path: 'stock-critico',
+    component: StockCriticoPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
+  },
+  {
+    path: 'stock-total',
+    component: StockTotalPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['BODEGUERO'] }
+  },
+
+  // Rutas para QF (Químico Farmacéutico)
+  {
+    path: 'home-qf',
+    component: QfHomeComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
+  {
+    path: 'productos-qf',
+    component: ProductosQfPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
+  {
+    path: 'crear-productos',
+    component: CrearProductosPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
+  {
+    path: 'editar-producto/:id',
+    component: EditarProductosComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
   {
     path: 'resumen-creacion-producto',
     component: ResumenCreacionProductoPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
   },
-  { path: 'stock-critico-qf', component: StockCriticoQfPageComponent },
-  { path: 'stock-normal-qf', component: StockNormalQfPageComponent },
-  { path: '**', redirectTo: 'login' },
+  {
+    path: 'stock-critico-qf',
+    component: StockCriticoQfPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
+  {
+    path: 'stock-normal-qf',
+    component: StockNormalQfPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['QF'] }
+  },
+
+  // Redirecciones
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
 ];
