@@ -5,6 +5,7 @@ import cl.ufro.dci.pds.compartido.eventos.EventoResultadoPago;
 import cl.ufro.dci.pds.compartido.eventos.ItemInventarioActualizado;
 import cl.ufro.dci.pds.infraestructura.BusEventosVentas;
 import cl.ufro.dci.pds.inventario.app.dtos.*;
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.lotes.Lote;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.mermas.ServicioMerma;
 import cl.ufro.dci.pds.inventario.dominio.control_stock.movimientos.TipoMovimiento;
@@ -197,5 +198,23 @@ public class ServicioAppInventario {
                     item.cantidad()
             );
         }
+    }
+
+    @Transactional
+    public Page<ProductoCatalogoVenta> buscarProductosParaVenta(
+            String nombreComercial,
+            String nombreGenerico,
+            CategoriaProducto categoria,
+            int numeroPagina,
+            int limite
+    ) {
+        var pageable = PageRequest.of(numeroPagina, limite);
+
+        String filtroCategoria = (categoria != null) ? categoria.name() : null;
+
+        var proyecciones = repositorioConsultaProducto
+                .buscarProductosParaVenta(nombreComercial, nombreGenerico, filtroCategoria, pageable);
+
+        return proyecciones.map(ProductoCatalogoVenta::desdeProyeccion);
     }
 }

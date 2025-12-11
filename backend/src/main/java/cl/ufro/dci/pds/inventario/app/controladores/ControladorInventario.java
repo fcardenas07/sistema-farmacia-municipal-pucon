@@ -4,7 +4,9 @@ import cl.ufro.dci.pds.inventario.app.dtos.*;
 
 import cl.ufro.dci.pds.inventario.app.servicios.ServicioAppInventario;
 
+import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -46,6 +48,25 @@ public class ControladorInventario {
     @GetMapping("/lotes/buscar")
     public ResponseEntity<List<LoteSimple>> buscarLotes(@RequestParam(required = false) String filtro) {
         return ResponseEntity.ok(servicioAppInventario.obtenerLotesPor(filtro));
+    }
+
+    @GetMapping("/para-venta")
+    public ResponseEntity<Page<ProductoCatalogoVenta>> buscarProductosParaVenta(
+            @RequestParam(required = false) String nombreComercial,
+            @RequestParam(required = false) String nombreGenerico,
+            @RequestParam(required = false) CategoriaProducto categoria,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int limite
+    ) {
+        var resultado = servicioAppInventario.buscarProductosParaVenta(
+                nombreComercial,
+                nombreGenerico,
+                categoria,
+                pagina,
+                limite
+        );
+
+        return ResponseEntity.ok(resultado);
     }
 
     @ExceptionHandler(Exception.class)
