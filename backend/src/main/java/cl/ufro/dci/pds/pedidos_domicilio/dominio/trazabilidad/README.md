@@ -1,4 +1,4 @@
-# trazabilidad
+razabilidad
 
 ## Descripción
 Directorio para el módulo **trazabilidad**.

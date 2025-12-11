@@ -1,4 +1,4 @@
-# logs
+ogs
 
 ## Descripción
 Directorio para el módulo **logs**.

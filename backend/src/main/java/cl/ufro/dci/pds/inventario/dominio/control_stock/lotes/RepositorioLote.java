@@ -27,4 +27,18 @@ public interface RepositorioLote extends JpaRepository<Lote, String> {
       AND l.fechaVencimiento < :limite
     """)
     List<Lote> findPorVencerEntre(LocalDateTime hoy, LocalDateTime limite);
+
+    @Query(value = """
+    SELECT COALESCE(SUM(l.stock_actual - l.stock_reservado), 0) AS productosPorVencer
+    FROM lote l
+    WHERE (l.stock_actual - l.stock_reservado) > 0
+      -- solo lotes no vencidos
+      AND l.fecha_vencimiento >= CURRENT_DATE
+      -- días hasta vencimiento dentro del límite de merma
+      AND DATE_PART('day', l.fecha_vencimiento - CURRENT_DATE)
+          <= COALESCE(l.limite_merma, 0)
+    """,
+            nativeQuery = true
+    )
+    int contarUnidadesPorVencer();
 }

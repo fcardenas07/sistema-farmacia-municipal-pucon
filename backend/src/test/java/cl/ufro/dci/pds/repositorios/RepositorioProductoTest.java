@@ -1,146 +1,135 @@
 package cl.ufro.dci.pds.repositorios;
 
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.CategoriaProducto;
-import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.Producto;
+import cl.ufro.dci.pds.fixtures.builders.ProductoBuilder;
 import cl.ufro.dci.pds.inventario.dominio.catalogos.productos.RepositorioProducto;
+import cl.ufro.dci.pds.fixtures.mothers.ProductoMother;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@ActiveProfiles("test")
 class RepositorioProductoTest {
 
-    /*
     @Autowired
     private RepositorioProducto repositorioProducto;
 
     @BeforeEach
     void setUp() {
         repositorioProducto.deleteAll();
-
-        repositorioProducto.saveAll(List.of(
-                new Producto("Paracetamol", "Paracetamol",
-                        "Tabletas", 500, "mg",
-                        10, 100, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                        "productos/P001.jpg"),
-                new Producto("Advil", "Ibuprofeno",
-                        "Tabletas", 400, "mg",
-                        5, 50, true, CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                        "productos/P002.jpg"),
-                new Producto("Amoxil", "Amoxicilina",
-                        "Caja 12 cápsulas", 500, "mg",
-                        20, 200, false, CategoriaProducto.ANTIBIOTICOS,
-                        "productos/P003.jpg")
-        ));
+        repositorioProducto.save(ProductoMother.paracetamolSinId());
     }
 
     @Test
-    @DisplayName("buscar por campos con todos los filtros nulos devuelve todos los productos")
-    void buscarProductosSinFiltros() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos(null, null, null, null, pageable);
-
-        assertThat(resultado).hasSize(3);
-        assertThat(resultado).extracting(Producto::getNombreComercial)
-                .containsExactlyInAnyOrder("Paracetamol", "Advil", "Amoxil");
-    }
-
-    @Test
-    @DisplayName("Buscar productos por nombre comercial devuelve coincidencias")
-    void buscarProductosPorNombreComercial() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos("Paracetamol", null, null, null, pageable);
-
-        assertThat(resultado.getContent()).hasSize(1);
-        assertThat(resultado.getContent().getFirst().getNombreComercial()).isEqualTo("Paracetamol");
-    }
-
-    @Test
-    @DisplayName("Buscar productos por nombre genérico devuelve coincidencias")
-    void buscarProductosPorNombreGenerico() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos(null, "Ibuprofeno", null, null, pageable);
-
-        assertThat(resultado.getContent()).hasSize(1);
-        assertThat(resultado.getContent().getFirst().getNombreGenerico()).isEqualTo("Ibuprofeno");
-    }
-
-    @Test
-    @DisplayName("Buscar productos por categoría devuelve coincidencias")
-    void buscarProductosPorCategoria() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos(
-                null,
-                null,
-                null,
-                CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS,
-                pageable
-        );
-
-        assertThat(resultado.getContent()).hasSize(2);
-
-        assertThat(resultado.getContent())
-                .allMatch(p -> p.getCategoriaProducto() == CategoriaProducto.ANALGESICOS_ANTIINFLAMATORIOS);
-
-        assertThat(resultado.getContent())
-                .allMatch(p -> p.getIdProducto() != null && !p.getIdProducto().isBlank());
-    }
-
-    @Test
-    @DisplayName("Buscar productos por activo devuelve coincidencias")
-    void buscarProductosPorActivo() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos(null, null, true, null, pageable);
-
-        assertThat(resultado.getContent()).hasSize(2);
-        assertThat(resultado.getContent()).allMatch(Producto::isActivo);
-    }
-
-    @Test
-    @DisplayName("Buscar productos sin coincidencias devuelve lista vacía")
-    void buscarProductosSinCoincidencias() {
-        var pageable = PageRequest.of(0, 4);
-        var resultado = repositorioProducto.buscarPorCampos("NoExiste", null, null, null, pageable);
-        assertThat(resultado.getContent()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("existsByClaveUnica devuelve true si existe un producto con la misma clave")
+    @DisplayName("existe por clave única devuelve true si existe un producto con la misma clave")
     void existsByClaveUnicaDevuelveTrue() {
-        var p = repositorioProducto.findAll().getFirst();
+        var producto = repositorioProducto.findAll().getFirst();
 
         boolean existe = repositorioProducto.existsByClaveUnica(
-                p.getNombreComercial(),
-                p.getNombreGenerico(),
-                p.getPresentacion(),
-                p.getDosificacion(),
-                p.getUnidadMedida(),
-                p.getFabricante().getIdFabricante()
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                producto.getFabricante() != null ? producto.getFabricante().getIdFabricante() : null
         );
 
         assertThat(existe).isTrue();
     }
 
     @Test
-    @DisplayName("existsByClaveUnica devuelve false si no existe un producto con la misma clave")
+    @DisplayName("existe por clave única devuelve false si no existe un producto con la misma clave")
     void existsByClaveUnicaDevuelveFalse() {
+        var producto = ProductoMother.amoxicilinaSinId();
+
         boolean existe = repositorioProducto.existsByClaveUnica(
-                "ProductoInexistente",
-                "GenéricoInexistente",
-                "Presentación",
-                123,
-                "Unidad",
-                "F999"
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                producto.getFabricante() != null ? producto.getFabricante().getIdFabricante() : null
         );
 
         assertThat(existe).isFalse();
     }
-         */
+
+    @Test
+    @DisplayName("existe por clave única funciona correctamente con presentacion NULL")
+    void existsConPresentacionNull() {
+        var producto = new ProductoBuilder()
+                .conNombreComercial("Prod X")
+                .stock(10, 100)
+                .sinFabricante()
+                .build();
+
+        producto.setPresentacion(null);
+        repositorioProducto.save(producto);
+
+        boolean existe = repositorioProducto.existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                null,
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                null
+        );
+
+        assertThat(existe).isTrue();
+    }
+
+    @Test
+    @DisplayName("existe por clave única funciona con unidadMedida NULL")
+    void existsConUnidadMedidaNull() {
+        var producto = new ProductoBuilder()
+                .conNombreComercial("Producto Y")
+                .sinFabricante()
+                .build();
+
+        producto.setUnidadMedida(null);
+        repositorioProducto.save(producto);
+
+        boolean existe = repositorioProducto.existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                producto.getPresentacion(),
+                producto.getDosificacion(),
+                null,
+                null
+        );
+
+        assertThat(existe).isTrue();
+    }
+
+    @Test
+    @DisplayName("existe por clave única devuelve no existe si cambia presentación aunque los demás campos coincidan")
+    void noExisteSiPresentacionDifiere() {
+        var producto = new ProductoBuilder().build();
+        repositorioProducto.save(producto);
+
+        var existe = repositorioProducto.existsByClaveUnica(
+                producto.getNombreComercial(),
+                producto.getNombreGenerico(),
+                "otra presentacion",
+                producto.getDosificacion(),
+                producto.getUnidadMedida(),
+                producto.getFabricante() != null ? producto.getFabricante().getIdFabricante() : null
+        );
+
+        assertThat(existe).isFalse();
+    }
+
+    @Test
+    @DisplayName("JPA asigna ID al guardar un producto sin ID")
+    void asignaIdAlGuardar() {
+        var producto = ProductoMother.paracetamolSinId();
+        var guardado = repositorioProducto.save(producto);
+        assertThat(guardado.getIdProducto()).isNotNull();
+    }
 }

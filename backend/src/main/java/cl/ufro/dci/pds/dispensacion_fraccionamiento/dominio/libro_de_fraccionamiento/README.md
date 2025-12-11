@@ -1,4 +1,4 @@
-# libro_de_fraccionamiento
+ibro_de_fraccionamiento
 
 ## Descripción
 Directorio para el módulo **libro_de_fraccionamiento**.

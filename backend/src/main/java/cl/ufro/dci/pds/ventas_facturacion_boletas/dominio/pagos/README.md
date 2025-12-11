@@ -1,4 +1,4 @@
-# pagos
+agos
 
 ## Descripción
 Directorio para el módulo **pagos**.
