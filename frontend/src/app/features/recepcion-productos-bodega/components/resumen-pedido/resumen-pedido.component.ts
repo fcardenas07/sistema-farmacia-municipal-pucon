@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { LotesService } from '../../services/lotes.service';
 import { ProductosBodegaService } from '../../services/productos-bodega.service';
 import { LoteInfo } from '../../models/lote-info';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({

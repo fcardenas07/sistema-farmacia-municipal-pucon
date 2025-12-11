@@ -15,10 +15,9 @@ export class ProductosBodegaService {
 
   buscarProductos(nombre: string): Observable<ProductoBackend[]> {
   return this.http.get<ProductoBackend[]>(
-    `${this.api}/productos/buscar-para-codigo?nombreComercial=${nombre}`
+    `${this.api}/productos/opciones?nombreComercial=${nombre}`
   );
 }
-
 
   // POST - Enviar lote individual
   postInventario(payload: LoteBackendPayload): Observable<any> {

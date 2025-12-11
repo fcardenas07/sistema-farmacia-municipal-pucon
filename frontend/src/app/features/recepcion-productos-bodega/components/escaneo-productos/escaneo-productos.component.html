@@ -45,18 +45,30 @@
         Buscar
       </button>
 
-      <!-- RESULTADOS -->
+      <!-- RESULTADOS DEL BACKEND -->
       <div class="dropdown-list" *ngIf="productosFiltrados.length > 0">
         @for (p of productosFiltrados; track p.idProducto) {
+
           <div class="dropdown-item" (click)="seleccionarProducto(p)">
+            
+            <div class="item-row">
 
-            @if (p.urlFoto) {
-              <img class="dropdown-photo" [src]="p.urlFoto" />
-            }
+              <!-- FOTO DEL PRODUCTO -->
+              <img *ngIf="p.urlFoto"
+                   [src]="p.urlFoto"
+                   class="product-thumb"
+                   alt="product">
 
-            <strong>{{ p.nombreComercial }}</strong><br>
-            <span>{{ p.nombreFabricante }}</span>
+              <div class="item-text">
+                <strong>{{ p.nombreComercial }}</strong>
+                <br>
+                <span>{{ p.nombreFabricante }}</span>
+              </div>
+
+            </div>
+
           </div>
+
         }
       </div>
 
@@ -118,6 +130,7 @@
       <h3 class="header-text">Lotes añadidos</h3>
 
       @for (b of batches; let i = $index; track i) {
+
         <div class="batch-card">
 
           <div class="left-info">
@@ -134,18 +147,25 @@
             <p><strong>Producto:</strong> {{ b.product.nombreComercial }}</p>
             <p>{{ b.product.nombreFabricante }}</p>
 
-            @if (b.product.urlFoto) {
-              <img class="product-photo" [src]="b.product.urlFoto" />
-            }
+            <!-- Mostrar foto también en el resumen -->
+            <img *ngIf="b.product.urlFoto"
+                 [src]="b.product.urlFoto"
+                 class="product-thumb-small"
+                 alt="foto">
           </div>
 
           <button class="delete-batch-btn" (click)="eliminarLote(i)">🗑</button>
 
         </div>
+
       }
+
     </div>
 
-    <button class="btn-finalize" (click)="finalize()">Finalizar</button>
+    <!-- FINALIZAR -->
+    <button class="btn-finalize" (click)="finalize()">
+      Finalizar
+    </button>
 
   </div>
 

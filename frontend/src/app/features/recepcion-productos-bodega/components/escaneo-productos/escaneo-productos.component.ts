@@ -23,12 +23,15 @@ import { Router } from '@angular/router';
 })
 export class EscaneoProductosComponent {
 
+  // Formulario del lote
   loteForm!: FormGroup;
 
+  // Buscador de productos
   productoSearch: string = '';
   productosFiltrados: ProductoBackend[] = [];
   selectedProduct: ProductoBackend | null = null;
 
+  // Lotes añadidos
   batches: LoteInfo[] = [];
 
   // Manejo de errores visuales
@@ -56,11 +59,12 @@ export class EscaneoProductosComponent {
       idProducto: [null, Validators.required]
     });
 
+    // Recuperar lotes guardados temporalmente
     this.batches = this.lotesService.getLotes();
   }
 
   // ===============================
-  // BUSCAR PRODUCTOS
+  //     BUSCAR PRODUCTOS BACKEND
   // ===============================
   buscarProductosBackend() {
     const texto = this.productoSearch.trim();
@@ -68,25 +72,32 @@ export class EscaneoProductosComponent {
 
     this.productosService.buscarProductos(texto).subscribe({
       next: (resp) => {
+        // Resp ahora devuelve: idProducto, nombreComercial, nombreFabricante, urlFoto
         this.productosFiltrados = resp;
       },
-      error: (err) => console.error("❌ Error al buscar productos", err)
+      error: (err) => console.error(err)
     });
   }
 
   // ===============================
-  // SELECCIONAR PRODUCTO
+  //   SELECCIONAR PRODUCTO
   // ===============================
   seleccionarProducto(p: ProductoBackend) {
     this.selectedProduct = p;
+
+    // Mostrar en el input
     this.productoSearch = p.nombreComercial;
+
+    // Ocultar lista
     this.productosFiltrados = [];
+
+    // Relacionar lote con producto
     this.loteForm.patchValue({ idProducto: p.idProducto });
     this.productoError = false; // quita mensaje de error si ya se seleccionó
   }
 
   // ===============================
-  // AÑADIR LOTE
+  //      AGREGAR LOTE
   // ===============================
   addBatch() {
     this.productoError = false;
@@ -111,20 +122,25 @@ export class EscaneoProductosComponent {
       limiteMerma: this.loteForm.value.limiteMerma,
       precioUnitario: this.loteForm.value.precioUnitario,
       codigoBarra: this.loteForm.value.codigoBarra,
-      product: this.selectedProduct
+      product: {
+        idProducto: this.selectedProduct.idProducto,
+        nombreComercial: this.selectedProduct.nombreComercial,
+        nombreFabricante: this.selectedProduct.nombreFabricante,
+        urlFoto: this.selectedProduct.urlFoto
+      }
     };
 
     this.batches.push(lote);
     this.lotesService.setLotes(this.batches);
 
-    // RESET
+    // Reset form y búsqueda
     this.loteForm.reset();
     this.productoSearch = '';
     this.selectedProduct = null;
   }
 
   // ===============================
-  // ELIMINAR LOTE
+  //       ELIMINAR LOTE
   // ===============================
   eliminarLote(index: number) {
     this.batches.splice(index, 1);
@@ -132,7 +148,7 @@ export class EscaneoProductosComponent {
   }
 
   // ===============================
-  // FINALIZAR
+  //          FINALIZAR
   // ===============================
   finalize() {
     this.lotesService.setLotes(this.batches);
